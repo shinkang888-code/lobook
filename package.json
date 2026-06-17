@@ -27,7 +27,9 @@
     "setup:hnc-skin": "node scripts/setup-hnc-skin.js",
     "verify:hnc-skin": "tsx scripts/verify-hnc-skin.ts",
     "setup:m365-word-docs": "node scripts/setup-m365-word-docs.js",
-    "verify:m365-word": "tsx scripts/verify-m365-word.ts"
+    "verify:m365-word": "tsx scripts/verify-m365-word.ts",
+    "setup:architecture-center": "node scripts/setup-architecture-center.js",
+    "verify:architecture": "tsx scripts/verify-architecture.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

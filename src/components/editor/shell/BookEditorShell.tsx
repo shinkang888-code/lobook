@@ -24,6 +24,7 @@ import { EditorToolbarProvider, useEditorToolbar } from "@/components/editor/she
 import { PolarisRibbon } from "@/components/editor/shell/PolarisRibbon";
 import { StatusBar } from "@/components/editor/shell/StatusBar";
 import { WordEditorPanel, type WordEditorPanelHandle } from "@/components/editor/word/WordEditorPanel";
+import { ArchitectureHub } from "@/components/editor/architecture/ArchitectureHub";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAddChapter, useBookStructure, useSaveBookStructure } from "@/hooks/useBookStructure";
 import { useQueryClient } from "@tanstack/react-query";
@@ -325,6 +326,8 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
         );
       case "cowork":
         return <AionCoworkHub bookId={book.id} bookTitle={title} />;
+      case "architecture":
+        return <ArchitectureHub bookId={book.id} bookTitle={title} />;
       case "hwp":
         return (
           <HwpEditorPanel
@@ -427,7 +430,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
         </aside>
 
         <main className="flex min-w-0 flex-1 flex-col">
-          {activeMode === "word" ? (
+          {activeMode === "word" || activeMode === "architecture" ? (
             <div className="min-h-0 flex-1">{renderEditor()}</div>
           ) : (
             <>
@@ -447,7 +450,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
         </main>
 
         <aside
-          className={`hidden shrink-0 border-l border-gray-300 lg:block ${activeMode === "word" ? "lg:hidden" : ""}`}
+          className={`hidden shrink-0 border-l border-gray-300 lg:block ${activeMode === "word" || activeMode === "architecture" ? "lg:hidden" : ""}`}
           style={{ width: "var(--editor-right-width, 300px)" }}
         >
           <PageSpecPanel

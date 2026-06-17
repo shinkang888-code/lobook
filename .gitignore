@@ -30,4 +30,6 @@ vendor/hnc-office-addin-ctrl/
 .hnc-skin-install.json
 .m365-word-docs-install.json
 vendor/microsoft-365-docs/
+.architecture-center-install.json
+vendor/architecture-center/
 .data/ppt-workspace/
