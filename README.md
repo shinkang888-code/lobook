@@ -60,9 +60,21 @@ npx shadcn@latest add [component]
 
 ## Vercel 배포
 
-1. GitHub `shinkang888-code/book` 연결
-2. Environment Variables에 Supabase 3개 키 등록
-3. Deploy
+프로덕션: **https://book-mu-ochre.vercel.app**
+
+1. GitHub `shinkang888-code/book` 연결됨
+2. Environment Variables (Production):
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. Supabase 프로젝트: `book` (`nmciigwlqaknlyoxitjz`)
+
+## Figma 디자인 시스템
+
+- **Figma 파일:** https://www.figma.com/design/3FVgUkf0MGa6QVQoRxnUE3/Book-Studio-Design-System
+- **Code Connect 템플릿:** `src/**/*.figma.tsx`
+- **게시 (Dev seat 필요):** `figma connect publish --token=$FIGMA_ACCESS_TOKEN`
+
+> 현재 Figma 계정은 View seat(Starter)라 MCP Code Connect 게시는 Dev seat 업그레이드 후 가능합니다.
 
 ## 관련 리포
 
