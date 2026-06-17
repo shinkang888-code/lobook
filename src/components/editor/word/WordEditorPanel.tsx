@@ -24,6 +24,20 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
 ) {
   const toolbar = useEditorToolbarOptional();
 
+  const WORD_TOOLBAR_KEYS = [
+  "bold",
+  "italic",
+  "underline",
+  "alignLeft",
+  "alignCenter",
+  "alignRight",
+  "undo",
+  "redo",
+  "copy",
+  "cut",
+  "paste",
+] as const;
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -76,7 +90,7 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
       },
     });
 
-    return () => toolbar.reset();
+    return () => toolbar.unregister([...WORD_TOOLBAR_KEYS]);
   }, [editor, toolbar]);
 
   if (!editor) {

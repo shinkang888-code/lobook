@@ -6,6 +6,7 @@ import type { EditorToolbarActions } from "@/lib/editor/types";
 type EditorToolbarContextValue = {
   actions: EditorToolbarActions;
   register: (actions: EditorToolbarActions) => void;
+  unregister: (keys: (keyof EditorToolbarActions)[]) => void;
   reset: () => void;
 };
 
@@ -15,12 +16,23 @@ export function EditorToolbarProvider({ children }: { children: React.ReactNode 
   const [actions, setActions] = useState<EditorToolbarActions>({});
 
   const register = useCallback((next: EditorToolbarActions) => {
-    setActions(next);
+    setActions((prev) => ({ ...prev, ...next }));
+  }, []);
+
+  const unregister = useCallback((keys: (keyof EditorToolbarActions)[]) => {
+    setActions((prev) => {
+      const copy = { ...prev };
+      for (const key of keys) delete copy[key];
+      return copy;
+    });
   }, []);
 
   const reset = useCallback(() => setActions({}), []);
 
-  const value = useMemo(() => ({ actions, register, reset }), [actions, register, reset]);
+  const value = useMemo(
+    () => ({ actions, register, unregister, reset }),
+    [actions, register, unregister, reset],
+  );
 
   return <EditorToolbarContext.Provider value={value}>{children}</EditorToolbarContext.Provider>;
 }

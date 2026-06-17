@@ -1,3 +1,5 @@
+import path from "path";
+
 let initPromise: Promise<void> | null = null;
 
 export function registerRhwpTextMeasure(): void {
@@ -15,6 +17,24 @@ export function registerRhwpTextMeasure(): void {
     }
     return ctx.measureText(text).width;
   };
+}
+
+export async function initRhwpServer(): Promise<typeof import("@rhwp/core")> {
+  if (typeof window !== "undefined") {
+    return initRhwp();
+  }
+
+  const wasmPath = path.join(process.cwd(), "public", "rhwp_bg.wasm");
+  (
+    globalThis as typeof globalThis & { measureTextWidth?: (font: string, text: string) => number }
+  ).measureTextWidth = (font: string, text: string) => {
+    void font;
+    return text.length * 8;
+  };
+
+  const rhwp = await import("@rhwp/core");
+  await rhwp.default({ module_or_path: wasmPath });
+  return rhwp;
 }
 
 export async function initRhwp(): Promise<typeof import("@rhwp/core")> {

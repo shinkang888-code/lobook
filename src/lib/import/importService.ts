@@ -1,10 +1,9 @@
 import { getBookStructure, saveBookStructure } from "@/lib/chapterService";
-import { importDocx } from "@/lib/import/docx";
+import { resolveImportFormat, type ImportMode } from "@/lib/engines/registry";
 import { importEpub } from "@/lib/import/epubImporter";
-import { saveImportFile } from "@/lib/import/storage";
 import type { SaveStructureInput } from "@/lib/types";
 
-export type ImportMode = "replace" | "append";
+export type { ImportMode } from "@/lib/engines/registry";
 
 export async function importDocxToBook(
   bookId: string,
@@ -12,16 +11,10 @@ export async function importDocxToBook(
   fileName: string,
   mode: ImportMode = "replace",
 ) {
-  await saveImportFile(new File([buffer], fileName), bookId, "docx");
-  const { html, markdown } = await importDocx(buffer);
-  return applyImport(bookId, mode, [
-    {
-      title: fileName.replace(/\.docx$/i, "") || "Word 원고",
-      content_md: markdown,
-      content_html: html,
-      primary_source: "word" as const,
-    },
-  ]);
+  const engine = resolveImportFormat("docx");
+  const result = await engine.importToChapters(buffer, { bookId, fileName, mode });
+  if (!result.chapters?.length) throw new Error("DOCX에서 내용을 추출하지 못했습니다.");
+  return applyImport(bookId, mode, result.chapters);
 }
 
 export async function importEpubToBook(
@@ -30,17 +23,12 @@ export async function importEpubToBook(
   fileName: string,
   mode: ImportMode = "replace",
 ) {
-  await saveImportFile(new File([buffer], fileName), bookId, "epub");
-  const epub = await importEpub(buffer);
-  const chapters = epub.chapters.map((ch, i) => ({
-    title: ch.title,
-    content_md: "",
-    content_html: ch.html,
-    primary_source: "html" as const,
-    sort_order: i,
-  }));
+  const engine = resolveImportFormat("epub");
+  const result = await engine.importToChapters(buffer, { bookId, fileName, mode });
+  if (!result.chapters?.length) throw new Error("EPUB에서 챕터를 추출하지 못했습니다.");
 
-  const structure = await applyImport(bookId, mode, chapters);
+  const structure = await applyImport(bookId, mode, result.chapters);
+  const epub = await importEpub(buffer);
   if (epub.title && mode === "replace") {
     await saveBookStructure(bookId, {
       title: epub.title,
@@ -61,9 +49,32 @@ export async function importEpubToBook(
   return getBookStructure(bookId);
 }
 
+export async function importHwpToBook(
+  bookId: string,
+  buffer: ArrayBuffer,
+  fileName: string,
+  mode: ImportMode = "replace",
+  hwpMode: "store" | "convert" = "convert",
+) {
+  const engine = resolveImportFormat("hwp");
+  const result = await engine.importToChapters(buffer, {
+    bookId,
+    fileName,
+    mode,
+    hwpMode,
+  });
+
+  if (hwpMode === "store" || !result.chapters?.length) {
+    return { storagePath: result.storagePath, fileName: result.fileName, imported: 0 };
+  }
+
+  const structure = await applyImport(bookId, mode, result.chapters);
+  return { ...result, structure, imported: result.imported };
+}
+
+/** @deprecated use importHwpToBook */
 export async function storeHwpImport(bookId: string, buffer: ArrayBuffer, fileName: string) {
-  const { storagePath } = await saveImportFile(new File([buffer], fileName), bookId, "hwp");
-  return { storagePath, fileName };
+  return importHwpToBook(bookId, buffer, fileName, "replace", "store");
 }
 
 async function applyImport(

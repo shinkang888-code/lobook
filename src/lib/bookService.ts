@@ -24,6 +24,8 @@ function mapRow(row: Record<string, unknown>): Book {
     content_html: String(row.content_html ?? ""),
     status: (row.status as Book["status"]) ?? "draft",
     page_spec: parsePageSpec(row.page_spec),
+    hwp_import_path: row.hwp_import_path != null ? String(row.hwp_import_path) : null,
+    hwp_import_name: row.hwp_import_name != null ? String(row.hwp_import_name) : null,
     created_at: String(row.created_at),
     updated_at: String(row.updated_at),
   };

@@ -12,6 +12,8 @@ export interface Book {
   content_html: string;
   status: BookStatus;
   page_spec?: PageSpec;
+  hwp_import_path?: string | null;
+  hwp_import_name?: string | null;
   created_at: string;
   updated_at: string;
 }

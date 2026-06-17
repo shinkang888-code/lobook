@@ -1,97 +1,96 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import type { HwpDocument } from "@rhwp/core";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { initRhwp, type RhwpPageInfo } from "@/lib/rhwp/setup";
+import type { PageSpec } from "@/lib/editor/types";
+import { RhwpCanvasViewer } from "./RhwpCanvasViewer";
 
 type HwpEditorPanelProps = {
   bookId: string;
+  pageSpec: PageSpec;
+  zoom: number;
+  activePage: number;
+  onPageCountChange?: (count: number) => void;
 };
 
-export function HwpEditorPanel({ bookId }: HwpEditorPanelProps) {
+export function HwpEditorPanel({
+  bookId,
+  pageSpec,
+  zoom,
+  activePage,
+  onPageCountChange,
+}: HwpEditorPanelProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [loading, setLoading] = useState(false);
+  const [loadingMeta, setLoadingMeta] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [pages, setPages] = useState<RhwpPageInfo[]>([]);
-  const [svgs, setSvgs] = useState<string[]>([]);
+  const [buffer, setBuffer] = useState<ArrayBuffer | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
-  const docRef = useRef<HwpDocument | null>(null);
+
+  const loadFromServer = useCallback(async () => {
+    setLoadingMeta(true);
+    setError(null);
+    try {
+      const metaRes = await fetch(`/api/books/${bookId}/import/hwp/latest`);
+      if (metaRes.status === 404) return;
+      if (!metaRes.ok) throw new Error("HWP 메타데이터 조회 실패");
+      const meta = (await metaRes.json()) as { fileName?: string };
+      const fileRes = await fetch(`/api/books/${bookId}/import/hwp/file`);
+      if (!fileRes.ok) throw new Error("HWP 파일을 불러올 수 없습니다.");
+      const buf = await fileRes.arrayBuffer();
+      setBuffer(buf);
+      setFileName(meta.fileName ?? "document.hwp");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "HWP 로드 실패");
+    } finally {
+      setLoadingMeta(false);
+    }
+  }, [bookId]);
 
   useEffect(() => {
-    return () => {
-      docRef.current?.free();
-      docRef.current = null;
-    };
-  }, []);
+    void loadFromServer();
+  }, [loadFromServer]);
 
   const handleFile = async (file: File) => {
     if (!file.name.match(/\.hwp(x)?$/i)) {
       setError("HWP 또는 HWPX 파일만 지원합니다.");
       return;
     }
-
-    setLoading(true);
     setError(null);
-    setPages([]);
-    setSvgs([]);
-    docRef.current?.free();
-
-    try {
-      const buffer = await file.arrayBuffer();
-      const rhwp = await initRhwp();
-      const doc = new rhwp.HwpDocument(new Uint8Array(buffer));
-      docRef.current = doc;
-
-      const count = doc.pageCount();
-      const infos: RhwpPageInfo[] = [];
-      const svgList: string[] = [];
-
-      for (let i = 0; i < count; i++) {
-        infos.push(JSON.parse(doc.getPageInfo(i)) as RhwpPageInfo);
-        svgList.push(doc.renderPageSvg(i));
-      }
-
-      setPages(infos);
-      setSvgs(svgList);
-      setFileName(file.name);
-
-      const key = `hwp-cache:${bookId}`;
-      sessionStorage.setItem(key, file.name);
-    } catch (e) {
-      setError(
-        e instanceof Error
-          ? e.message
-          : "HWP 렌더링 실패 — @rhwp/core WASM이 로드되지 않았을 수 있습니다.",
-      );
-    } finally {
-      setLoading(false);
-    }
+    const buf = await file.arrayBuffer();
+    setBuffer(buf);
+    setFileName(file.name);
+    onPageCountChange?.(0);
   };
 
-  if (loading) {
+  if (loadingMeta) {
     return (
       <div className="flex h-full items-center justify-center gap-2 text-sm text-gray-500">
         <Loader2 className="size-5 animate-spin" />
-        HWP 렌더링 중…
+        HWP 불러오는 중…
       </div>
     );
   }
 
-  if (svgs.length > 0) {
+  if (buffer && fileName) {
     return (
-      <div className="h-full overflow-auto p-4">
-        <p className="mb-3 text-xs text-gray-500">{fileName} · {svgs.length}페이지</p>
-        <div className="mx-auto flex max-w-lg flex-col gap-6">
-          {svgs.map((svg, i) => (
-            <div
-              key={i}
-              className="overflow-hidden rounded bg-white shadow-sm"
-              dangerouslySetInnerHTML={{ __html: svg }}
-            />
-          ))}
-        </div>
+      <div className="flex h-full min-h-0 flex-col">
+        <RhwpCanvasViewer
+          buffer={buffer}
+          fileName={fileName}
+          pageSpec={pageSpec}
+          zoom={zoom}
+          activePage={activePage}
+          singlePage
+          onPageCountChange={onPageCountChange}
+          onError={setError}
+        />
+        {error && (
+          <p className="shrink-0 px-2 py-1 text-[10px] text-red-600">{error}</p>
+        )}
+        <p className="shrink-0 border-t border-amber-200 bg-amber-50 px-2 py-1 text-[10px] text-amber-800">
+          편집: Ribbon → HWP 가져오기 → 「HTML로 변환하여 편집」 후 Word/HTML 탭 사용
+        </p>
       </div>
     );
   }
@@ -112,16 +111,19 @@ export function HwpEditorPanel({ bookId }: HwpEditorPanelProps) {
         <Upload className="mx-auto mb-4 size-12 text-gray-400" />
         <h3 className="mb-2 text-sm font-semibold text-gray-700">HWP 편집기</h3>
         <p className="mb-4 max-w-sm text-xs text-gray-500">
-          한글(HWP) 원고를 업로드하면 @rhwp/core WASM으로 페이지 미리보기를 제공합니다.
+          Ribbon → HWP 가져오기 또는 아래 버튼으로 파일을 열면 Canvas 뷰어로 표시됩니다.
+          ({pageSpec.preset_id.toUpperCase()} 규격에 맞춰 스케일)
         </p>
         {error && <p className="mb-3 text-xs text-red-500">{error}</p>}
-        <Button type="button" variant="outline" size="sm" onClick={() => inputRef.current?.click()}>
-          HWP 파일 가져오기
-        </Button>
+        <div className="flex flex-wrap justify-center gap-2">
+          <Button type="button" variant="outline" size="sm" onClick={() => inputRef.current?.click()}>
+            HWP 파일 선택
+          </Button>
+          <Button type="button" variant="ghost" size="sm" onClick={() => void loadFromServer()}>
+            서버에서 다시 불러오기
+          </Button>
+        </div>
       </div>
-      {pages.length > 0 && (
-        <p className="text-xs text-gray-400">{pages.length}페이지 로드됨</p>
-      )}
     </div>
   );
 }

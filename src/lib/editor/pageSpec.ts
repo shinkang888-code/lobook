@@ -61,6 +61,19 @@ export function savePageSpec(bookId: string, spec: PageSpec): void {
   localStorage.setItem(`book-page-spec:${bookId}`, JSON.stringify(spec));
 }
 
+export function contentAreaPx(
+  spec: PageSpec,
+  zoom = 1,
+): { width: number; height: number } {
+  const w = spec.orientation === "portrait" ? spec.width_mm : spec.height_mm;
+  const h = spec.orientation === "portrait" ? spec.height_mm : spec.width_mm;
+  const { margins } = spec;
+  return {
+    width: mmToPx(w, zoom) - mmToPx(margins.left + margins.right, zoom),
+    height: mmToPx(h, zoom) - mmToPx(margins.top + margins.bottom, zoom),
+  };
+}
+
 export function applyPreset(presetId: PagePresetId, current: PageSpec): PageSpec {
   if (presetId === "custom") return { ...current, preset_id: "custom" };
   const preset = PAGE_PRESETS[presetId];

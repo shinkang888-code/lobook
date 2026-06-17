@@ -3,6 +3,9 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { Editor } from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
+import "prismjs/themes/prism.css";
+import "@toast-ui/editor-plugin-code-syntax-highlight/dist/toastui-editor-plugin-code-syntax-highlight.css";
+import codeSyntaxHighlight from "@toast-ui/editor-plugin-code-syntax-highlight";
 import { uploadEditorImage } from "@/lib/uploadEditorImage";
 
 export type MarkdownEditorHandle = {
@@ -47,6 +50,8 @@ const MarkdownEditorInner = forwardRef<MarkdownEditorHandle, MarkdownEditorProps
       [bookId, onUploadError],
     );
 
+    const plugins = useMemo(() => [codeSyntaxHighlight], []);
+
     return (
       <Editor
         ref={editorRef}
@@ -58,6 +63,7 @@ const MarkdownEditorInner = forwardRef<MarkdownEditorHandle, MarkdownEditorProps
         usageStatistics={false}
         hideModeSwitch={false}
         hooks={hooks}
+        plugins={plugins}
         onChange={onChange}
       />
     );

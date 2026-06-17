@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { DocxPreviewPanel } from "@/components/editor/modals/DocxPreviewPanel";
 
 export type ImportKind = "docx" | "epub" | "hwp";
 
@@ -21,7 +22,7 @@ type ImportDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   kind: ImportKind;
-  onSuccess: () => void;
+  onSuccess: (opts?: { switchMode?: "word" | "hwp" }) => void;
 };
 
 const KIND_LABELS: Record<ImportKind, { title: string; accept: string; ext: string }> = {
@@ -38,15 +39,38 @@ export function ImportDialog({ bookId, open, onOpenChange, kind, onSuccess }: Im
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"replace" | "append">("replace");
+  const [hwpMode, setHwpMode] = useState<"convert" | "store">("convert");
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [previewBuffer, setPreviewBuffer] = useState<ArrayBuffer | null>(null);
 
   const meta = KIND_LABELS[kind];
+
+  const resetPending = () => {
+    setPendingFile(null);
+    setPreviewBuffer(null);
+  };
+
+  const handleFileSelected = async (file: File) => {
+    if (kind === "docx") {
+      const buf = await file.arrayBuffer();
+      setPendingFile(file);
+      setPreviewBuffer(buf);
+      return;
+    }
+    void handleImport(file);
+  };
 
   const handleImport = async (file: File) => {
     setLoading(true);
     try {
       const form = new FormData();
       form.append("file", file);
-      if (kind !== "hwp") form.append("mode", mode);
+      if (kind !== "hwp") {
+        form.append("mode", mode);
+      } else {
+        form.append("mode", mode);
+        form.append("hwpMode", hwpMode);
+      }
 
       const endpoint =
         kind === "docx"
@@ -60,13 +84,22 @@ export function ImportDialog({ bookId, open, onOpenChange, kind, onSuccess }: Im
       if (!res.ok) throw new Error(data.error ?? "가져오기 실패");
 
       if (kind === "hwp") {
-        toast.success("HWP 파일이 저장되었습니다. HWP 탭에서 미리보기하세요.");
+        if (hwpMode === "store") {
+          toast.success("HWP 파일이 저장되었습니다. HWP 탭에서 Canvas 미리보기하세요.");
+          onSuccess({ switchMode: "hwp" });
+        } else {
+          toast.success(
+            `${data.imported ?? 0}개 페이지를 HTML로 변환했습니다. Word 탭에서 편집하세요.`,
+          );
+          onSuccess({ switchMode: "word" });
+        }
       } else {
         toast.success(
           `${data.imported ?? 1}개 챕터를 가져왔습니다.${data.structure?.chapters?.length ? ` (총 ${data.structure.chapters.length}챕터)` : ""}`,
         );
+        onSuccess(kind === "docx" ? { switchMode: "word" } : undefined);
       }
-      onSuccess();
+      resetPending();
       onOpenChange(false);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "가져오기 실패");
@@ -76,12 +109,18 @@ export function ImportDialog({ bookId, open, onOpenChange, kind, onSuccess }: Im
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) resetPending();
+        onOpenChange(v);
+      }}
+    >
+      <DialogContent className={kind === "docx" && previewBuffer ? "sm:max-w-2xl" : "sm:max-w-md"}>
         <DialogHeader>
           <DialogTitle>{meta.title}</DialogTitle>
           <DialogDescription>
-            {meta.ext} 파일을 선택하세요. 가져온 내용은 챕터로 저장됩니다.
+            {meta.ext} 파일을 선택하세요. DOCX는 microscope-js로 미리보기 후 가져올 수 있습니다.
           </DialogDescription>
         </DialogHeader>
 
@@ -108,29 +147,95 @@ export function ImportDialog({ bookId, open, onOpenChange, kind, onSuccess }: Im
           </div>
         )}
 
-        <div className="rounded-lg border border-dashed p-8 text-center">
-          <input
-            ref={inputRef}
-            type="file"
-            accept={meta.accept}
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) void handleImport(file);
-            }}
-          />
-          <FileUp className="mx-auto mb-2 size-10 text-muted-foreground" />
-          <Label className="text-muted-foreground">{meta.ext} 파일</Label>
-        </div>
+        {kind === "hwp" && (
+          <div className="flex flex-col gap-2 text-sm">
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="hwpMode"
+                checked={hwpMode === "convert"}
+                onChange={() => setHwpMode("convert")}
+              />
+              HTML로 변환하여 편집 (Word 탭)
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="hwpMode"
+                checked={hwpMode === "store"}
+                onChange={() => setHwpMode("store")}
+              />
+              원본만 저장 (HWP Canvas 뷰어)
+            </label>
+            <div className="flex gap-2 pt-1">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="mode"
+                  checked={mode === "replace"}
+                  onChange={() => setMode("replace")}
+                />
+                교체
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="mode"
+                  checked={mode === "append"}
+                  onChange={() => setMode("append")}
+                />
+                추가
+              </label>
+            </div>
+          </div>
+        )}
+
+        {kind === "docx" && previewBuffer && pendingFile && (
+          <div className="space-y-2">
+            <Label className="text-xs text-muted-foreground">microscope-js 미리보기 — {pendingFile.name}</Label>
+            <DocxPreviewPanel buffer={previewBuffer} fileName={pendingFile.name} />
+          </div>
+        )}
+
+        {!previewBuffer && (
+          <div className="rounded-lg border border-dashed p-8 text-center">
+            <input
+              ref={inputRef}
+              type="file"
+              accept={meta.accept}
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) void handleFileSelected(file);
+              }}
+            />
+            <FileUp className="mx-auto mb-2 size-10 text-muted-foreground" />
+            <Label className="text-muted-foreground">{meta.ext} 파일</Label>
+          </div>
+        )}
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              resetPending();
+              onOpenChange(false);
+            }}
+            disabled={loading}
+          >
             취소
           </Button>
-          <Button onClick={() => inputRef.current?.click()} disabled={loading}>
-            {loading ? <Loader2 className="animate-spin" /> : null}
-            파일 선택
-          </Button>
+          {previewBuffer && pendingFile ? (
+            <Button onClick={() => void handleImport(pendingFile)} disabled={loading}>
+              {loading ? <Loader2 className="animate-spin" /> : null}
+              가져오기
+            </Button>
+          ) : (
+            <Button onClick={() => inputRef.current?.click()} disabled={loading}>
+              {loading ? <Loader2 className="animate-spin" /> : null}
+              파일 선택
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

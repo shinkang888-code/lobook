@@ -56,6 +56,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
   const [activeChapterId, setActiveChapterId] = useState<string>("");
   const [chapterDrafts, setChapterDrafts] = useState<Record<string, { md: string; html: string }>>({});
   const [importKind, setImportKind] = useState<ImportKind | null>(null);
+  const [hwpPageCount, setHwpPageCount] = useState(0);
   const queryClient = useQueryClient();
 
   const chapters = structure?.chapters ?? [];
@@ -94,7 +95,8 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
 
   const pages = useMemo(() => splitMarkdownToPages(currentMd), [currentMd]);
   const toc = useMemo(() => buildTocFromMarkdown(currentMd), [currentMd]);
-  const pageTotal = pages.length;
+  const pageTotal =
+    activeMode === "hwp" && hwpPageCount > 0 ? hwpPageCount : Math.max(1, pages.length);
 
   useEffect(() => {
     savePageSpec(book.id, pageSpec);
@@ -235,9 +237,10 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
     }
   };
 
-  const handleImportSuccess = () => {
+  const handleImportSuccess = (opts?: { switchMode?: "word" | "hwp" }) => {
     setChapterDrafts({});
     setDirty(false);
+    if (opts?.switchMode) setActiveMode(opts.switchMode);
     void queryClient.invalidateQueries({ queryKey: ["books", book.id, "structure"] });
   };
 
@@ -282,6 +285,8 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
             key={`html-${activeChapter.id}`}
             ref={htmlRef}
             initialHtml={currentHtml}
+            pageSpec={pageSpec}
+            zoom={zoom}
             onChange={() => updateDraft("html", htmlRef.current?.getHtml() ?? "")}
           />
         );
@@ -295,7 +300,15 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
           />
         );
       case "hwp":
-        return <HwpEditorPanel bookId={book.id} />;
+        return (
+          <HwpEditorPanel
+            bookId={book.id}
+            pageSpec={pageSpec}
+            zoom={zoom}
+            activePage={activePage}
+            onPageCountChange={setHwpPageCount}
+          />
+        );
       default:
         return null;
     }
