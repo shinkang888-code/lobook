@@ -345,7 +345,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#f3f3f3]">
+    <div className="hancom-editor-shell fixed inset-0 z-50 flex flex-col hancom-workspace-bg">
       <AiCommandBar
         bookId={book.id}
         bookTitle={title}

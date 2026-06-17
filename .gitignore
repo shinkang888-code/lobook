@@ -24,6 +24,8 @@ vendor/hwpx-contents-extract/
 .ppt-master-install.json
 vendor/hwpx-contents-extract/
 vendor/hancom-toolkit/
+vendor/hnc-office-addin-ctrl/
 .hwpx-extract-install.json
 .hancom-toolkit-install.json
+.hnc-skin-install.json
 .data/ppt-workspace/

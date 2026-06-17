@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { HncCommandBtn, HncIconOnlyBtn, HncRibbonGroup, HncRibbonIconBtn } from "@/components/hancom/HncControls";
 import type { RibbonTab } from "@/lib/editor/types";
 import { useEditorToolbarOptional } from "./EditorToolbarContext";
 
@@ -89,214 +90,142 @@ export function PolarisRibbon({
   ];
 
   return (
-    <div className="shrink-0 select-none">
-      {/* Title bar — Polaris navy */}
-      <div className="flex h-9 items-center bg-[#2b579a] px-3 text-xs text-white">
-        <span className="mr-2 font-semibold tracking-wide">Book Studio</span>
-        <span className="mx-2 opacity-40">|</span>
-        <span className="flex-1 truncate opacity-90">{bookTitle || "제목 없음"}</span>
-        <span className="hidden items-center gap-2 sm:flex">
+    <div className="hancom-editor-shell shrink-0 select-none">
+      <div className="hancom-titlebar">
+        <span className="hancom-titlebar-brand">한글 Book Studio</span>
+        <span className="mx-1 opacity-40">|</span>
+        <span className="hancom-titlebar-doc">{bookTitle || "제목 없음"}</span>
+        <div className="hancom-titlebar-status">
           <span
-            className={`inline-block size-2 rounded-full ${dirty ? "bg-amber-300" : "bg-emerald-300"}`}
+            className={`hancom-titlebar-dot ${dirty ? "hancom-titlebar-dot--dirty" : "hancom-titlebar-dot--saved"}`}
           />
-          <span className="opacity-80">{saving ? "저장 중…" : dirty ? "변경됨" : "저장됨"}</span>
-        </span>
+          <span>{saving ? "저장 중…" : dirty ? "변경됨" : "저장됨"}</span>
+        </div>
       </div>
 
-      {/* Menu tabs */}
-      <div className="border-b border-[#1e3f6f] bg-[#2b579a]">
-        <div className="scrollbar-thin flex h-8 items-center gap-0.5 overflow-x-auto px-1">
-          <button
-            type="button"
+      <div className="hancom-ribbon-tabs">
+        <div className="hancom-ribbon-tabs-inner">
+          <HncIconOnlyBtn
+            icon={ChevronLeft}
+            label="목록으로"
             onClick={() => router.push("/")}
-            className="shrink-0 rounded p-1.5 text-white/80 hover:bg-white/10"
-            title="목록으로"
-          >
-            <ChevronLeft className="size-4" />
-          </button>
+            className="!border-transparent !bg-transparent hover:!bg-white/10"
+          />
           {tabs.map(({ id, label }) => (
             <button
               key={id}
               type="button"
               onClick={() => setTab(id)}
-              className={`shrink-0 rounded-t px-4 py-1 text-xs font-medium transition-colors ${
-                tab === id ? "bg-[#f3f3f3] text-[#2b579a]" : "text-white/90 hover:bg-white/10"
-              }`}
+              className={`hancom-ribbon-tab-btn ${tab === id ? "hancom-ribbon-tab-btn--active" : ""}`}
             >
               {label}
             </button>
           ))}
-          <div className="min-w-2 flex-1" />
-          {onSave && (
-            <button
-              type="button"
-              onClick={onSave}
-              disabled={saving}
-              className="flex shrink-0 items-center gap-1 rounded bg-white/20 px-3 py-1 text-xs text-white hover:bg-white/30 disabled:opacity-50"
-            >
-              <Save className="size-3.5" />
-              {saving ? "저장 중" : "저장"}
-            </button>
-          )}
-          {onPreview && (
-            <button
-              type="button"
-              onClick={onPreview}
-              className="flex shrink-0 items-center gap-1 rounded bg-white/20 px-3 py-1 text-xs text-white hover:bg-white/30"
-            >
-              <Eye className="size-3.5" />
-              미리보기
-            </button>
-          )}
-          {onExportEpub && (
-            <button
-              type="button"
-              onClick={onExportEpub}
-              className="flex shrink-0 items-center gap-1 rounded bg-white/20 px-3 py-1 text-xs text-white hover:bg-white/30"
-            >
-              <Download className="size-3.5" />
-              EPUB
-            </button>
-          )}
+          <div className="hancom-ribbon-quickactions">
+            {onSave && (
+              <HncCommandBtn icon={Save} label={saving ? "저장 중" : "저장"} onClick={onSave} disabled={saving} />
+            )}
+            {onPreview && <HncCommandBtn icon={Eye} label="미리보기" onClick={onPreview} />}
+            {onExportEpub && <HncCommandBtn icon={Download} label="EPUB" onClick={onExportEpub} />}
+          </div>
         </div>
       </div>
 
-      {/* Ribbon panel */}
-      <div className="ribbon-panel min-h-[76px] overflow-x-auto border-b border-gray-300 bg-[#f3f3f3] px-2 py-1.5">
+      <div className="hancom-ribbon-panel">
         {tab === "file" && (
-          <div className="flex min-w-max gap-4 text-xs">
-            <RibbonGroup label="파일">
-              <RibbonBtn icon={FileText} label="목록" onClick={() => router.push("/")} />
-              {onSave && <RibbonBtn icon={Save} label="저장" onClick={onSave} />}
-              {onSnapshot && <RibbonBtn icon={FileStack} label="버전 저장" onClick={onSnapshot} />}
-              <RibbonBtn icon={Printer} label="인쇄" onClick={() => window.print()} />
-            </RibbonGroup>
-            <RibbonGroup label="가져오기">
-              <RibbonBtn icon={FileText} label="Word" onClick={onImportDocx} />
-              <RibbonBtn icon={FileStack} label="EPUB" onClick={onImportEpub} />
-              <RibbonBtn icon={FileText} label="HWP" onClick={onImportHwp} />
-              <RibbonBtn icon={FileStack} label="PDF" onClick={onImportPdf} />
-            </RibbonGroup>
-            <RibbonGroup label="변환">
-              <RibbonBtn icon={FileCode2} label="마크다운" onClick={onConvertMarkdown} />
-            </RibbonGroup>
-            <RibbonGroup label="내보내기">
-              {onExportEpub && <RibbonBtn icon={Download} label="EPUB" onClick={onExportEpub} />}
-              {onExportDocx && <RibbonBtn icon={Download} label="Word" onClick={onExportDocx} />}
-              {onExportPdf && <RibbonBtn icon={Printer} label="PDF" onClick={onExportPdf} />}
-            </RibbonGroup>
+          <div className="hancom-ribbon-row">
+            <HncRibbonGroup label="파일">
+              <HncRibbonIconBtn icon={FileText} label="목록" large onClick={() => router.push("/")} />
+              {onSave && <HncRibbonIconBtn icon={Save} label="저장" large onClick={onSave} />}
+              {onSnapshot && <HncRibbonIconBtn icon={FileStack} label="버전" large onClick={onSnapshot} />}
+              <HncRibbonIconBtn icon={Printer} label="인쇄" large onClick={() => window.print()} />
+            </HncRibbonGroup>
+            <HncRibbonGroup label="가져오기">
+              <HncRibbonIconBtn icon={FileText} label="Word" large onClick={onImportDocx} />
+              <HncRibbonIconBtn icon={FileStack} label="EPUB" large onClick={onImportEpub} />
+              <HncRibbonIconBtn icon={FileText} label="HWP" large onClick={onImportHwp} />
+              <HncRibbonIconBtn icon={FileStack} label="PDF" large onClick={onImportPdf} />
+            </HncRibbonGroup>
+            <HncRibbonGroup label="변환">
+              <HncRibbonIconBtn icon={FileCode2} label="마크다운" large onClick={onConvertMarkdown} />
+            </HncRibbonGroup>
+            <HncRibbonGroup label="보내기">
+              {onExportEpub && <HncRibbonIconBtn icon={Download} label="EPUB" large onClick={onExportEpub} />}
+              {onExportDocx && <HncRibbonIconBtn icon={Download} label="Word" large onClick={onExportDocx} />}
+              {onExportPdf && <HncRibbonIconBtn icon={Printer} label="PDF" large onClick={onExportPdf} />}
+            </HncRibbonGroup>
           </div>
         )}
         {tab === "edit" && (
-          <div className="flex min-w-max gap-4 text-xs">
-            <RibbonGroup label="클립보드">
-              <RibbonBtn icon={Copy} label="복사" onClick={actions.copy} />
-              <RibbonBtn icon={Scissors} label="잘라내기" onClick={actions.cut} />
-              <RibbonBtn icon={ClipboardPaste} label="붙여넣기" onClick={actions.paste} />
-            </RibbonGroup>
-            <RibbonGroup label="편집">
-              <RibbonBtn icon={Undo2} label="실행 취소" onClick={actions.undo} />
-              <RibbonBtn icon={Redo2} label="다시 실행" onClick={actions.redo} />
-            </RibbonGroup>
+          <div className="hancom-ribbon-row">
+            <HncRibbonGroup label="클립보드">
+              <HncRibbonIconBtn icon={Copy} label="복사" large onClick={actions.copy} />
+              <HncRibbonIconBtn icon={Scissors} label="잘라내기" large onClick={actions.cut} />
+              <HncRibbonIconBtn icon={ClipboardPaste} label="붙여넣기" large onClick={actions.paste} />
+            </HncRibbonGroup>
+            <HncRibbonGroup label="편집">
+              <HncRibbonIconBtn icon={Undo2} label="실행 취소" large onClick={actions.undo} />
+              <HncRibbonIconBtn icon={Redo2} label="다시 실행" large onClick={actions.redo} />
+            </HncRibbonGroup>
           </div>
         )}
         {tab === "view" && (
-          <div className="flex min-w-max gap-4 text-xs">
-            <RibbonGroup label="확대/축소">
-              <RibbonBtn icon={ZoomOut} label="축소" onClick={actions.zoomOut} />
-              <RibbonBtn icon={ZoomIn} label="확대" onClick={actions.zoomIn} />
-              <RibbonBtn icon={Maximize2} label="폭 맞춤" onClick={actions.zoomFit} />
-              <RibbonBtn icon={LayoutGrid} label="100%" onClick={actions.zoomReset} />
-            </RibbonGroup>
-            <RibbonGroup label="페이지">
-              <RibbonBtn icon={ChevronLeft} label="이전" onClick={actions.prevPage} />
-              <RibbonBtn icon={ChevronRight} label="다음" onClick={actions.nextPage} />
-              <RibbonBtn
+          <div className="hancom-ribbon-row">
+            <HncRibbonGroup label="확대/축소">
+              <HncRibbonIconBtn icon={ZoomOut} label="축소" large onClick={actions.zoomOut} />
+              <HncRibbonIconBtn icon={ZoomIn} label="확대" large onClick={actions.zoomIn} />
+              <HncRibbonIconBtn icon={Maximize2} label="폭 맞춤" large onClick={actions.zoomFit} />
+              <HncRibbonIconBtn icon={LayoutGrid} label="100%" large onClick={actions.zoomReset} />
+            </HncRibbonGroup>
+            <HncRibbonGroup label="페이지">
+              <HncRibbonIconBtn icon={ChevronLeft} label="이전" large onClick={actions.prevPage} />
+              <HncRibbonIconBtn icon={ChevronRight} label="다음" large onClick={actions.nextPage} />
+              <HncRibbonIconBtn
                 icon={FileStack}
                 label="썸네일"
-                onClick={onToggleThumbnails}
+                large
                 active={showThumbnails}
+                onClick={onToggleThumbnails}
               />
-            </RibbonGroup>
+            </HncRibbonGroup>
           </div>
         )}
         {tab === "insert" && (
-          <div className="flex min-w-max gap-4 text-xs">
-            <RibbonGroup label="삽입">
-              <RibbonBtn icon={ImageIcon} label="그림" />
-              <RibbonBtn icon={Table} label="표" />
-              <RibbonBtn icon={Link2} label="하이퍼링크" />
-              <RibbonBtn icon={Minus} label="구분선" />
-            </RibbonGroup>
+          <div className="hancom-ribbon-row">
+            <HncRibbonGroup label="삽입">
+              <HncRibbonIconBtn icon={ImageIcon} label="그림" large disabled />
+              <HncRibbonIconBtn icon={Table} label="표" large disabled />
+              <HncRibbonIconBtn icon={Link2} label="링크" large disabled />
+              <HncRibbonIconBtn icon={Minus} label="구분선" large disabled />
+            </HncRibbonGroup>
           </div>
         )}
         {tab === "format" && (
-          <div className="flex min-w-max gap-4 text-xs">
-            <RibbonGroup label="글꼴">
-              <RibbonBtn icon={Bold} label="굵게" onClick={actions.bold} />
-              <RibbonBtn icon={Italic} label="기울임" onClick={actions.italic} />
-              <RibbonBtn icon={Underline} label="밑줄" onClick={actions.underline} />
-            </RibbonGroup>
-            <RibbonGroup label="단락">
-              <RibbonBtn icon={AlignLeft} label="왼쪽" onClick={actions.alignLeft} />
-              <RibbonBtn icon={AlignCenter} label="가운데" onClick={actions.alignCenter} />
-              <RibbonBtn icon={AlignRight} label="오른쪽" onClick={actions.alignRight} />
-            </RibbonGroup>
+          <div className="hancom-ribbon-row">
+            <HncRibbonGroup label="글꼴">
+              <HncRibbonIconBtn icon={Bold} label="굵게" large onClick={actions.bold} />
+              <HncRibbonIconBtn icon={Italic} label="기울임" large onClick={actions.italic} />
+              <HncRibbonIconBtn icon={Underline} label="밑줄" large onClick={actions.underline} />
+            </HncRibbonGroup>
+            <HncRibbonGroup label="단락">
+              <HncRibbonIconBtn icon={AlignLeft} label="왼쪽" large onClick={actions.alignLeft} />
+              <HncRibbonIconBtn icon={AlignCenter} label="가운데" large onClick={actions.alignCenter} />
+              <HncRibbonIconBtn icon={AlignRight} label="오른쪽" large onClick={actions.alignRight} />
+            </HncRibbonGroup>
           </div>
         )}
         {tab === "page" && (
-          <div className="flex min-w-max gap-4 text-xs">
-            <RibbonGroup label="용지">
-              <RibbonBtn icon={Ruler} label="페이지 설정" />
-              <RibbonBtn icon={RotateCw} label="방향" />
-            </RibbonGroup>
-            <p className="self-center text-[10px] text-gray-500">
+          <div className="hancom-ribbon-row items-center">
+            <HncRibbonGroup label="용지">
+              <HncRibbonIconBtn icon={Ruler} label="페이지 설정" large disabled />
+              <HncRibbonIconBtn icon={RotateCw} label="방향" large disabled />
+            </HncRibbonGroup>
+            <p className="self-center px-2 text-[10px] text-[var(--hnc-control-text-color-disabled)]">
               우측 패널에서 페이지 규격(B5/A4 등)과 여백을 설정하세요.
             </p>
           </div>
         )}
       </div>
     </div>
-  );
-}
-
-function RibbonGroup({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex shrink-0 flex-col border-r border-gray-300 pr-3 last:border-0">
-      <div className="mb-0.5 flex gap-0.5">{children}</div>
-      <span className="text-center text-[10px] leading-none text-gray-500">{label}</span>
-    </div>
-  );
-}
-
-function RibbonBtn({
-  icon: Icon,
-  label,
-  onClick,
-  disabled,
-  active,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  onClick?: () => void;
-  disabled?: boolean;
-  active?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled || !onClick}
-      className={`flex min-w-[48px] flex-col items-center gap-0.5 rounded px-2 py-1 transition-colors ${
-        active
-          ? "bg-[#2b579a]/15 text-[#2b579a]"
-          : disabled || !onClick
-            ? "cursor-default opacity-40"
-            : "text-gray-700 hover:bg-gray-200"
-      }`}
-    >
-      <Icon className="size-5" />
-      <span className="whitespace-nowrap text-[10px] leading-none">{label}</span>
-    </button>
   );
 }

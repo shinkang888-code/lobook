@@ -1,0 +1,316 @@
+/**
+ * Book Studio × Hancom Office 2020 skin bridge
+ * @see https://github.com/shinkang888-code/hnc-office-addin-ctrl
+ */
+
+.hnc-lucide-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}
+
+.hnc-lucide-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+}
+
+.hnc-lucide-icon-lg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+}
+
+.hnc-lucide-icon-lg svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+}
+
+.hancom-editor-shell {
+  font-family: var(--hnc-control-font-family);
+  font-size: var(--hnc-control-font-size);
+  color: var(--hnc-control-text-color);
+  background: var(--hnc-control-background-color);
+}
+
+.hancom-titlebar {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 10px;
+  background: linear-gradient(180deg, #3d5fa8 0%, var(--hnc-control-text-color-accent3) 100%);
+  color: #fff;
+  font-size: 12px;
+  border-bottom: 1px solid #2a4578;
+}
+
+.hancom-titlebar-brand {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-right: 8px;
+}
+
+.hancom-titlebar-doc {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.95;
+}
+
+.hancom-titlebar-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.hancom-titlebar-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.hancom-titlebar-dot--dirty {
+  background: #f5c542;
+}
+
+.hancom-titlebar-dot--saved {
+  background: #6dd47e;
+}
+
+.hancom-ribbon-tabs {
+  background: linear-gradient(180deg, #4a6bb5 0%, #3d5fa8 100%);
+  border-bottom: 1px solid #2a4578;
+  padding: 0 4px;
+}
+
+.hancom-ribbon-tabs-inner {
+  display: flex;
+  align-items: flex-end;
+  min-height: 32px;
+}
+
+.hancom-ribbon-tab-btn {
+  display: inline-block;
+  margin: 0;
+  padding: 6px 14px 7px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.92);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-family: var(--hnc-control-font-family);
+  white-space: nowrap;
+}
+
+.hancom-ribbon-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.hancom-ribbon-tab-btn--active {
+  color: var(--hnc-control-text-color-accent3);
+  font-weight: 700;
+  background: var(--hnc-control-background-color);
+  border-bottom-color: var(--hnc-control-border-color-accent1);
+  border-radius: 3px 3px 0 0;
+}
+
+.hancom-ribbon-quickactions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding: 2px 4px;
+}
+
+.hancom-ribbon-quickactions .hnc-command-button {
+  min-width: auto;
+  padding: 2px 10px;
+  font-size: 11px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.hancom-ribbon-quickactions .hnc-command-button .hnc-caption {
+  color: #fff;
+}
+
+.hancom-ribbon-quickactions .hnc-command-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.hancom-ribbon-tabs .hnc-icon-only-button {
+  border-color: transparent;
+  background: transparent;
+  margin: 4px 2px;
+}
+
+.hancom-ribbon-tabs .hnc-icon-only-button .hnc-lucide-icon svg {
+  stroke: #fff;
+}
+
+.hancom-ribbon-tabs .hnc-icon-only-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+
+.hancom-ribbon-panel {
+  min-height: 88px;
+  overflow-x: auto;
+  background: var(--hnc-control-background-color);
+  border-bottom: 1px solid var(--hnc-control-border-color);
+  padding: 8px 10px;
+}
+
+.hancom-ribbon-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.hancom-ribbon-group {
+  flex-shrink: 0;
+  padding-right: 8px;
+  margin-right: 4px;
+  border-right: 1px solid var(--hnc-control-background-accent2);
+}
+
+.hancom-ribbon-group:last-child {
+  border-right: none;
+}
+
+.hancom-ribbon-group .hnc-groupbox > .hnc-caption:first-child {
+  font-size: 10px;
+  margin-bottom: 4px;
+}
+
+.hancom-ribbon-group .hnc-control-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  align-items: flex-start;
+}
+
+.hnc-ribbon-icon-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 52px;
+  max-width: 72px;
+  padding: 4px 6px !important;
+  text-align: center;
+  cursor: pointer;
+}
+
+.hnc-ribbon-icon-btn .hnc-caption {
+  display: block;
+  margin-top: 2px;
+  margin-left: 0 !important;
+  font-size: 10px;
+  line-height: 1.2;
+  white-space: nowrap;
+  max-width: 68px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hnc-ribbon-icon-btn--active {
+  background-color: var(--hnc-control-background-color-hover) !important;
+  border-color: var(--hnc-control-border-color-accent1) !important;
+}
+
+.hnc-ribbon-icon-btn:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.hancom-editor-tabs {
+  background: #eceef3;
+  border-bottom: 1px solid var(--hnc-control-border-color);
+  padding: 0 8px;
+}
+
+.hancom-editor-tabs-inner {
+  display: flex;
+  align-items: flex-end;
+}
+
+.hancom-editor-tab-btn {
+  display: inline-block;
+  margin: 0;
+  padding: 8px 16px 9px;
+  font-size: 12px;
+  font-family: var(--hnc-control-font-family);
+  color: var(--hnc-control-text-color);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.hancom-editor-tab-btn:hover {
+  background: var(--hnc-control-background-color-hover);
+  color: var(--hnc-control-text-color-hover);
+}
+
+.hancom-editor-tab-btn--active {
+  color: var(--hnc-control-text-color-accent3);
+  font-weight: 700;
+  border-bottom-color: var(--hnc-control-border-color-accent1);
+  background: var(--hnc-control-background-color);
+}
+
+.hancom-statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 24px;
+  padding: 0 10px;
+  font-size: 11px;
+  color: #fff;
+  background: linear-gradient(180deg, #3d5fa8 0%, var(--hnc-control-text-color-accent3) 100%);
+  border-top: 1px solid #2a4578;
+}
+
+.hancom-statusbar span {
+  opacity: 0.92;
+}
+
+.hancom-workspace-bg {
+  background: #e8eaef;
+}
+
+.hancom-ai-bar {
+  border-bottom: 1px solid var(--hnc-control-border-color);
+  background: linear-gradient(180deg, #fafbfd 0%, #f0f3fa 100%);
+}
+
+.hancom-ai-bar input,
+.hancom-ai-bar select {
+  font-family: var(--hnc-control-font-family);
+  font-size: 12px;
+  border-color: var(--hnc-control-border-color);
+  border-radius: var(--hnc-control-border-radius);
+}
+
+.hancom-ai-bar input:focus,
+.hancom-ai-bar select:focus {
+  border-color: var(--hnc-control-border-color-hover);
+  outline: none;
+}

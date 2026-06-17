@@ -93,16 +93,18 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
   const aiOn = status?.ai.enabled;
 
   return (
-    <div className="shrink-0 border-b border-[#1e3f6f]/20 bg-gradient-to-r from-[#1a3560] via-[#2b579a] to-[#3d6db5] px-4 py-3 text-white shadow-md">
+    <div className="hancom-ai-bar shrink-0 px-4 py-3 shadow-sm">
       <div className="mx-auto flex max-w-[1600px] flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-white/15 backdrop-blur">
-              <Sparkles className="size-4 text-amber-200" />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-[var(--hnc-control-background-color-hover)]">
+              <Sparkles className="size-4 text-[var(--hnc-control-text-color-accent1)]" />
             </div>
             <div>
-              <p className="text-sm font-semibold tracking-tight">AI 프레젠테이션 스튜디오</p>
-              <p className="text-[11px] text-white/70">
+              <p className="text-sm font-semibold tracking-tight text-[var(--hnc-control-text-color-accent3)]">
+                AI 프레젠테이션 스튜디오
+              </p>
+              <p className="text-[11px] text-slate-500">
                 PPT Master · {bookTitle || "제목 없음"}
                 {aiOn ? ` · ${status?.ai.model}` : " · 로컬 플래너"}
               </p>
@@ -110,11 +112,11 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
           </div>
           <div className="flex items-center gap-2 text-[11px]">
             {engineOk ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-emerald-100">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-800">
                 <CheckCircle2 className="size-3" /> PPT 엔진 준비
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-amber-100">
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-amber-900">
                 <AlertCircle className="size-3" /> setup:ppt-master 필요
               </span>
             )}
@@ -123,7 +125,7 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
                 type="button"
                 size="sm"
                 variant="secondary"
-                className="h-7 gap-1 bg-white/15 text-white hover:bg-white/25"
+                className="h-7 gap-1"
                 onClick={handleDownload}
               >
                 <Download className="size-3.5" />
@@ -135,13 +137,13 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
 
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end">
           <div className="relative flex-1">
-            <Wand2 className="pointer-events-none absolute left-3 top-3 size-4 text-white/40" />
+            <Wand2 className="pointer-events-none absolute left-3 top-3 size-4 text-slate-400" />
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="예: 이 책 내용으로 투자자 발표용 8장 슬라이드를 만들어줘. 핵심 메시지와 bullet 위주로."
               rows={2}
-              className="w-full resize-none rounded-xl border border-white/20 bg-white/10 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/45 backdrop-blur focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
+              className="w-full resize-none rounded-xl border border-[var(--hnc-control-border-color)] bg-white py-2.5 pl-10 pr-4 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[var(--hnc-control-border-color-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--hnc-control-border-color-hover)]/30"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                   e.preventDefault();
@@ -152,14 +154,16 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex overflow-hidden rounded-lg border border-white/20 bg-white/10">
+            <div className="flex overflow-hidden rounded-lg border border-[var(--hnc-control-border-color)] bg-white">
               {(["ppt169", "ppt43"] as PptCanvasFormat[]).map((f) => (
                 <button
                   key={f}
                   type="button"
                   onClick={() => setFormat(f)}
                   className={`px-3 py-2 text-xs font-medium transition ${
-                    format === f ? "bg-white text-[#2b579a]" : "text-white/85 hover:bg-white/10"
+                    format === f
+                      ? "bg-[var(--hnc-control-text-color-accent3)] text-white"
+                      : "text-slate-600 hover:bg-[var(--hnc-control-background-color-hover)]"
                   }`}
                 >
                   {f === "ppt169" ? "16:9" : "4:3"}
@@ -170,7 +174,7 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
             <select
               value={maxSlides}
               onChange={(e) => setMaxSlides(Number(e.target.value))}
-              className="h-9 rounded-lg border border-white/20 bg-white/10 px-3 text-xs text-white focus:outline-none focus:ring-2 focus:ring-white/20"
+              className="h-9 rounded-lg border border-[var(--hnc-control-border-color)] bg-white px-3 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-[var(--hnc-control-border-color-hover)]/30"
             >
               {[6, 8, 10, 12, 16].map((n) => (
                 <option key={n} value={n} className="text-slate-900">
@@ -180,12 +184,7 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
             </select>
 
             {onOpenCowork && (
-              <Button
-                type="button"
-                variant="secondary"
-                className="h-9 gap-1.5 bg-white/10 text-white hover:bg-white/20"
-                onClick={onOpenCowork}
-              >
+              <Button type="button" variant="outline" className="h-9 gap-1.5" onClick={onOpenCowork}>
                 <Bot className="size-4" />
                 Cowork
               </Button>
@@ -194,7 +193,7 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
             <Button
               type="button"
               disabled={loading || !engineOk}
-              className="h-9 gap-2 bg-white text-[#2b579a] hover:bg-white/90"
+              className="h-9 gap-2 bg-[var(--hnc-control-text-color-accent3)] text-white hover:opacity-90"
               onClick={() => void handleGenerate()}
             >
               {loading ? (
@@ -213,7 +212,7 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
               key={preset}
               type="button"
               onClick={() => setPrompt(preset)}
-              className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] text-white/85 transition hover:bg-white/15"
+              className="rounded-full border border-[var(--hnc-control-border-color)] bg-white px-3 py-1 text-[11px] text-slate-600 transition hover:bg-[var(--hnc-control-background-color-hover)]"
             >
               {preset}
             </button>

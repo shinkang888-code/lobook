@@ -1,0 +1,101 @@
+/* Copyright (c) Hancom. All rights reserved. */
+/* Licensed under the MIT License. See License.txt in the project root for license information. */
+
+/* -----------------------
+** checkbox
+** 기본 형태를 지우고 before를 이용하여 왼편 box 표시. text 형태로 체크마크 표시
+-------------------------- */
+.hnc-checkbox,
+.hnc-radio {
+    position: absolute; /* display none으로 해도되나, 그러면 포커스를 줄 수 없어서 absolute와 clip 사용 */
+    clip: rect(0,0,0,0);
+    /* hover, disabled, focus 는 hnc-base 에 정의함(동일한게 있음) */
+ }
+.hnc-checkbox + .hnc-caption:before { /* checkbox 왼편 box */
+    content: '';
+    display: inline-block;
+    box-sizing: border-box; /* border, padding 포함 */
+    width: 14px;
+    height: 14px; 
+    vertical-align: top; /* 우측 caption보다 margin, padding이 추가되어 있으므로 최대한 top에 맞춤. 또한, 생략시 content text가 없는 경우 우측 caption과 세로 위치가 안맞아서 추가 */
+    line-height: 1; /* check 마크 위치를 맞추기 위해 font-size에 맞춤 */
+    margin-top: 1px; /* vertical-align: top 에 맞춰 보정 */
+    margin-left: 0px; /* caption의 border 1px 가 있어 왼쪽은 꼭 0으로 해야 다른 컨트롤과 정렬이 맞음 */
+    margin-right: 5px; /* caption과의 간격 */
+
+    padding: var(--hnc-control-padding);
+    
+    font-size: 12px;
+    color: var(--hnc-control-text-color-accent2); /* check 마크 표시 색 */
+    background-color: var(--hnc-control-background-color);
+    border-style: var(--hnc-control-border-style);
+    border-width: var(--hnc-control-border-width);
+    border-color: var(--hnc-control-border-color);
+    border-radius: var(--hnc-control-border-radius);
+}
+.hnc-checkbox:checked + .hnc-caption:before { /* checked 시 box에 표시되는 마크 */
+    content: '\2714'; /* [✔] check 표시 글꼴. svg 쓰긴 좀 부담스러워서 이미 있는 비슷한 글꼴 사용 */
+    font-weight: bold;
+}
+
+.hnc-checkbox + .hnc-caption:hover {
+    color: var(--hnc-control-text-color-accent1); /* hover시 캡션 글자도 바꿈 */
+}
+.hnc-checkbox + .hnc-caption,
+.hnc-radio + .hnc-caption {
+    padding-right : 12px; /* 다른개체들과 함께 표시될때 우측 간격 확보 */
+}
+/* -----------------------
+** radio
+** 기본 형태를 지우고 before를 이용하여 왼편 원형 표시. after로 체크 마크 표시
+** hnc-check에 기본형태 정의
+-------------------------- */
+.hnc-radio + .hnc-caption {
+    position: relative; /* 라디오의 선택표시는 after 가상선택자를 넣어 absolute 로 하게 되는데, 캡션을 기준으로 좌표가 설정되게끔 relative 를 강제함. 그렇치 않으면 스크린 기준으로 표시됨 */
+}
+.hnc-radio + .hnc-caption:before { /* radio 왼편 동그라미 */
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px; 
+    vertical-align: top; /* 생략시 content text가 없는 경우 우측 caption과 세로 위치가 안맞아서 추가 */
+    margin-top: 1px; /* vertical-align: top 에 맞춰 보정 */
+    margin-left: 0px; /* caption의 border 1px 가 있어 왼쪽은 꼭 0으로 해야 다른 컨트롤과 정렬이 맞음 */
+    margin-right: 5px; /* caption과의 간격 */
+
+    background-color: var(--hnc-control-background-color);
+    border-style: var(--hnc-control-border-style);
+    border-width: var(--hnc-control-border-width);
+    border-color: var(--hnc-control-border-color);
+    border-radius: 50%;
+}
+.hnc-radio:checked + .hnc-caption:after { /* checked 시 원형에 표시되는 마크 */
+    content: ''; 
+    position: absolute;
+    box-sizing: border-box; /* border, padding 포함 */
+
+    /* gradation을 이용해 마커 표시 방법 : 축소 상태에서도 여전히 offset이 틀어질 수 있고, 300%이상에서는 그러데이션이 뿌옇게 표시되어 별로 보기 안좋음. 그래도 100%~200% 정도에서는 그럴싸하게 보임 */
+    /* 확대/축소시 마커의 오프셋이 틀어지는 경향이 있어 after와 동일한 크기로 만든후 radial 그러데이션 으로 표시 */
+    /* width: 14px; /* border를 포함하므로 after보다 2가 큼 */
+    /* height: 14px;  */
+    /* margin-top: 1px;  */
+    /* margin-left: 0px; caption의 border가 있어 왼쪽은 꼭 0으로 해야 다른 컨트롤과 정렬이 맞음 */
+    /* left : 0px;  */
+    /* top: 0px;  */
+    /* background: radial-gradient(var(--hnc-control-text-color-accent3) 35%, transparent 42%);  */ 
+    
+    /* div 의 left-top을 조정하는 방법 : 축소 상태에서도 여전히 offset이 틀어질 수 있고, 125%, 150%등 나누어 떨어지지 않는 비율에서는 오프셋이 틀어짐. 하지만, 200%, 300%등에서는 선명하게 잘 보임 */
+    width: 8px;
+    height: 8px;
+    left: 3px;
+    top: 4px;
+    /* 중심 좌표로 바꿔봤자, 상기 left-top 명시적으로 지정하는 것과 동일 */
+    /* left : calc(14px / 2 - 8px / 2); 14 : 라디오 circle 크기, 8 : check mark */
+    /* top : calc(1px + 14px / 2 - 8px / 2); 1px : margin-top 14 : 라디오 circle 크기, 8 : check mark */
+
+    background-color: var(--hnc-control-text-color-accent3);
+
+    border-width: 0px;
+    border-radius: 50%; 
+
+}

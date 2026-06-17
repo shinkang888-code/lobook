@@ -1,0 +1,114 @@
+/* Copyright (c) Hancom. All rights reserved. */
+/* Licensed under the MIT License. See License.txt in the project root for license information. */
+
+/* -----------------------
+** tab 
+** hnc-tab-header에서 radio를 활용하여 checked 항목의 hnc-tab-body의 display 한다.
+** div 하위에 hnc-tab-headers 와 hnc-tab-bodies로 구성.
+** hnc-tab-headers는 ul > li > input(radio) 으로 구성해야함. 초기에 checked 된 항목이 있어야 보임.
+** hnc-tab-headers 의 li 갯수와 hnc-tab-bodies의 갯수는 일치해야 함
+** javascript에서 check된 항목의 위치를 구하여 해당 body를 show 함
+-------------------------- */
+.hnc-tab {
+    display: block; /* tab은 한줄 차지함 */
+    padding: 0px; /* hnc-tab-body 에서 설정함 */
+    background-color: transparent;
+    border-color: transparent; 
+    border-width: 0px; /* hnc-tab-body에서 조정함. tab자체는 margin만 컨트롤을 따름. */
+}
+.hnc-tab-headers,
+.hnc-tab-bodies { /* hnc-tab-header와 hnc-tab-body들을 묶기 위한 용도 */
+    position: relative; /* z-index 가 동작할 수 있도록 position 속성 추가 */
+    display: block; /* 한줄 차지 */
+    padding: 0px;
+    margin : 0px;
+    background-color: transparent;
+    border-color: transparent;  
+    border-width: 0px;  
+}
+.hnc-tab-headers {
+    z-index: 1; /* tab-headers가 tab-bodies 위에 보이도록 설정 */
+}
+.hnc-tab-headers > li {
+    display: inline-block; /* 각 radio 항목이 가로배치 되도록 함 */
+}
+.hnc-tab-radio { /* radio */
+    position: absolute; /* display none으로 해도되나, 그러면 포커스를 줄 수 없어서 clip 사용 */
+    clip: rect(0,0,0,0);
+}
+.hnc-tab-header-container {
+    margin: 0;
+    background-color: transparent; 
+    border-color: transparent;
+    border-width: 0px;
+    border-bottom-width: var(--hnc-control-border-width); /* 하단 1px만 표시. 최초는 tab-body와 동일한 색 */
+}
+.hnc-workspace-style .hnc-tab-header-container {
+    padding-bottom: 2px; /* 작업창은 tab 선택 표시가 3px이어서 padding 영역을 좀더 확보함. 원래는 1px */
+}
+.hnc-tab-header-container:before { /* tab-header 간의 구분자 */
+    content: "";
+    display: inline-block;
+    margin-left: -1px; /* 왼쪽 tab-header 사이 중간이 되도록 margin 조정 */
+    width: 1px;
+    height: 12px;
+    vertical-align: middle;
+    background-color: var(--hnc-control-background-accent2);
+}
+.hnc-tab-headers > li:first-child > .hnc-tab-header-container:before {
+    background-color: transparent; /* 첫번째 tab-header는 구분선이 없음 */
+}
+.hnc-tab-radio:checked ~ .hnc-tab-header-container {
+    border-color: var(--hnc-control-border-color-accent1); /* tab-header 선택 표시. */
+    padding-bottom: 0px; /* 하단 패딩을 줄이고, 하단 너비 증가 */
+    border-bottom-width: 2px;
+}
+
+.hnc-workspace-style .hnc-tab-radio:checked ~ .hnc-tab-header-container {
+    border-bottom-width: 3px; /*workspace-style은 좀 굵게 선택 표시 */
+}
+.hnc-tab-header-container > .hnc-tab-header {
+    display: inline-block;
+    margin: 0;
+    padding: 7px; /* 빈 영역을 클릭해도 radio 선택될 수 있게 padding으로 공간 확보 */
+    font-size: var(--hnc-control-font-size);
+    color: var(--hnc-control-text-color);
+    background-color: transparent; 
+    border-color: transparent;
+    border-width: 1px; /* focus 표시용 */
+    /* focus 는 hnc-base에 정의 */
+    /* caption 툴팁은 hnc-base에 정의 */
+}
+.hnc-tab-radio:checked ~ .hnc-tab-header-container > .hnc-tab-header,
+.hnc-tab-radio:checked ~ .hnc-tab-header-container > .hnc-tab-header > .hnc-caption { /* 선택된 header 캡션은 굵게 */
+    color: var(--hnc-control-text-color-accent3);
+    font-weight: bold;
+}
+
+.hnc-tab-radio:checked ~ .hnc-tab-header-container > .hnc-tab-header > .hnc-image + .hnc-caption {
+    color: var(--hnc-control-text-color);
+    font-weight: normal; /* image와 함께 있는 캡션이면 툴팁이므로 툴팁과 동일하게 스타일링 */ 
+}
+.hnc-tab-header-container > .hnc-tab-header > .hnc-image {
+    filter: grayscale(100%); /* tab-header의 이미지는 회색조로 표시 */  
+}
+.hnc-tab-radio:checked ~ .hnc-tab-header-container > .hnc-tab-header > .hnc-image {
+    filter: none; /* 선택된 tab-header의 이미지는 원래대로 표시 */  
+}
+.hnc-tab-body {
+    display: none; /* 본문부분은 일반상태에서 표시 안하고, radio check되면 block으로 표시. 이때 javascript에서 check된 항목과 순서가 같은 tab-body를 show함 */
+    position: relative; /* 여러개의 본문들이 tab-header 밑에 동일한 위치에 표시되도록 함. absolute로 구현 하면 radio의 sibling으로 tab-body를 배치하여 css 로 show/hide 가능하나 layout flow를 해침. */
+    box-sizing: border-box; /* 테두리와 padding이 width에 포함된 상태에서 width=100% 차지. 만약 content-box로 하면 content가 100% width를 차지하고, border와 padding이 추가되어 실제 width가 viewport 영역을 넘게 되어 불필요한 가로 스크롤이 표시됨 */
+    width: 100%; /*사용되는 공간 전체 차지 */
+    padding: 15px 15px 15px 15px;
+    margin: 0px; /* hnc-tab 자체의 margin 따름 */
+    margin-top: -1px; /* 상단 header와 1px 겹쳐보이게함 */
+    border-radius: var(--hnc-control-border-radius); 
+}
+
+.hnc-workspace-style .hnc-tab-body { /* 상단 border 만 표시한다.*/
+    border-radius: 0px;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+}

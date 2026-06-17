@@ -27,6 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <head>
+        <link rel="stylesheet" href="/hancom-skin/hnc-office-addin-ctrl.css" />
+        <link rel="stylesheet" href="/hancom-skin/book-studio-hancom.css" />
+      </head>
       <body className="min-h-full bg-muted/20">
         <QueryProvider>
           <Header />

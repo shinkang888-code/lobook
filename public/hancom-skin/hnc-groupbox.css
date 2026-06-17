@@ -1,0 +1,35 @@
+/* Copyright (c) Hancom. All rights reserved. */
+/* Licensed under the MIT License. See License.txt in the project root for license information. */
+
+/* -----------------------
+** groupbox
+** 첫번째 child인 hnc-caption의 :after로 separator 생성.
+-------------------------- */
+.hnc-groupbox {
+    background-color: transparent; 
+    border-color: transparent;          
+    border-width: 0;
+    padding-left: 11px; /* groupbox 하위 항목 들여쓰기 */
+    padding-right: 11px; /* groupbox 하위 항목 들여쓰기 */
+}
+.hnc-groupbox > .hnc-caption:first-child {
+    display: flex; /* seperator를 가로로 확장해서 쓰도록 함. caption과 separator 가 1줄에 나오므로 block 특성처럼 정의 */
+ 
+    margin-left: -11px; /* groupbox 들여쓴 만큼 내어쓰기 */
+    margin-right: -11px; /* groupbox 들여쓴 만큼 내어쓰기 */
+    margin-bottom: 7px; /* 실제 그룹박스 item 간의 간격 */
+
+    align-items: center; /* after 세로 가운데 정렬 */
+    
+    color: var(--hnc-control-text-color-accent3);
+    font-weight: bold;
+   
+    border-width: 0; 
+}
+.hnc-groupbox > .hnc-caption:first-child::after { /* 캡션 오른편 separator */
+    content:"";
+    flex-grow: 1; /* 가변 길이여서 텍스트 표시되고 남은 공간을 모두 채움 */
+    margin-left: 10px; /* 왼쪽 캡션과의 여백 */
+    height: 1px;
+    background-color: var(--hnc-control-background-accent2);
+}

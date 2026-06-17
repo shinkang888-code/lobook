@@ -20,24 +20,22 @@ type EditorTabBarProps = {
 
 export function EditorTabBar({ activeMode, onModeChange }: EditorTabBarProps) {
   return (
-    <div className="flex h-10 shrink-0 items-center border-b border-gray-300 bg-white px-2">
-      <div className="flex gap-0.5">
+    <div className="hancom-editor-tabs shrink-0">
+      <div className="hancom-editor-tabs-inner h-10 items-stretch">
         {CORE_EDITOR_MODES.map((mode) => (
           <button
             key={mode}
             type="button"
             onClick={() => onModeChange(mode)}
-            className={`rounded px-4 py-1.5 text-xs font-medium transition-colors ${
-              activeMode === mode
-                ? "bg-[#2b579a] text-white"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
+            className={`hancom-editor-tab-btn ${activeMode === mode ? "hancom-editor-tab-btn--active" : ""}`}
           >
             {MODE_LABELS[mode]}
           </button>
         ))}
+        <div className="ml-auto flex items-center pr-2 text-[10px] text-[var(--hnc-control-text-color-disabled)]">
+          편집기 모드
+        </div>
       </div>
-      <div className="ml-auto text-[10px] text-gray-400">편집기 모드 · Ctrl+Tab 전환 (예정)</div>
     </div>
   );
 }

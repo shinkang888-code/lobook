@@ -30,8 +30,8 @@
   :root {
     --editor-left-width: 260px;
     --editor-right-width: 300px;
-    --polaris-navy: #2b579a;
-    --polaris-workspace: #f3f3f3;
+    --polaris-navy: var(--hnc-control-text-color-accent3, #335095);
+    --polaris-workspace: #e8eaef;
   }
 
   .rhwp-page svg {
