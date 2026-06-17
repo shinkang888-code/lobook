@@ -3,6 +3,37 @@
 @import "shadcn/tailwind.css";
 
 @layer components {
+  .polaris-workspace {
+    background-color: #f3f3f3;
+  }
+
+  .polaris-page {
+    color: #1a1a1a;
+  }
+
+  .ribbon-panel {
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .polaris-doc-body {
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    line-height: 1.8;
+    color: #1a1a1a;
+  }
+
+  .polaris-doc-editor .ProseMirror {
+    min-height: 60vh;
+    padding: 0;
+    outline: none;
+  }
+
+  :root {
+    --editor-left-width: 260px;
+    --editor-right-width: 300px;
+    --polaris-navy: #2b579a;
+    --polaris-workspace: #f3f3f3;
+  }
+
   .book-content h1 {
     @apply mb-4 text-3xl font-bold;
   }

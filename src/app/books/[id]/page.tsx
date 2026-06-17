@@ -31,12 +31,6 @@ export default function EditBookPage({ params }: PageProps) {
   }
 
   return (
-    <section className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">편집</h1>
-        <p className="text-sm text-muted-foreground">Markdown · WYSIWYG · EPUB 내보내기</p>
-      </div>
-      <BookEditor book={book} />
-    </section>
+    <BookEditor book={book} />
   );
 }
