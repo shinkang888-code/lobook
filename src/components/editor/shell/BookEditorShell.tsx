@@ -15,6 +15,7 @@ import {
 import { ChapterList } from "@/components/editor/navigation/ChapterList";
 import { PageThumbnailStrip } from "@/components/editor/navigation/PageThumbnailStrip";
 import { TocNavigator } from "@/components/editor/navigation/TocNavigator";
+import { ConvertToMarkdownDialog } from "@/components/editor/modals/ConvertToMarkdownDialog";
 import { ImportDialog, type ImportKind } from "@/components/editor/modals/ImportDialog";
 import { EditorTabBar } from "@/components/editor/shell/EditorTabBar";
 import { EditorToolbarProvider, useEditorToolbar } from "@/components/editor/shell/EditorToolbarContext";
@@ -57,6 +58,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
   const [activeChapterId, setActiveChapterId] = useState<string>("");
   const [chapterDrafts, setChapterDrafts] = useState<Record<string, { md: string; html: string }>>({});
   const [importKind, setImportKind] = useState<ImportKind | null>(null);
+  const [convertMarkdownOpen, setConvertMarkdownOpen] = useState(false);
   const [hwpPageCount, setHwpPageCount] = useState(0);
   const queryClient = useQueryClient();
 
@@ -245,6 +247,13 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
     void queryClient.invalidateQueries({ queryKey: ["books", book.id, "structure"] });
   };
 
+  const handleConvertMarkdownSuccess = () => {
+    setChapterDrafts({});
+    setDirty(false);
+    setActiveMode("markdown");
+    void queryClient.invalidateQueries({ queryKey: ["books", book.id, "structure"] });
+  };
+
   const handleAddChapter = async () => {
     try {
       const chapter = await addChapter.mutateAsync(`제${chapters.length + 1}장`);
@@ -339,6 +348,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
         onImportEpub={() => setImportKind("epub")}
         onImportHwp={() => setImportKind("hwp")}
         onImportPdf={() => setImportKind("pdf")}
+        onConvertMarkdown={() => setConvertMarkdownOpen(true)}
         onSnapshot={() => void handleSnapshot()}
         onPreview={() => router.push(`/books/${book.id}/preview`)}
         showThumbnails={showThumbnails}
@@ -357,6 +367,14 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
           onSuccess={handleImportSuccess}
         />
       )}
+
+      <ConvertToMarkdownDialog
+        bookId={book.id}
+        chapterId={activeChapter?.id}
+        open={convertMarkdownOpen}
+        onOpenChange={setConvertMarkdownOpen}
+        onSuccess={handleConvertMarkdownSuccess}
+      />
 
       <EditorTabBar activeMode={activeMode} onModeChange={setActiveMode} />
 

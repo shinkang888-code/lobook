@@ -1,0 +1,4 @@
+# MarkItDown — Office/PDF → Markdown 변환 (Book Studio 연동)
+# 설치: pip install -r requirements-markitdown.txt
+# 리포: https://github.com/shinkang888-code/markitdown (microsoft/markitdown fork)
+markitdown[docx,pdf,epub,pptx,xlsx]>=0.1.0
