@@ -10,7 +10,10 @@ const ALLOWED_IMPORT: Record<string, string[]> = {
   epub: ["application/epub+zip"],
   hwp: ["application/x-hwp", "application/octet-stream", "application/haansofthwp"],
   hwpx: ["application/hwp+zip", "application/vnd.hancom.hwpx", "application/octet-stream"],
+  pdf: ["application/pdf", "application/octet-stream"],
 };
+
+export type ImportFileKind = "docx" | "epub" | "hwp" | "hwpx" | "pdf";
 
 function extFromFilename(name: string): string {
   return name.split(".").pop()?.toLowerCase() ?? "bin";
@@ -19,7 +22,7 @@ function extFromFilename(name: string): string {
 export async function saveImportFile(
   file: File,
   bookId: string,
-  kind: "docx" | "epub" | "hwp" | "hwpx",
+  kind: ImportFileKind,
 ): Promise<{ storagePath: string; localUrl?: string }> {
   if (file.size > MAX_IMPORT_BYTES) {
     throw new Error("파일은 50MB 이하만 업로드할 수 있습니다.");
@@ -34,7 +37,7 @@ export async function saveImportFile(
     if (!admin) throw new Error("Supabase 연결 실패");
 
     const { error } = await admin.storage.from("book-imports").upload(objectPath, buffer, {
-      contentType: file.type || ALLOWED_IMPORT[kind][0],
+      contentType: file.type || ALLOWED_IMPORT[kind]?.[0] || "application/octet-stream",
       upsert: false,
     });
     if (error) throw new Error(error.message);

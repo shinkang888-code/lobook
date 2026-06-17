@@ -1,12 +1,17 @@
 "use client";
 
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
-import { forwardRef, useEffect, useImperativeHandle } from "react";
+import Image from "@tiptap/extension-image";
+import Link from "@tiptap/extension-link";
+import { Loader2 } from "lucide-react";
 import { useEditorToolbarOptional } from "@/components/editor/shell/EditorToolbarContext";
+import { EigenpalDocxEditor, type EigenpalDocxEditorHandle } from "./EigenpalDocxEditor";
+import "@eigenpal/docx-editor-react/styles.css";
 
 export type WordEditorPanelHandle = {
   getHtml: () => string;
@@ -14,17 +19,14 @@ export type WordEditorPanelHandle = {
 };
 
 type Props = {
+  bookId: string;
   initialHtml: string;
   onChange?: () => void;
 };
 
-export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function WordEditorPanel(
-  { initialHtml, onChange },
-  ref,
-) {
-  const toolbar = useEditorToolbarOptional();
+type WordSubMode = "html" | "docx";
 
-  const WORD_TOOLBAR_KEYS = [
+const WORD_TOOLBAR_KEYS = [
   "bold",
   "italic",
   "underline",
@@ -38,6 +40,17 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
   "paste",
 ] as const;
 
+export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function WordEditorPanel(
+  { bookId, initialHtml, onChange },
+  ref,
+) {
+  const toolbar = useEditorToolbarOptional();
+  const eigenpalRef = useRef<EigenpalDocxEditorHandle>(null);
+  const [subMode, setSubMode] = useState<WordSubMode>("html");
+  const [docxBuffer, setDocxBuffer] = useState<ArrayBuffer | null>(null);
+  const [docxFileName, setDocxFileName] = useState<string | null>(null);
+  const [loadingDocx, setLoadingDocx] = useState(false);
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -45,6 +58,8 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
       Underline,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Placeholder.configure({ placeholder: "Word 스타일 편집…" }),
+      Image,
+      Link.configure({ openOnClick: false }),
     ],
     content: initialHtml || "<p></p>",
     onUpdate: () => onChange?.(),
@@ -54,6 +69,27 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
       },
     },
   });
+
+  const loadDocx = useCallback(async () => {
+    setLoadingDocx(true);
+    try {
+      const metaRes = await fetch(`/api/books/${bookId}/import/docx/latest`);
+      if (metaRes.status === 404) return;
+      if (!metaRes.ok) return;
+      const meta = (await metaRes.json()) as { fileName?: string };
+      const fileRes = await fetch(`/api/books/${bookId}/import/docx/file`);
+      if (!fileRes.ok) return;
+      const buf = await fileRes.arrayBuffer();
+      setDocxBuffer(buf);
+      setDocxFileName(meta.fileName ?? "document.docx");
+    } finally {
+      setLoadingDocx(false);
+    }
+  }, [bookId]);
+
+  useEffect(() => {
+    void loadDocx();
+  }, [loadDocx]);
 
   useEffect(() => {
     if (editor && initialHtml) {
@@ -67,7 +103,7 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
   }));
 
   useEffect(() => {
-    if (!editor || !toolbar) return;
+    if (!editor || !toolbar || subMode !== "html") return;
 
     toolbar.register({
       bold: () => editor.chain().focus().toggleBold().run(),
@@ -91,9 +127,9 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
     });
 
     return () => toolbar.unregister([...WORD_TOOLBAR_KEYS]);
-  }, [editor, toolbar]);
+  }, [editor, toolbar, subMode]);
 
-  if (!editor) {
+  if (!editor && subMode === "html") {
     return (
       <div className="flex h-full items-center justify-center text-sm text-gray-400">
         Word 편집기 로딩…
@@ -102,8 +138,45 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
   }
 
   return (
-    <div className="polaris-doc-editor h-full overflow-auto">
-      <EditorContent editor={editor} />
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-gray-50 px-2 py-1">
+        <button
+          type="button"
+          onClick={() => setSubMode("html")}
+          className={`rounded px-2 py-0.5 text-[10px] ${subMode === "html" ? "bg-[#2b579a] text-white" : "text-gray-600"}`}
+        >
+          HTML (TipTap)
+        </button>
+        <button
+          type="button"
+          onClick={() => setSubMode("docx")}
+          disabled={!docxBuffer && !loadingDocx}
+          className={`rounded px-2 py-0.5 text-[10px] ${subMode === "docx" ? "bg-[#2b579a] text-white" : "text-gray-600"} disabled:opacity-40`}
+        >
+          DOCX (eigenpal) {docxFileName ? `· ${docxFileName}` : ""}
+        </button>
+        {loadingDocx && <Loader2 className="size-3 animate-spin text-gray-400" />}
+      </div>
+
+      <div className="min-h-0 flex-1">
+        {subMode === "html" && editor && (
+          <div className="polaris-doc-editor h-full overflow-auto">
+            <EditorContent editor={editor} />
+          </div>
+        )}
+        {subMode === "docx" && docxBuffer && docxFileName && (
+          <EigenpalDocxEditor
+            ref={eigenpalRef}
+            documentBuffer={docxBuffer}
+            fileName={docxFileName}
+          />
+        )}
+        {subMode === "docx" && !docxBuffer && !loadingDocx && (
+          <div className="flex h-full items-center justify-center text-xs text-gray-500">
+            DOCX 파일을 가져오면 eigenpal 네이티브 편집기를 사용할 수 있습니다.
+          </div>
+        )}
+      </div>
     </div>
   );
 });

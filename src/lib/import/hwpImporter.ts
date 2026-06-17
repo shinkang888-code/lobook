@@ -30,7 +30,6 @@ export async function extractHwpChaptersFromHtml(buffer: ArrayBuffer): Promise<H
 }
 
 export async function extractHwpBufferFromPath(storagePath: string): Promise<ArrayBuffer> {
-  const { readImportBuffer } = await import("@/lib/import/storage");
-  const buf = await readImportBuffer(storagePath);
-  return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
+  const { readImportBufferAsArrayBuffer } = await import("@/lib/import/importBuffer");
+  return readImportBufferAsArrayBuffer(storagePath);
 }

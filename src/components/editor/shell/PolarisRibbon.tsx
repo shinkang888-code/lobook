@@ -47,6 +47,7 @@ type PolarisRibbonProps = {
   onImportDocx?: () => void;
   onImportEpub?: () => void;
   onImportHwp?: () => void;
+  onImportPdf?: () => void;
   onSnapshot?: () => void;
   onPreview?: () => void;
   showThumbnails?: boolean;
@@ -64,6 +65,7 @@ export function PolarisRibbon({
   onImportDocx,
   onImportEpub,
   onImportHwp,
+  onImportPdf,
   onSnapshot,
   onPreview,
   showThumbnails,
@@ -170,6 +172,7 @@ export function PolarisRibbon({
               <RibbonBtn icon={FileText} label="Word" onClick={onImportDocx} />
               <RibbonBtn icon={FileStack} label="EPUB" onClick={onImportEpub} />
               <RibbonBtn icon={FileText} label="HWP" onClick={onImportHwp} />
+              <RibbonBtn icon={FileStack} label="PDF" onClick={onImportPdf} />
             </RibbonGroup>
             <RibbonGroup label="내보내기">
               {onExportEpub && <RibbonBtn icon={Download} label="EPUB" onClick={onExportEpub} />}

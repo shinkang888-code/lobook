@@ -15,14 +15,14 @@ import {
 import { Label } from "@/components/ui/label";
 import { DocxPreviewPanel } from "@/components/editor/modals/DocxPreviewPanel";
 
-export type ImportKind = "docx" | "epub" | "hwp";
+export type ImportKind = "docx" | "epub" | "hwp" | "pdf";
 
 type ImportDialogProps = {
   bookId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   kind: ImportKind;
-  onSuccess: (opts?: { switchMode?: "word" | "hwp" }) => void;
+  onSuccess: (opts?: { switchMode?: "word" | "hwp" | "pdf" }) => void;
 };
 
 const KIND_LABELS: Record<ImportKind, { title: string; accept: string; ext: string }> = {
@@ -33,6 +33,7 @@ const KIND_LABELS: Record<ImportKind, { title: string; accept: string; ext: stri
   },
   epub: { title: "EPUB 가져오기", accept: ".epub,application/epub+zip", ext: "EPUB" },
   hwp: { title: "HWP/HWPX 가져오기", accept: ".hwp,.hwpx", ext: "HWP/HWPX" },
+  pdf: { title: "PDF 가져오기", accept: ".pdf,application/pdf", ext: "PDF" },
 };
 
 export function ImportDialog({ bookId, open, onOpenChange, kind, onSuccess }: ImportDialogProps) {
@@ -65,9 +66,9 @@ export function ImportDialog({ bookId, open, onOpenChange, kind, onSuccess }: Im
     try {
       const form = new FormData();
       form.append("file", file);
-      if (kind !== "hwp") {
+      if (kind !== "hwp" && kind !== "pdf") {
         form.append("mode", mode);
-      } else {
+      } else if (kind === "hwp") {
         form.append("mode", mode);
         form.append("hwpMode", hwpMode);
       }
@@ -77,13 +78,18 @@ export function ImportDialog({ bookId, open, onOpenChange, kind, onSuccess }: Im
           ? `/api/books/${bookId}/import/docx`
           : kind === "epub"
             ? `/api/books/${bookId}/import/epub`
-            : `/api/books/${bookId}/import/hwp`;
+            : kind === "hwp"
+              ? `/api/books/${bookId}/import/hwp`
+              : `/api/books/${bookId}/import/pdf`;
 
       const res = await fetch(endpoint, { method: "POST", body: form });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "가져오기 실패");
 
-      if (kind === "hwp") {
+      if (kind === "pdf") {
+        toast.success("PDF 파일이 저장되었습니다. PDF 탭에서 미리보기하세요.");
+        onSuccess({ switchMode: "pdf" });
+      } else if (kind === "hwp") {
         if (hwpMode === "store") {
           toast.success("HWP 파일이 저장되었습니다. HWP 탭에서 Canvas 미리보기하세요.");
           onSuccess({ switchMode: "hwp" });
@@ -124,7 +130,7 @@ export function ImportDialog({ bookId, open, onOpenChange, kind, onSuccess }: Im
           </DialogDescription>
         </DialogHeader>
 
-        {kind !== "hwp" && (
+        {kind !== "hwp" && kind !== "pdf" && (
           <div className="flex gap-2 text-sm">
             <label className="flex items-center gap-2">
               <input

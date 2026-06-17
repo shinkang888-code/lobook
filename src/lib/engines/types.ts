@@ -44,7 +44,7 @@ export interface DocumentEngine {
   mimeTypes?: string[];
   canView: boolean;
   canEdit: boolean;
-  editorMode?: "markdown" | "html" | "word" | "hwp";
+  editorMode?: "markdown" | "html" | "word" | "hwp" | "pdf";
   importToChapters(buffer: ArrayBuffer, opts: ImportOptions): Promise<ImportResult>;
 }
 

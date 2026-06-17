@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { PageCanvas, ZoomControls } from "@/components/editor/canvas/PageCanvas";
 import { PageSpecPanel } from "@/components/editor/canvas/PageSpecPanel";
 import { HwpEditorPanel } from "@/components/editor/hwp/HwpEditorPanel";
+import { PdfEditorPanel } from "@/components/editor/pdf/PdfEditorPanel";
 import { HtmlEditorPanel, type HtmlEditorPanelHandle } from "@/components/editor/html/HtmlEditorPanel";
 import {
   MarkdownEditorPanel,
@@ -237,7 +238,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
     }
   };
 
-  const handleImportSuccess = (opts?: { switchMode?: "word" | "hwp" }) => {
+  const handleImportSuccess = (opts?: { switchMode?: "word" | "hwp" | "pdf" }) => {
     setChapterDrafts({});
     setDirty(false);
     if (opts?.switchMode) setActiveMode(opts.switchMode);
@@ -295,8 +296,18 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
           <WordEditorPanel
             key={`word-${activeChapter.id}`}
             ref={wordRef}
+            bookId={book.id}
             initialHtml={currentHtml}
             onChange={() => updateDraft("html", wordRef.current?.getHtml() ?? "")}
+          />
+        );
+      case "pdf":
+        return (
+          <PdfEditorPanel
+            bookId={book.id}
+            pageSpec={pageSpec}
+            activePage={activePage}
+            onPageCountChange={setHwpPageCount}
           />
         );
       case "hwp":
@@ -327,6 +338,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
         onImportDocx={() => setImportKind("docx")}
         onImportEpub={() => setImportKind("epub")}
         onImportHwp={() => setImportKind("hwp")}
+        onImportPdf={() => setImportKind("pdf")}
         onSnapshot={() => void handleSnapshot()}
         onPreview={() => router.push(`/books/${book.id}/preview`)}
         showThumbnails={showThumbnails}

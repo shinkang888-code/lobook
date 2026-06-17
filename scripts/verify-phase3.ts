@@ -50,7 +50,7 @@ async function main() {
   console.log("\n=== Phase 1 Sprint 1 검증 ===\n");
 
   const engines = listEngines();
-  if (engines.length < 4) errors.push(`engine count ${engines.length} < 4`);
+  if (engines.length < 5) errors.push(`engine count ${engines.length} < 5`);
   else ok(`Document engines ${engines.length}개 — ${engines.map((e) => e.format).join(", ")}`);
 
   const wordEngine = resolveImportFormat("docx");

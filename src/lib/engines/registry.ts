@@ -1,6 +1,7 @@
 import { htmlEngine } from "./htmlEngine";
 import { hwpEngine } from "./hwpEngine";
 import { markdownEngine } from "./markdownEngine";
+import { pdfEngine } from "./pdfEngine";
 import { wordEngine } from "./wordEngine";
 import type { DocumentEngine, DocumentFormat } from "./types";
 
@@ -9,12 +10,14 @@ export const IMPORT_ENGINES: DocumentEngine[] = [
   wordEngine,
   htmlEngine,
   hwpEngine,
+  pdfEngine,
 ];
 
 const importByKind = {
   docx: wordEngine,
   epub: htmlEngine,
   hwp: hwpEngine,
+  pdf: pdfEngine,
 } as const;
 
 export function getEngine(format: DocumentFormat): DocumentEngine | undefined {
@@ -25,7 +28,7 @@ export function listEngines(): DocumentEngine[] {
   return [...IMPORT_ENGINES];
 }
 
-export function resolveImportFormat(kind: "docx" | "epub" | "hwp"): DocumentEngine {
+export function resolveImportFormat(kind: keyof typeof importByKind): DocumentEngine {
   return importByKind[kind];
 }
 

@@ -11,7 +11,8 @@
     "verify:phase1": "tsx scripts/verify-phase1.ts",
     "verify:phase2": "tsx scripts/verify-phase2.ts",
     "verify:phase3": "tsx scripts/verify-phase3.ts",
-    "verify:sprint1": "tsx scripts/verify-phase3.ts"
+    "verify:sprint1": "tsx scripts/verify-phase3.ts",
+    "verify:phase4": "tsx scripts/verify-phase4.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
@@ -21,10 +22,13 @@
     "@microscope-js/react": "^0.1.5",
     "@microscope-js/renderer-docx": "^0.1.5",
     "@microscope-js/renderer-image": "^0.1.5",
+    "@microscope-js/renderer-pdf": "^0.1.5",
     "@rhwp/core": "^0.7.15",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",
     "@tanstack/react-query": "^5.101.0",
+    "@tiptap/extension-image": "^3.27.0",
+    "@tiptap/extension-link": "^3.27.0",
     "@tiptap/extension-placeholder": "^3.26.1",
     "@tiptap/extension-text-align": "^3.26.1",
     "@tiptap/extension-underline": "^3.26.1",
@@ -44,6 +48,7 @@
     "mammoth": "^1.12.0",
     "next": "16.2.9",
     "next-themes": "^0.4.6",
+    "pdfjs-dist": "^4.10.38",
     "prismjs": "^1.30.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",

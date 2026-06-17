@@ -72,6 +72,11 @@ export async function importHwpToBook(
   return { ...result, structure, imported: result.imported };
 }
 
+export async function importPdfToBook(bookId: string, buffer: ArrayBuffer, fileName: string) {
+  const engine = resolveImportFormat("pdf");
+  return engine.importToChapters(buffer, { bookId, fileName, mode: "replace" });
+}
+
 /** @deprecated use importHwpToBook */
 export async function storeHwpImport(bookId: string, buffer: ArrayBuffer, fileName: string) {
   return importHwpToBook(bookId, buffer, fileName, "replace", "store");

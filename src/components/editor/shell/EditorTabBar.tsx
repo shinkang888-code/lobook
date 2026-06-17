@@ -8,6 +8,7 @@ const MODE_LABELS: Record<EditorMode, string> = {
   html: "HTML",
   word: "Word",
   hwp: "HWP",
+  pdf: "PDF",
   preview: "미리보기",
 };
 
