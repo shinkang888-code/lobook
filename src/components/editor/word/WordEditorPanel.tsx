@@ -9,9 +9,15 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { useEditorToolbarOptional } from "@/components/editor/shell/EditorToolbarContext";
+import type { PageSpec } from "@/lib/editor/types";
+import { buildTocHtml, extractHeadings } from "@/lib/word/wordDocumentUtils";
 import { EigenpalDocxEditor, type EigenpalDocxEditorHandle } from "./EigenpalDocxEditor";
+import { WordM365Ribbon } from "./WordM365Ribbon";
+import { WordM365SidePanel } from "./WordM365SidePanel";
 import "@eigenpal/docx-editor-react/styles.css";
+import "./word-m365.css";
 
 export type WordEditorPanelHandle = {
   getHtml: () => string;
@@ -21,6 +27,8 @@ export type WordEditorPanelHandle = {
 type Props = {
   bookId: string;
   initialHtml: string;
+  pageSpec: PageSpec;
+  chapterTitle?: string;
   onChange?: () => void;
 };
 
@@ -41,7 +49,7 @@ const WORD_TOOLBAR_KEYS = [
 ] as const;
 
 export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function WordEditorPanel(
-  { bookId, initialHtml, onChange },
+  { bookId, initialHtml, pageSpec, chapterTitle, onChange },
   ref,
 ) {
   const toolbar = useEditorToolbarOptional();
@@ -50,6 +58,8 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
   const [docxBuffer, setDocxBuffer] = useState<ArrayBuffer | null>(null);
   const [docxFileName, setDocxFileName] = useState<string | null>(null);
   const [loadingDocx, setLoadingDocx] = useState(false);
+  const [reviewMode, setReviewMode] = useState(false);
+  const [copilotBusy, setCopilotBusy] = useState(false);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -65,10 +75,71 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
     onUpdate: () => onChange?.(),
     editorProps: {
       attributes: {
-        class: "polaris-doc-body prose prose-gray max-w-none min-h-[60vh] focus:outline-none",
+        class: "focus:outline-none",
       },
     },
   });
+
+  const insertToc = useCallback(() => {
+    if (!editor) return;
+    const html = editor.getHTML();
+    const toc = buildTocHtml(extractHeadings(html));
+    editor.chain().focus().insertContent(toc).run();
+    onChange?.();
+    toast.success("목차 블록을 삽입했습니다.");
+  }, [editor, onChange]);
+
+  const runCopilot = useCallback(
+    async (prompt: string) => {
+      if (!editor) return;
+      setCopilotBusy(true);
+      try {
+        const html = editor.getHTML();
+        const res = await fetch(`/api/books/${bookId}/cowork/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: `${prompt}\n\n---\n현재 원고:\n${html.slice(0, 8000)}`,
+            history: [],
+          }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error((err as { error?: string }).error ?? "Copilot 실패");
+        }
+        const reader = res.body?.getReader();
+        if (!reader) throw new Error("스트림 없음");
+        const decoder = new TextDecoder();
+        let text = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          text += decoder.decode(value, { stream: true });
+        }
+        if (text.trim()) {
+          editor.chain().focus().insertContent(`<p>${text.replace(/\n/g, "</p><p>")}</p>`).run();
+          onChange?.();
+          toast.success("Copilot 결과를 문서에 삽입했습니다.");
+        }
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Copilot 오류");
+      } finally {
+        setCopilotBusy(false);
+      }
+    },
+    [bookId, editor, onChange],
+  );
+
+  const handleCopilotAction = useCallback(
+    (prompt: string) => {
+      if (prompt === "__insert_toc__") {
+        insertToc();
+        return;
+      }
+      void runCopilot(prompt);
+    },
+    [insertToc, runCopilot],
+  );
 
   const loadDocx = useCallback(async () => {
     setLoadingDocx(true);
@@ -137,13 +208,24 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
     );
   }
 
+  const htmlContent = editor?.getHTML() ?? "";
+
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <div className="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-gray-50 px-2 py-1">
+    <div className="word-m365-workspace h-full min-h-0">
+      <WordM365Ribbon
+        editor={subMode === "html" ? editor : null}
+        pageSpec={pageSpec}
+        reviewMode={reviewMode}
+        onToggleReview={() => setReviewMode((v) => !v)}
+        onCopilotAction={handleCopilotAction}
+        disabled={subMode === "docx" || copilotBusy}
+      />
+
+      <div className="word-m365-mode-bar">
         <button
           type="button"
           onClick={() => setSubMode("html")}
-          className={`rounded px-2 py-0.5 text-[10px] ${subMode === "html" ? "bg-[#2b579a] text-white" : "text-gray-600"}`}
+          className={`word-m365-mode-btn ${subMode === "html" ? "word-m365-mode-btn--active" : ""}`}
         >
           HTML (TipTap)
         </button>
@@ -151,30 +233,41 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
           type="button"
           onClick={() => setSubMode("docx")}
           disabled={!docxBuffer && !loadingDocx}
-          className={`rounded px-2 py-0.5 text-[10px] ${subMode === "docx" ? "bg-[#2b579a] text-white" : "text-gray-600"} disabled:opacity-40`}
+          className={`word-m365-mode-btn ${subMode === "docx" ? "word-m365-mode-btn--active" : ""} disabled:opacity-40`}
         >
           DOCX (eigenpal) {docxFileName ? `· ${docxFileName}` : ""}
         </button>
         {loadingDocx && <Loader2 className="size-3 animate-spin text-gray-400" />}
+        {chapterTitle && <span className="ml-auto text-[10px] text-slate-500">{chapterTitle}</span>}
       </div>
 
-      <div className="min-h-0 flex-1">
-        {subMode === "html" && editor && (
-          <div className="polaris-doc-editor h-full overflow-auto">
-            <EditorContent editor={editor} />
-          </div>
-        )}
-        {subMode === "docx" && docxBuffer && docxFileName && (
-          <EigenpalDocxEditor
-            ref={eigenpalRef}
-            documentBuffer={docxBuffer}
-            fileName={docxFileName}
-          />
-        )}
-        {subMode === "docx" && !docxBuffer && !loadingDocx && (
-          <div className="flex h-full items-center justify-center text-xs text-gray-500">
-            DOCX 파일을 가져오면 eigenpal 네이티브 편집기를 사용할 수 있습니다.
-          </div>
+      <div className="word-m365-body">
+        <div className="word-m365-canvas">
+          {subMode === "html" && editor && (
+            <div className="word-m365-page">
+              <div className={`word-m365-paper ${reviewMode ? "word-m365-paper--review" : ""}`}>
+                <EditorContent editor={editor} />
+              </div>
+            </div>
+          )}
+          {subMode === "docx" && docxBuffer && docxFileName && (
+            <div className="min-h-0 flex-1">
+              <EigenpalDocxEditor
+                ref={eigenpalRef}
+                documentBuffer={docxBuffer}
+                fileName={docxFileName}
+              />
+            </div>
+          )}
+          {subMode === "docx" && !docxBuffer && !loadingDocx && (
+            <div className="flex h-full items-center justify-center text-xs text-gray-500">
+              DOCX 파일을 가져오면 eigenpal 네이티브 편집기를 사용할 수 있습니다.
+            </div>
+          )}
+        </div>
+
+        {subMode === "html" && (
+          <WordM365SidePanel bookId={bookId} html={htmlContent} onInsertToc={insertToc} />
         )}
       </div>
     </div>

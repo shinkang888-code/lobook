@@ -309,6 +309,8 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
             ref={wordRef}
             bookId={book.id}
             initialHtml={currentHtml}
+            pageSpec={pageSpec}
+            chapterTitle={activeChapter.title}
             onChange={() => updateDraft("html", wordRef.current?.getHtml() ?? "")}
           />
         );
@@ -425,21 +427,27 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
         </aside>
 
         <main className="flex min-w-0 flex-1 flex-col">
-          <PageCanvas pageSpec={pageSpec} zoom={zoom}>
-            {renderEditor()}
-          </PageCanvas>
-          <ZoomControls
-            zoom={zoom}
-            onZoomChange={setZoom}
-            pageNumber={activePage}
-            pageTotal={pageTotal}
-            onPrevPage={() => setActivePage((p) => Math.max(1, p - 1))}
-            onNextPage={() => setActivePage((p) => Math.min(pageTotal, p + 1))}
-          />
+          {activeMode === "word" ? (
+            <div className="min-h-0 flex-1">{renderEditor()}</div>
+          ) : (
+            <>
+              <PageCanvas pageSpec={pageSpec} zoom={zoom}>
+                {renderEditor()}
+              </PageCanvas>
+              <ZoomControls
+                zoom={zoom}
+                onZoomChange={setZoom}
+                pageNumber={activePage}
+                pageTotal={pageTotal}
+                onPrevPage={() => setActivePage((p) => Math.max(1, p - 1))}
+                onNextPage={() => setActivePage((p) => Math.min(pageTotal, p + 1))}
+              />
+            </>
+          )}
         </main>
 
         <aside
-          className="hidden shrink-0 border-l border-gray-300 lg:block"
+          className={`hidden shrink-0 border-l border-gray-300 lg:block ${activeMode === "word" ? "lg:hidden" : ""}`}
           style={{ width: "var(--editor-right-width, 300px)" }}
         >
           <PageSpecPanel

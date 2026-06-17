@@ -28,4 +28,6 @@ vendor/hnc-office-addin-ctrl/
 .hwpx-extract-install.json
 .hancom-toolkit-install.json
 .hnc-skin-install.json
+.m365-word-docs-install.json
+vendor/microsoft-365-docs/
 .data/ppt-workspace/
