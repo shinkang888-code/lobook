@@ -9,6 +9,7 @@ const MODE_LABELS: Record<EditorMode, string> = {
   word: "Word",
   hwp: "HWP",
   pdf: "PDF",
+  cowork: "AI Cowork",
   preview: "미리보기",
 };
 

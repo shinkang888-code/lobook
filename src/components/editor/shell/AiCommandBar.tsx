@@ -9,6 +9,7 @@ import {
   Wand2,
   CheckCircle2,
   AlertCircle,
+  Bot,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ type AiCommandBarProps = {
   bookId: string;
   bookTitle: string;
   onGenerated?: (fileName: string) => void;
+  onOpenCowork?: () => void;
 };
 
 const PRESETS = [
@@ -32,7 +34,7 @@ const PRESETS = [
   "독자 대상 소개용 프레젠테이션",
 ];
 
-export function AiCommandBar({ bookId, bookTitle, onGenerated }: AiCommandBarProps) {
+export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: AiCommandBarProps) {
   const [prompt, setPrompt] = useState("");
   const [format, setFormat] = useState<PptCanvasFormat>("ppt169");
   const [maxSlides, setMaxSlides] = useState(10);
@@ -176,6 +178,18 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated }: AiCommandBarPro
                 </option>
               ))}
             </select>
+
+            {onOpenCowork && (
+              <Button
+                type="button"
+                variant="secondary"
+                className="h-9 gap-1.5 bg-white/10 text-white hover:bg-white/20"
+                onClick={onOpenCowork}
+              >
+                <Bot className="size-4" />
+                Cowork
+              </Button>
+            )}
 
             <Button
               type="button"

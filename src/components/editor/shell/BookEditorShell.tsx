@@ -15,6 +15,7 @@ import {
 import { ChapterList } from "@/components/editor/navigation/ChapterList";
 import { PageThumbnailStrip } from "@/components/editor/navigation/PageThumbnailStrip";
 import { TocNavigator } from "@/components/editor/navigation/TocNavigator";
+import { AionCoworkHub } from "@/components/editor/cowork/AionCoworkHub";
 import { AiCommandBar } from "@/components/editor/shell/AiCommandBar";
 import { ConvertToMarkdownDialog } from "@/components/editor/modals/ConvertToMarkdownDialog";
 import { ImportDialog, type ImportKind } from "@/components/editor/modals/ImportDialog";
@@ -320,6 +321,8 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
             onPageCountChange={setHwpPageCount}
           />
         );
+      case "cowork":
+        return <AionCoworkHub bookId={book.id} bookTitle={title} />;
       case "hwp":
         return (
           <HwpEditorPanel
@@ -337,7 +340,11 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#f3f3f3]">
-      <AiCommandBar bookId={book.id} bookTitle={title} />
+      <AiCommandBar
+        bookId={book.id}
+        bookTitle={title}
+        onOpenCowork={() => setActiveMode("cowork")}
+      />
       <PolarisRibbon
         bookTitle={title}
         saving={saveStructure.isPending}
