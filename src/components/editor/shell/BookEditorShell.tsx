@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PageCanvas, ZoomControls } from "@/components/editor/canvas/PageCanvas";
@@ -10,6 +11,7 @@ import {
   MarkdownEditorPanel,
   type MarkdownEditorPanelHandle,
 } from "@/components/editor/markdown/MarkdownEditorPanel";
+import { ChapterList } from "@/components/editor/navigation/ChapterList";
 import { PageThumbnailStrip } from "@/components/editor/navigation/PageThumbnailStrip";
 import { TocNavigator } from "@/components/editor/navigation/TocNavigator";
 import { EditorTabBar } from "@/components/editor/shell/EditorTabBar";
@@ -18,57 +20,76 @@ import { PolarisRibbon } from "@/components/editor/shell/PolarisRibbon";
 import { StatusBar } from "@/components/editor/shell/StatusBar";
 import { WordEditorPanel, type WordEditorPanelHandle } from "@/components/editor/word/WordEditorPanel";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAddChapter, useBookStructure, useSaveBookStructure } from "@/hooks/useBookStructure";
 import { loadPageSpec, savePageSpec } from "@/lib/editor/pageSpec";
 import { buildTocFromMarkdown, splitMarkdownToPages } from "@/lib/editor/tocBuilder";
 import type { EditorMode, PageSpec } from "@/lib/editor/types";
-import type { Book, BookStatus } from "@/lib/types";
+import type { Book, BookStatus, SaveStructureInput } from "@/lib/types";
 
 type BookEditorShellProps = {
   book: Book;
-  title: string;
-  author: string;
-  status: BookStatus;
-  saving?: boolean;
-  dirty?: boolean;
-  onTitleChange: (title: string) => void;
-  onAuthorChange: (author: string) => void;
-  onDirty: () => void;
-  onSave: (
-    content: { content_md: string; content_html: string },
-    nextStatus?: BookStatus,
-  ) => Promise<void>;
-  onExport: (getContent: () => { content_md: string; content_html: string }) => Promise<void>;
-  onPreview: () => void;
 };
 
-function BookEditorShellInner({
-  book,
-  title,
-  author,
-  saving,
-  dirty,
-  onTitleChange,
-  onAuthorChange,
-  onDirty,
-  onSave,
-  onExport,
-  onPreview,
-}: BookEditorShellProps) {
+function BookEditorShellInner({ book }: BookEditorShellProps) {
+  const router = useRouter();
   const mdRef = useRef<MarkdownEditorPanelHandle>(null);
   const htmlRef = useRef<HtmlEditorPanelHandle>(null);
   const wordRef = useRef<WordEditorPanelHandle>(null);
   const toolbar = useEditorToolbar();
 
+  const { data: structure, isLoading } = useBookStructure(book.id);
+  const saveStructure = useSaveBookStructure(book.id);
+  const addChapter = useAddChapter(book.id);
+
+  const [title, setTitle] = useState(book.title);
+  const [author, setAuthor] = useState(book.author);
+  const [status] = useState<BookStatus>(book.status);
+  const [dirty, setDirty] = useState(false);
   const [activeMode, setActiveMode] = useState<EditorMode>("markdown");
   const [pageSpec, setPageSpec] = useState<PageSpec>(() => loadPageSpec(book.id));
   const [zoom, setZoom] = useState(1);
   const [activePage, setActivePage] = useState(1);
   const [leftTab, setLeftTab] = useState<"toc" | "thumb">("toc");
   const [showThumbnails, setShowThumbnails] = useState(false);
-  const [contentMd, setContentMd] = useState(book.content_md);
+  const [activeChapterId, setActiveChapterId] = useState<string>("");
+  const [chapterDrafts, setChapterDrafts] = useState<Record<string, { md: string; html: string }>>({});
 
-  const pages = useMemo(() => splitMarkdownToPages(contentMd), [contentMd]);
-  const toc = useMemo(() => buildTocFromMarkdown(contentMd), [contentMd]);
+  const chapters = structure?.chapters ?? [];
+  const activeChapter = chapters.find((c) => c.id === activeChapterId) ?? chapters[0];
+
+  useEffect(() => {
+    if (structure?.book.page_spec) {
+      setPageSpec(structure.book.page_spec);
+    }
+    if (chapters.length > 0 && !activeChapterId) {
+      setActiveChapterId(chapters[0].id);
+    }
+  }, [structure, chapters, activeChapterId]);
+
+  useEffect(() => {
+    if (!activeChapter) return;
+    setChapterDrafts((prev) => {
+      if (prev[activeChapter.id]) return prev;
+      return {
+        ...prev,
+        [activeChapter.id]: {
+          md: activeChapter.content_md,
+          html: activeChapter.content_html,
+        },
+      };
+    });
+  }, [activeChapter]);
+
+  const currentMd = activeChapter
+    ? (chapterDrafts[activeChapter.id]?.md ?? activeChapter.content_md)
+    : book.content_md;
+
+  const currentHtml = activeChapter
+    ? (chapterDrafts[activeChapter.id]?.html ?? activeChapter.content_html)
+    : book.content_html;
+
+  const pages = useMemo(() => splitMarkdownToPages(currentMd), [currentMd]);
+  const toc = useMemo(() => buildTocFromMarkdown(currentMd), [currentMd]);
   const pageTotal = pages.length;
 
   useEffect(() => {
@@ -86,61 +107,143 @@ function BookEditorShellInner({
     });
   }, [toolbar, pageTotal]);
 
-  const handleMdChange = useCallback(() => {
-    const md = mdRef.current?.getMarkdown() ?? "";
-    setContentMd(md);
-    onDirty();
-  }, [onDirty]);
+  const updateDraft = useCallback(
+    (field: "md" | "html", value: string) => {
+      if (!activeChapter) return;
+      setChapterDrafts((prev) => ({
+        ...prev,
+        [activeChapter.id]: {
+          md: field === "md" ? value : (prev[activeChapter.id]?.md ?? activeChapter.content_md),
+          html: field === "html" ? value : (prev[activeChapter.id]?.html ?? activeChapter.content_html),
+        },
+      }));
+      setDirty(true);
+    },
+    [activeChapter],
+  );
 
-  const getContent = useCallback(() => {
-    const content_md = mdRef.current?.getMarkdown() ?? book.content_md;
-    let content_html = mdRef.current?.getHTML() ?? book.content_html;
-    if (activeMode === "html") {
-      content_html = htmlRef.current?.getHtml() ?? content_html;
-    } else if (activeMode === "word") {
-      content_html = wordRef.current?.getHtml() ?? content_html;
+  const buildSavePayload = useCallback((): SaveStructureInput => {
+    const updatedChapters = chapters.map((ch) => {
+      const draft = chapterDrafts[ch.id];
+      let content_md = draft?.md ?? ch.content_md;
+      let content_html = draft?.html ?? ch.content_html;
+
+      if (ch.id === activeChapter?.id) {
+        if (activeMode === "markdown" && mdRef.current) {
+          content_md = mdRef.current.getMarkdown();
+          content_html = mdRef.current.getHTML();
+        } else if (activeMode === "html" && htmlRef.current) {
+          content_html = htmlRef.current.getHtml();
+        } else if (activeMode === "word" && wordRef.current) {
+          content_html = wordRef.current.getHtml();
+        }
+      }
+
+      return {
+        id: ch.id,
+        title: ch.id === activeChapter?.id && draft ? ch.title : ch.title,
+        sort_order: ch.sort_order,
+        content_md,
+        content_html,
+        primary_source: ch.primary_source,
+      };
+    });
+
+    return {
+      title,
+      author,
+      status,
+      page_spec: pageSpec,
+      chapters: updatedChapters,
+    };
+  }, [chapters, chapterDrafts, activeChapter, activeMode, title, author, status, pageSpec]);
+
+  const handleSave = async () => {
+    try {
+      await saveStructure.mutateAsync(buildSavePayload());
+      setDirty(false);
+      toast.success("저장되었습니다.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "저장 실패");
     }
-    return { content_md, content_html };
-  }, [activeMode, book.content_md, book.content_html]);
+  };
 
-  const handleSave = useCallback(async () => {
-    await onSave(getContent());
-  }, [onSave, getContent]);
+  const handleExport = async () => {
+    try {
+      if (dirty) await handleSave();
+      const res = await fetch(`/api/books/${book.id}/export`, { method: "POST" });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error ?? "EPUB 내보내기 실패");
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${title || "book"}.epub`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      toast.success("EPUB 파일을 다운로드했습니다.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "EPUB 내보내기 실패");
+    }
+  };
+
+  const handleAddChapter = async () => {
+    try {
+      const chapter = await addChapter.mutateAsync(`제${chapters.length + 1}장`);
+      setActiveChapterId(chapter.id);
+      toast.success("챕터가 추가되었습니다.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "챕터 추가 실패");
+    }
+  };
 
   const renderEditor = () => {
+    if (isLoading || !activeChapter) {
+      return (
+        <div className="flex h-full items-center justify-center text-sm text-gray-400">
+          {isLoading ? "불러오는 중…" : "챕터가 없습니다."}
+        </div>
+      );
+    }
+
     switch (activeMode) {
       case "markdown":
         return (
           <MarkdownEditorPanel
+            key={activeChapter.id}
             ref={mdRef}
             bookId={book.id}
-            initialValue={book.content_md}
-            onChange={handleMdChange}
+            initialValue={currentMd}
+            onChange={() => {
+              const md = mdRef.current?.getMarkdown() ?? "";
+              updateDraft("md", md);
+              updateDraft("html", mdRef.current?.getHTML() ?? "");
+            }}
             onUploadError={(msg) => toast.error(msg)}
           />
         );
       case "html":
         return (
           <HtmlEditorPanel
+            key={`html-${activeChapter.id}`}
             ref={htmlRef}
-            initialHtml={book.content_html || mdRef.current?.getHTML() || ""}
-            onChange={onDirty}
+            initialHtml={currentHtml}
+            onChange={() => updateDraft("html", htmlRef.current?.getHtml() ?? "")}
           />
         );
       case "word":
         return (
           <WordEditorPanel
+            key={`word-${activeChapter.id}`}
             ref={wordRef}
-            initialHtml={book.content_html || mdRef.current?.getHTML() || ""}
-            onChange={onDirty}
+            initialHtml={currentHtml}
+            onChange={() => updateDraft("html", wordRef.current?.getHtml() ?? "")}
           />
         );
       case "hwp":
-        return (
-          <HwpEditorPanel
-            onImport={() => toast.info("HWP import는 Phase 2에서 hwpreader와 연동됩니다.")}
-          />
-        );
+        return <HwpEditorPanel bookId={book.id} />;
       default:
         return null;
     }
@@ -150,11 +253,11 @@ function BookEditorShellInner({
     <div className="fixed inset-0 z-50 flex flex-col bg-[#f3f3f3]">
       <PolarisRibbon
         bookTitle={title}
-        saving={saving}
+        saving={saveStructure.isPending}
         dirty={dirty}
         onSave={() => void handleSave()}
-        onExport={() => void onExport(getContent)}
-        onPreview={onPreview}
+        onExport={() => void handleExport()}
+        onPreview={() => router.push(`/books/${book.id}/preview`)}
         showThumbnails={showThumbnails}
         onToggleThumbnails={() => {
           setShowThumbnails((v) => !v);
@@ -165,12 +268,18 @@ function BookEditorShellInner({
       <EditorTabBar activeMode={activeMode} onModeChange={setActiveMode} />
 
       <div className="flex min-h-0 flex-1">
-        {/* Left panel */}
         <aside
           className="hidden shrink-0 flex-col border-r border-gray-300 bg-white lg:flex"
           style={{ width: "var(--editor-left-width, 260px)" }}
         >
-          <Tabs value={leftTab} onValueChange={(v) => setLeftTab(v as "toc" | "thumb")} className="flex h-full flex-col">
+          <ChapterList
+            chapters={chapters}
+            activeChapterId={activeChapter?.id ?? ""}
+            onSelect={setActiveChapterId}
+            onAdd={() => void handleAddChapter()}
+            adding={addChapter.isPending}
+          />
+          <Tabs value={leftTab} onValueChange={(v) => setLeftTab(v as "toc" | "thumb")} className="flex min-h-0 flex-1 flex-col">
             <TabsList className="mx-2 mt-2 grid w-auto grid-cols-2">
               <TabsTrigger value="toc" className="text-xs">
                 목차
@@ -181,11 +290,7 @@ function BookEditorShellInner({
             </TabsList>
             <div className="min-h-0 flex-1">
               {leftTab === "toc" ? (
-                <TocNavigator
-                  nodes={toc}
-                  activePage={activePage}
-                  onPageSelect={setActivePage}
-                />
+                <TocNavigator nodes={toc} activePage={activePage} onPageSelect={setActivePage} />
               ) : (
                 <PageThumbnailStrip pages={pages} activePage={activePage} onPageSelect={setActivePage} />
               )}
@@ -193,7 +298,6 @@ function BookEditorShellInner({
           </Tabs>
         </aside>
 
-        {/* Center */}
         <main className="flex min-w-0 flex-1 flex-col">
           <PageCanvas pageSpec={pageSpec} zoom={zoom}>
             {renderEditor()}
@@ -208,20 +312,22 @@ function BookEditorShellInner({
           />
         </main>
 
-        {/* Right panel */}
         <aside
           className="hidden shrink-0 border-l border-gray-300 lg:block"
           style={{ width: "var(--editor-right-width, 300px)" }}
         >
           <PageSpecPanel
             pageSpec={pageSpec}
-            onChange={setPageSpec}
+            onChange={(spec) => {
+              setPageSpec(spec);
+              setDirty(true);
+            }}
             bookTitle={title}
             author={author}
             onMetaChange={(field, value) => {
-              if (field === "title") onTitleChange(value);
-              else onAuthorChange(value);
-              onDirty();
+              if (field === "title") setTitle(value);
+              else setAuthor(value);
+              setDirty(true);
             }}
           />
         </aside>
@@ -233,16 +339,16 @@ function BookEditorShellInner({
         pageSpec={pageSpec}
         editorMode={activeMode}
         zoom={zoom}
-        bookTitle={title}
+        bookTitle={`${title}${activeChapter ? ` · ${activeChapter.title}` : ""}`}
       />
     </div>
   );
 }
 
-export function BookEditorShell(props: BookEditorShellProps) {
+export function BookEditorShell({ book }: BookEditorShellProps) {
   return (
     <EditorToolbarProvider>
-      <BookEditorShellInner {...props} />
+      <BookEditorShellInner book={book} />
     </EditorToolbarProvider>
   );
 }

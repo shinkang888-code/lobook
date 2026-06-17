@@ -1,6 +1,9 @@
 "use client";
 
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import CodeMirror from "@uiw/react-codemirror";
+import { html } from "@codemirror/lang-html";
+import { oneDark } from "@codemirror/theme-one-dark";
 
 export type HtmlEditorPanelHandle = {
   getHtml: () => string;
@@ -16,32 +19,33 @@ export const HtmlEditorPanel = forwardRef<HtmlEditorPanelHandle, Props>(function
   { initialHtml, onChange },
   ref,
 ) {
-  const [html, setHtml] = useState(initialHtml);
+  const [value, setValue] = useState(initialHtml);
 
   useEffect(() => {
-    setHtml(initialHtml);
+    setValue(initialHtml);
   }, [initialHtml]);
 
   useImperativeHandle(ref, () => ({
-    getHtml: () => html,
-    setHtml: (v: string) => setHtml(v),
+    getHtml: () => value,
+    setHtml: (v: string) => setValue(v),
   }));
 
   return (
     <div className="grid h-full min-h-[400px] grid-cols-2 gap-0">
-      <textarea
-        value={html}
-        onChange={(e) => {
-          setHtml(e.target.value);
+      <CodeMirror
+        value={value}
+        height="100%"
+        theme={oneDark}
+        extensions={[html()]}
+        onChange={(v) => {
+          setValue(v);
           onChange?.();
         }}
-        className="h-full w-full resize-none border-r border-gray-200 bg-[#1e1e1e] p-3 font-mono text-xs leading-relaxed text-gray-100 focus:outline-none"
-        spellCheck={false}
-        placeholder="EPUB XHTML 소스…"
+        className="h-full overflow-auto border-r border-gray-200 text-xs"
       />
       <div
         className="book-content h-full overflow-auto bg-white p-4"
-        dangerouslySetInnerHTML={{ __html: html || "<p class='text-gray-400'>미리보기</p>" }}
+        dangerouslySetInnerHTML={{ __html: value || "<p class='text-gray-400'>미리보기</p>" }}
       />
     </div>
   );

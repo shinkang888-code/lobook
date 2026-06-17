@@ -1,3 +1,5 @@
+import { DEFAULT_PAGE_SPEC } from "@/lib/editor/pageSpec";
+import type { PageSpec } from "@/lib/editor/types";
 import { getSupabaseAdmin, isSupabaseConfigured } from "./supabaseClient";
 import {
   createLocalBook,
@@ -8,6 +10,11 @@ import {
 } from "./localBookStore";
 import type { Book, CreateBookInput, UpdateBookInput } from "./types";
 
+function parsePageSpec(raw: unknown): PageSpec | undefined {
+  if (raw && typeof raw === "object") return { ...DEFAULT_PAGE_SPEC, ...(raw as PageSpec) };
+  return undefined;
+}
+
 function mapRow(row: Record<string, unknown>): Book {
   return {
     id: String(row.id),
@@ -16,6 +23,7 @@ function mapRow(row: Record<string, unknown>): Book {
     content_md: String(row.content_md ?? ""),
     content_html: String(row.content_html ?? ""),
     status: (row.status as Book["status"]) ?? "draft",
+    page_spec: parsePageSpec(row.page_spec),
     created_at: String(row.created_at),
     updated_at: String(row.updated_at),
   };
