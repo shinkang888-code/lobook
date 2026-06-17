@@ -11,9 +11,13 @@ const ALLOWED_IMPORT: Record<string, string[]> = {
   hwp: ["application/x-hwp", "application/octet-stream", "application/haansofthwp"],
   hwpx: ["application/hwp+zip", "application/vnd.hancom.hwpx", "application/octet-stream"],
   pdf: ["application/pdf", "application/octet-stream"],
+  pptx: [
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "application/octet-stream",
+  ],
 };
 
-export type ImportFileKind = "docx" | "epub" | "hwp" | "hwpx" | "pdf";
+export type ImportFileKind = "docx" | "epub" | "hwp" | "hwpx" | "pdf" | "pptx";
 
 function extFromFilename(name: string): string {
   return name.split(".").pop()?.toLowerCase() ?? "bin";

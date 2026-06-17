@@ -1,0 +1,6 @@
+# PPT Master export deps (Book Studio)
+# pip install -r requirements-ppt-master.txt
+python-pptx>=0.6.21
+edge-tts>=7.2.8
+svglib>=1.5.0
+reportlab>=4.0.0

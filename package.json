@@ -14,7 +14,9 @@
     "verify:sprint1": "tsx scripts/verify-phase3.ts",
     "verify:phase4": "tsx scripts/verify-phase4.ts",
     "verify:markitdown": "tsx scripts/verify-markitdown.ts",
-    "setup:markitdown": "pip install -r requirements-markitdown.txt"
+    "setup:markitdown": "pip install -r requirements-markitdown.txt",
+    "setup:ppt-master": "node scripts/setup-ppt-master.js && pip install -r requirements-ppt-master.txt",
+    "verify:ppt": "tsx scripts/verify-ppt.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

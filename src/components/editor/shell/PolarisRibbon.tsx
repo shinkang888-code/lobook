@@ -177,10 +177,10 @@ export function PolarisRibbon({
               <RibbonBtn icon={FileText} label="HWP" onClick={onImportHwp} />
               <RibbonBtn icon={FileStack} label="PDF" onClick={onImportPdf} />
             </RibbonGroup>
-                        <RibbonGroup label="변환">
+            <RibbonGroup label="변환">
               <RibbonBtn icon={FileCode2} label="마크다운" onClick={onConvertMarkdown} />
             </RibbonGroup>
-<RibbonGroup label="내보내기">
+            <RibbonGroup label="내보내기">
               {onExportEpub && <RibbonBtn icon={Download} label="EPUB" onClick={onExportEpub} />}
               {onExportDocx && <RibbonBtn icon={Download} label="Word" onClick={onExportDocx} />}
               {onExportPdf && <RibbonBtn icon={Printer} label="PDF" onClick={onExportPdf} />}
