@@ -21,9 +21,29 @@ Supabase 없이도 **로컬 저장소**로 바로 동작합니다.
 
 ## Supabase 연동 (선택)
 
-1. [Supabase](https://supabase.com) 프로젝트 생성
-2. SQL Editor에서 `supabase/migrations/20260617000000_books.sql` 실행
-3. `.env.local.example` → `.env.local` 복사 후 값 입력
+### CLI로 마이그레이션 (권장)
+
+```powershell
+# 1. CLI 로그인 (최초 1회)
+supabase login
+
+# 2. 프로젝트 연결
+cd c:\cursor\book
+supabase link --project-ref nmciigwlqaknlyoxitjz
+
+# 3. 원격 DB에 마이그레이션 적용
+supabase db push --include-all --yes
+```
+
+| 마이그레이션 | 내용 |
+|-------------|------|
+| `20260617032255_books.sql` | `books` 테이블 |
+| `20260617034319_book_images_storage.sql` | `book-images` Storage |
+| `20260617020000_chapters_pages.sql` | `page_spec`, `chapters`, `pages` |
+
+### 환경 변수
+
+`.env.local.example` → `.env.local` 복사 후 값 입력 (Vercel Production에도 동일 설정)
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
