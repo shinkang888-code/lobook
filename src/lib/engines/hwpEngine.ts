@@ -25,7 +25,7 @@ export const hwpEngine: DocumentEngine = {
       return { imported: 0, storagePath, fileName: opts.fileName };
     }
 
-    const pages = await extractHwpChaptersFromHtml(buffer);
+    const pages = await extractHwpChaptersFromHtml(buffer, opts.fileName);
     return {
       imported: pages.length,
       storagePath,

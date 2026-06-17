@@ -19,6 +19,8 @@
 # vendors
 vendor/aionui/
 vendor/ppt-master/
+vendor/hwpx-contents-extract/
 .aionui-install.json
 .ppt-master-install.json
+.hwpx-extract-install.json
 .data/ppt-workspace/

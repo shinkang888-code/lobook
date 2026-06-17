@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { DocxPreviewPanel } from "@/components/editor/modals/DocxPreviewPanel";
+import { HwpxPreviewPanel } from "@/components/editor/modals/HwpxPreviewPanel";
 
 export type ImportKind = "docx" | "epub" | "hwp" | "pdf";
 
@@ -58,6 +59,12 @@ export function ImportDialog({ bookId, open, onOpenChange, kind, onSuccess }: Im
       setPreviewBuffer(buf);
       return;
     }
+    if (kind === "hwp" && file.name.match(/\.hwpx$/i)) {
+      const buf = await file.arrayBuffer();
+      setPendingFile(file);
+      setPreviewBuffer(buf);
+      return;
+    }
     void handleImport(file);
   };
 
@@ -94,8 +101,9 @@ export function ImportDialog({ bookId, open, onOpenChange, kind, onSuccess }: Im
           toast.success("HWP 파일이 저장되었습니다. HWP 탭에서 Canvas 미리보기하세요.");
           onSuccess({ switchMode: "hwp" });
         } else {
+          const unit = pendingFile?.name.match(/\.hwpx$/i) ? "섹션" : "페이지";
           toast.success(
-            `${data.imported ?? 0}개 페이지를 HTML로 변환했습니다. Word 탭에서 편집하세요.`,
+            `${data.imported ?? 0}개 ${unit}을 HTML로 변환했습니다. Word 탭에서 편집하세요.`,
           );
           onSuccess({ switchMode: "word" });
         }
@@ -122,11 +130,21 @@ export function ImportDialog({ bookId, open, onOpenChange, kind, onSuccess }: Im
         onOpenChange(v);
       }}
     >
-      <DialogContent className={kind === "docx" && previewBuffer ? "sm:max-w-2xl" : "sm:max-w-md"}>
+      <DialogContent
+        className={
+          kind === "docx" && previewBuffer
+            ? "sm:max-w-2xl"
+            : kind === "hwp" && previewBuffer
+              ? "sm:max-w-2xl"
+              : "sm:max-w-md"
+        }
+      >
         <DialogHeader>
           <DialogTitle>{meta.title}</DialogTitle>
           <DialogDescription>
-            {meta.ext} 파일을 선택하세요. DOCX는 microscope-js로 미리보기 후 가져올 수 있습니다.
+            {kind === "hwp"
+              ? "HWP는 Canvas 뷰어, HWPX는 한컴 추출기 기반 HTML 미리보기 후 가져올 수 있습니다."
+              : `${meta.ext} 파일을 선택하세요. DOCX는 microscope-js로 미리보기 후 가져올 수 있습니다.`}
           </DialogDescription>
         </DialogHeader>
 
@@ -200,6 +218,13 @@ export function ImportDialog({ bookId, open, onOpenChange, kind, onSuccess }: Im
           <div className="space-y-2">
             <Label className="text-xs text-muted-foreground">microscope-js 미리보기 — {pendingFile.name}</Label>
             <DocxPreviewPanel buffer={previewBuffer} fileName={pendingFile.name} />
+          </div>
+        )}
+
+        {kind === "hwp" && previewBuffer && pendingFile && (
+          <div className="space-y-2">
+            <Label className="text-xs text-muted-foreground">HWPX 추출 미리보기 — {pendingFile.name}</Label>
+            <HwpxPreviewPanel buffer={previewBuffer} fileName={pendingFile.name} />
           </div>
         )}
 

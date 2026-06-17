@@ -1,4 +1,5 @@
 import { initRhwpServer } from "@/lib/rhwp/setup";
+import { hwpxBufferToChapters, isHwpxFileName } from "@/lib/hwpx/hwpxService";
 
 export type HwpPageChapter = {
   title: string;
@@ -6,7 +7,14 @@ export type HwpPageChapter = {
   page_index: number;
 };
 
-export async function extractHwpChaptersFromHtml(buffer: ArrayBuffer): Promise<HwpPageChapter[]> {
+export async function extractHwpChaptersFromHtml(
+  buffer: ArrayBuffer,
+  fileName = "document.hwp",
+): Promise<HwpPageChapter[]> {
+  if (isHwpxFileName(fileName)) {
+    return hwpxBufferToChapters(buffer);
+  }
+
   const rhwp = await initRhwpServer();
   const doc = new rhwp.HwpDocument(new Uint8Array(buffer));
 

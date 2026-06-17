@@ -19,7 +19,9 @@
     "verify:ppt": "tsx scripts/verify-ppt.ts",
     "setup:aionui": "node scripts/setup-aionui.js",
     "start:aionui": "node scripts/start-aionui.js",
-    "verify:aionui": "tsx scripts/verify-aionui.ts"
+    "verify:aionui": "tsx scripts/verify-aionui.ts",
+    "setup:hwpx-extract": "node scripts/setup-hwpx-extract.js",
+    "verify:hwpx": "tsx scripts/verify-hwpx.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

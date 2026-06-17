@@ -5,6 +5,8 @@ import { Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { PageSpec } from "@/lib/editor/types";
 import { RhwpCanvasViewer } from "./RhwpCanvasViewer";
+import { HwpxHtmlViewer } from "./HwpxHtmlViewer";
+import { isHwpxFileName } from "@/lib/hwpx/hwpxService";
 
 type HwpEditorPanelProps = {
   bookId: string;
@@ -73,6 +75,27 @@ export function HwpEditorPanel({
   }
 
   if (buffer && fileName) {
+    if (isHwpxFileName(fileName)) {
+      return (
+        <div className="flex h-full min-h-0 flex-col">
+          <HwpxHtmlViewer
+            buffer={buffer}
+            fileName={fileName}
+            pageSpec={pageSpec}
+            zoom={zoom}
+            onPageCountChange={onPageCountChange}
+            onError={setError}
+          />
+          {error && (
+            <p className="shrink-0 px-2 py-1 text-[10px] text-red-600">{error}</p>
+          )}
+          <p className="shrink-0 border-t border-[#2b579a]/20 bg-[#2b579a]/5 px-2 py-1 text-[10px] text-[#2b579a]">
+            HWPX: 한컴 hwpx-contents-extract 기반 본문 추출 · Ribbon → HTML 변환으로 Word 탭 편집
+          </p>
+        </div>
+      );
+    }
+
     return (
       <div className="flex h-full min-h-0 flex-col">
         <RhwpCanvasViewer

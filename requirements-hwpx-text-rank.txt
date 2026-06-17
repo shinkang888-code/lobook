@@ -1,0 +1,3 @@
+# Optional: hwpx-contents-extract text_rank (KoNLPy)
+# Book Studio 기본 키워드 추출은 TypeScript 내장 — Python은 고급 분석용
+# konlpy>=0.6.0
