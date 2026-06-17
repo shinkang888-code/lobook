@@ -117,8 +117,10 @@ export function BookEditor({ book }: BookEditorProps) {
       <div className="overflow-hidden rounded-2xl border bg-background">
         <MarkdownEditor
           ref={editorRef}
+          bookId={book.id}
           initialValue={book.content_md}
           onChange={() => setDirty(true)}
+          onUploadError={(message) => toast.error(message)}
         />
       </div>
 

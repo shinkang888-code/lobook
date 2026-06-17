@@ -14,9 +14,11 @@ const MarkdownEditorInner = dynamic(() => import("./MarkdownEditorInner"), {
 });
 
 type MarkdownEditorProps = {
+  bookId: string;
   initialValue?: string;
   height?: string;
   onChange?: () => void;
+  onUploadError?: (message: string) => void;
 };
 
 const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
