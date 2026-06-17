@@ -14,6 +14,7 @@ import {
 import { ChapterList } from "@/components/editor/navigation/ChapterList";
 import { PageThumbnailStrip } from "@/components/editor/navigation/PageThumbnailStrip";
 import { TocNavigator } from "@/components/editor/navigation/TocNavigator";
+import { ImportDialog, type ImportKind } from "@/components/editor/modals/ImportDialog";
 import { EditorTabBar } from "@/components/editor/shell/EditorTabBar";
 import { EditorToolbarProvider, useEditorToolbar } from "@/components/editor/shell/EditorToolbarContext";
 import { PolarisRibbon } from "@/components/editor/shell/PolarisRibbon";
@@ -21,6 +22,7 @@ import { StatusBar } from "@/components/editor/shell/StatusBar";
 import { WordEditorPanel, type WordEditorPanelHandle } from "@/components/editor/word/WordEditorPanel";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAddChapter, useBookStructure, useSaveBookStructure } from "@/hooks/useBookStructure";
+import { useQueryClient } from "@tanstack/react-query";
 import { loadPageSpec, savePageSpec } from "@/lib/editor/pageSpec";
 import { buildTocFromMarkdown, splitMarkdownToPages } from "@/lib/editor/tocBuilder";
 import type { EditorMode, PageSpec } from "@/lib/editor/types";
@@ -53,6 +55,8 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
   const [showThumbnails, setShowThumbnails] = useState(false);
   const [activeChapterId, setActiveChapterId] = useState<string>("");
   const [chapterDrafts, setChapterDrafts] = useState<Record<string, { md: string; html: string }>>({});
+  const [importKind, setImportKind] = useState<ImportKind | null>(null);
+  const queryClient = useQueryClient();
 
   const chapters = structure?.chapters ?? [];
   const activeChapter = chapters.find((c) => c.id === activeChapterId) ?? chapters[0];
@@ -168,25 +172,73 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
     }
   };
 
-  const handleExport = async () => {
+  const downloadBlob = async (url: string, filename: string) => {
+    const res = await fetch(url, { method: "POST" });
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error ?? "다운로드 실패");
+    }
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.download = filename;
+    anchor.click();
+    URL.revokeObjectURL(objectUrl);
+  };
+
+  const handleExportEpub = async () => {
     try {
       if (dirty) await handleSave();
-      const res = await fetch(`/api/books/${book.id}/export`, { method: "POST" });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "EPUB 내보내기 실패");
-      }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `${title || "book"}.epub`;
-      anchor.click();
-      URL.revokeObjectURL(url);
+      await downloadBlob(`/api/books/${book.id}/export`, `${title || "book"}.epub`);
       toast.success("EPUB 파일을 다운로드했습니다.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "EPUB 내보내기 실패");
     }
+  };
+
+  const handleExportDocx = async () => {
+    try {
+      if (dirty) await handleSave();
+      await downloadBlob(`/api/books/${book.id}/export/docx`, `${title || "book"}.docx`);
+      toast.success("Word(DOCX) 파일을 다운로드했습니다.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "DOCX 내보내기 실패");
+    }
+  };
+
+  const handleExportPdf = async () => {
+    try {
+      if (dirty) await handleSave();
+      await downloadBlob(`/api/books/${book.id}/export/pdf`, `${title || "book"}-print.html`);
+      toast.success("인쇄용 HTML을 다운로드했습니다. 브라우저에서 PDF로 저장하세요.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "PDF 내보내기 실패");
+    }
+  };
+
+  const handleSnapshot = async () => {
+    try {
+      if (dirty) await handleSave();
+      const res = await fetch(`/api/books/${book.id}/versions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ label: `v ${new Date().toLocaleString("ko-KR")}` }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "버전 저장 실패");
+      toast.success(
+        data.version ? "버전 스냅샷이 저장되었습니다." : (data.message ?? "완료되었습니다."),
+      );
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "버전 저장 실패");
+    }
+  };
+
+  const handleImportSuccess = () => {
+    setChapterDrafts({});
+    setDirty(false);
+    void queryClient.invalidateQueries({ queryKey: ["books", book.id, "structure"] });
   };
 
   const handleAddChapter = async () => {
@@ -256,7 +308,13 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
         saving={saveStructure.isPending}
         dirty={dirty}
         onSave={() => void handleSave()}
-        onExport={() => void handleExport()}
+        onExportEpub={() => void handleExportEpub()}
+        onExportDocx={() => void handleExportDocx()}
+        onExportPdf={() => void handleExportPdf()}
+        onImportDocx={() => setImportKind("docx")}
+        onImportEpub={() => setImportKind("epub")}
+        onImportHwp={() => setImportKind("hwp")}
+        onSnapshot={() => void handleSnapshot()}
         onPreview={() => router.push(`/books/${book.id}/preview`)}
         showThumbnails={showThumbnails}
         onToggleThumbnails={() => {
@@ -264,6 +322,16 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
           setLeftTab("thumb");
         }}
       />
+
+      {importKind && (
+        <ImportDialog
+          bookId={book.id}
+          open={Boolean(importKind)}
+          onOpenChange={(open) => !open && setImportKind(null)}
+          kind={importKind}
+          onSuccess={handleImportSuccess}
+        />
+      )}
 
       <EditorTabBar activeMode={activeMode} onModeChange={setActiveMode} />
 

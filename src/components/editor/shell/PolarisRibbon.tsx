@@ -41,7 +41,13 @@ type PolarisRibbonProps = {
   saving?: boolean;
   dirty?: boolean;
   onSave?: () => void;
-  onExport?: () => void;
+  onExportEpub?: () => void;
+  onExportDocx?: () => void;
+  onExportPdf?: () => void;
+  onImportDocx?: () => void;
+  onImportEpub?: () => void;
+  onImportHwp?: () => void;
+  onSnapshot?: () => void;
   onPreview?: () => void;
   showThumbnails?: boolean;
   onToggleThumbnails?: () => void;
@@ -52,7 +58,13 @@ export function PolarisRibbon({
   saving,
   dirty,
   onSave,
-  onExport,
+  onExportEpub,
+  onExportDocx,
+  onExportPdf,
+  onImportDocx,
+  onImportEpub,
+  onImportHwp,
+  onSnapshot,
   onPreview,
   showThumbnails,
   onToggleThumbnails,
@@ -131,10 +143,10 @@ export function PolarisRibbon({
               미리보기
             </button>
           )}
-          {onExport && (
+          {onExportEpub && (
             <button
               type="button"
-              onClick={onExport}
+              onClick={onExportEpub}
               className="flex shrink-0 items-center gap-1 rounded bg-white/20 px-3 py-1 text-xs text-white hover:bg-white/30"
             >
               <Download className="size-3.5" />
@@ -151,8 +163,18 @@ export function PolarisRibbon({
             <RibbonGroup label="파일">
               <RibbonBtn icon={FileText} label="목록" onClick={() => router.push("/")} />
               {onSave && <RibbonBtn icon={Save} label="저장" onClick={onSave} />}
-              {onExport && <RibbonBtn icon={Download} label="EPUB" onClick={onExport} />}
+              {onSnapshot && <RibbonBtn icon={FileStack} label="버전 저장" onClick={onSnapshot} />}
               <RibbonBtn icon={Printer} label="인쇄" onClick={() => window.print()} />
+            </RibbonGroup>
+            <RibbonGroup label="가져오기">
+              <RibbonBtn icon={FileText} label="Word" onClick={onImportDocx} />
+              <RibbonBtn icon={FileStack} label="EPUB" onClick={onImportEpub} />
+              <RibbonBtn icon={FileText} label="HWP" onClick={onImportHwp} />
+            </RibbonGroup>
+            <RibbonGroup label="내보내기">
+              {onExportEpub && <RibbonBtn icon={Download} label="EPUB" onClick={onExportEpub} />}
+              {onExportDocx && <RibbonBtn icon={Download} label="Word" onClick={onExportDocx} />}
+              {onExportPdf && <RibbonBtn icon={Printer} label="PDF" onClick={onExportPdf} />}
             </RibbonGroup>
           </div>
         )}
