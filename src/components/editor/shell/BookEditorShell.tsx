@@ -331,6 +331,12 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
             zoom={zoom}
             activePage={activePage}
             onPageCountChange={setHwpPageCount}
+            onConvertedToWord={() => {
+              setChapterDrafts({});
+              setDirty(false);
+              setActiveMode("word");
+              void queryClient.invalidateQueries({ queryKey: ["books", book.id, "structure"] });
+            }}
           />
         );
       default:

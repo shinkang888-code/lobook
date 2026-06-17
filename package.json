@@ -21,7 +21,9 @@
     "start:aionui": "node scripts/start-aionui.js",
     "verify:aionui": "tsx scripts/verify-aionui.ts",
     "setup:hwpx-extract": "node scripts/setup-hwpx-extract.js",
-    "verify:hwpx": "tsx scripts/verify-hwpx.ts"
+    "verify:hwpx": "tsx scripts/verify-hwpx.ts",
+    "setup:hancom-toolkit": "node scripts/setup-hancom-toolkit.js",
+    "verify:hancom": "tsx scripts/verify-hancom-toolkit.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

@@ -22,5 +22,8 @@ vendor/ppt-master/
 vendor/hwpx-contents-extract/
 .aionui-install.json
 .ppt-master-install.json
+vendor/hwpx-contents-extract/
+vendor/hancom-toolkit/
 .hwpx-extract-install.json
+.hancom-toolkit-install.json
 .data/ppt-workspace/
