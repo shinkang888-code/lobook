@@ -363,21 +363,6 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
         saving={saveStructure.isPending}
         dirty={dirty}
         onSave={() => void handleSave()}
-        onExportEpub={() => void handleExportEpub()}
-        onExportDocx={() => void handleExportDocx()}
-        onExportPdf={() => void handleExportPdf()}
-        onImportDocx={() => setImportKind("docx")}
-        onImportEpub={() => setImportKind("epub")}
-        onImportHwp={() => setImportKind("hwp")}
-        onImportPdf={() => setImportKind("pdf")}
-        onConvertMarkdown={() => setConvertMarkdownOpen(true)}
-        onSnapshot={() => void handleSnapshot()}
-        onPreview={() => router.push(`/books/${book.id}/preview`)}
-        showThumbnails={showThumbnails}
-        onToggleThumbnails={() => {
-          setShowThumbnails((v) => !v);
-          setLeftTab("thumb");
-        }}
       />
 
       {importKind && (
