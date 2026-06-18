@@ -50,7 +50,7 @@ Book Studio는 현재 **Polaris Shell UI + Markdown(Toast UI) 1종 완성** 상�
 | **Word (DOCX)** | [microscope-js](https://github.com/shinkang888-code/microscope-js) | `c:\cursor\microscope-js` | TS | DOCX/PDF/XLSX/PPTX **클라이언트 뷰어** | **P0** |
 | **Word (DOCX)** | [DocX](https://github.com/shinkang888-code/DocX) | — | C# | Word 파일 생성/수정 (.NET) | **P4** 서버 sidecar |
 | **Word (DOCX)** | [python-office](https://github.com/shinkang888-code/python-office) | — | Python | Office 자동화 | **P3** batch 변환 |
-| **통합 오피스** | [Loffice](https://github.com/shinkang888-code/lofice) | `c:\cursor\lofice` | JS/Next.js | **60+ 포맷**, 모든 엔진 통합 레퍼런스 | **P0** 패턴 소스 |
+| **통합 오피스** | [Loffice](https://github.com/shinkang888-code/looffice) | `c:\cursor\looffice` | JS/Next.js | **60+ 포맷**, 모든 엔진 통합 레퍼런스 | **P0** 패턴 소스 |
 | **HWP/HWPX** | [hwpreader](https://github.com/shinkang888-code/hwpreader) | `c:\cursor\hwpreader` | Rust/WASM | `@rhwp/core` 뷰어·편집, rhwp-studio | **P0** |
 | **HWP/HWPX** | [hwpx-skill](https://github.com/shinkang888-code/hwpx-skill) | `c:\cursor\hwpx-skill` | Python | HWP→HWPX, MD→HWPX, 양식 복제 | **P1** sidecar |
 | **HWP/HWPX** | [HANCOM](https://github.com/shinkang888-code/HANCOM) | — | PS | 한컴 설치 구조 분석 | **P4** 참조 |
@@ -505,7 +505,7 @@ Book {
 | 리포 | URL |
 |------|-----|
 | book | https://github.com/shinkang888-code/book |
-| Loffice | https://github.com/shinkang888-code/lofice |
+| Loffice | https://github.com/shinkang888-code/looffice |
 | naverb | https://github.com/shinkang888-code/naverb |
 | hwpreader | https://github.com/shinkang888-code/hwpreader |
 | microscope-js | https://github.com/shinkang888-code/microscope-js |

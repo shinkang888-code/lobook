@@ -1,6 +1,6 @@
 /**
  * Loffice 통합 오피스 엔진 카탈로그
- * @see https://github.com/shinkang888-code/lofice
+ * @see https://github.com/shinkang888-code/looffice
  */
 
 export type LofficeEngineId =

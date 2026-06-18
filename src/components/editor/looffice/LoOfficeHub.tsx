@@ -124,7 +124,7 @@ export function LoOfficeHub({ bookId, bookTitle, onApplyOcrText }: LoOfficeHubPr
             <div className="looffice-card">
               <h3 className="mb-2 text-sm font-bold text-slate-800">Loffice × LoBooK</h3>
               <p className="text-[11px] leading-relaxed text-slate-600">
-                shinkang888-code/lofice는 Word·HTML·PDF·HWP·Excel·PPT 등 60+ 형식을 통합한 핵심 오피스 허브입니다.
+                shinkang888-code/looffice는 Word·HTML·PDF·HWP·Excel·PPT 등 60+ 형식을 통합한 핵심 오피스 허브입니다.
                 LoBooK는 Loffice에서 검증된 OCR·뷰어·편집 엔진을 전자책 워크플로에 연동합니다.
               </p>
             </div>

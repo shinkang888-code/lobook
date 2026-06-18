@@ -22,6 +22,6 @@ export async function GET() {
       tesseract: true,
       ddddocr: isDdddOcrServerAvailable(),
     },
-    repo: "https://github.com/shinkang888-code/lofice",
+    repo: "https://github.com/shinkang888-code/looffice",
   });
 }

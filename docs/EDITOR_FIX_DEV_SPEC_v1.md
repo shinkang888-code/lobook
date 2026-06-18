@@ -468,8 +468,8 @@ npm run verify:phase3  # hwp html import 테스트 (신규)
 
 | 리소스 | 경로 | 활용 |
 |--------|------|------|
-| Loffice RhwpCanvasViewer | `c:\cursor\lofice\src\components\hwp\` | HWP scale/zoom/canvas |
-| Loffice HwpEditor | `c:\cursor\lofice\src\app\hwp-editor\` | 편집 API 참고 |
+| Loffice RhwpCanvasViewer | `c:\cursor\looffice\src\components\hwp\` | HWP scale/zoom/canvas |
+| Loffice HwpEditor | `c:\cursor\looffice\src\app\hwp-editor\` | 편집 API 참고 |
 | @rhwp/core API | `node_modules/@rhwp/core/rhwp.d.ts` | renderPageHtml, insertText |
 | 기존 명세 | `docs/EDITOR_UPGRADE_DEV_SPEC_v1.md` §8.4 | 편집기 상세 TO-BE |
 

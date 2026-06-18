@@ -82,7 +82,7 @@ Book Studio는 현재 **단일 Markdown 에디터 + 카드 레이아웃** MVP이
 | **book** | ✅ `c:\cursor\book` | 허브 Next.js 앱 | 본 프로젝트 |
 | **naverb** | ✅ `c:\cursor\naverb` | Toast UI Editor 소스 | Markdown 탭 (npm `@toast-ui/react-editor` 사용 중) |
 | **ebook** | ✅ `c:\cursor\ebook` | Magic/Sigil EPUB C++ | OPF/Nav/Headings 알고리즘 TS 포팅 |
-| **Loffice** | ✅ `c:\cursor\lofice` | **Polaris UI 레퍼런스** | `LofficeLayout`, `DocxEditor`, `RhwpCanvasViewer` 패턴 복제 |
+| **Loffice** | ✅ `c:\cursor\looffice` | **Polaris UI 레퍼런스** | `LofficeLayout`, `DocxEditor`, `RhwpCanvasViewer` 패턴 복제 |
 | **hwpreader** | ⚠️ LFS 일부 실패 | `@rhwp/core` WASM | npm 설치 + `public/rhwp_bg.wasm` |
 | **hwpx-skill** | ✅ | Python HWPX 변환 | Phase 2 API sidecar |
 | **microscope-js** | ✅ | DOCX/PDF 뷰어 | Word import preview |

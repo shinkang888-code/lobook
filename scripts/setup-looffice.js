@@ -7,10 +7,10 @@ const path = require("path");
 const { execSync } = require("child_process");
 
 const bookRoot = path.join(__dirname, "..");
-const defaultSource = path.join(bookRoot, "..", "lofice");
+const defaultSource = path.join(bookRoot, "..", "looffice");
 const sourceRoot = process.env.LOOFFICE_ROOT || defaultSource;
 const vendorRoot = path.join(bookRoot, "vendor", "looffice");
-const REPO = "https://github.com/shinkang888-code/lofice.git";
+const REPO = "https://github.com/shinkang888-code/looffice.git";
 
 function run(cmd, cwd) {
   console.log(`> ${cmd}`);
@@ -20,7 +20,7 @@ function run(cmd, cwd) {
 function main() {
   let root = sourceRoot;
   if (!fs.existsSync(path.join(root, "package.json"))) {
-    console.log("Cloning lofice (shallow)...");
+    console.log("Cloning loffice (shallow)...");
     fs.mkdirSync(path.dirname(vendorRoot), { recursive: true });
     run(`git clone --depth 1 ${REPO} "${vendorRoot}"`, bookRoot);
     root = vendorRoot;
