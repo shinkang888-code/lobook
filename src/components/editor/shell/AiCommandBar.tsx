@@ -10,14 +10,35 @@ import {
   CheckCircle2,
   AlertCircle,
   Bot,
+  Palette,
+  Cpu,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import type { PptCanvasFormat } from "@/lib/ppt/pptMasterPaths";
+import type { PptAiProvider } from "@/lib/ppt/pptAiService";
 
 type PptStatus = {
   engine: { available: boolean; error?: string };
-  ai: { enabled: boolean; model: string };
+  ai: {
+    enabled: boolean;
+    model: string;
+    provider: PptAiProvider;
+    openai: { enabled: boolean; model: string };
+    gemini: {
+      apiEnabled: boolean;
+      cliAvailable: boolean;
+      cliVersion?: string;
+      model: string;
+    };
+  };
+  figma: {
+    cliAvailable: boolean;
+    cliVersion?: string;
+    apiEnabled: boolean;
+    themeCount: number;
+  };
+  themes: Array<{ id: string; label: string; source?: string }>;
 };
 
 type AiCommandBarProps = {
@@ -34,10 +55,35 @@ const PRESETS = [
   "독자 대상 소개용 프레젠테이션",
 ];
 
+const PROVIDER_LABELS: Record<PptAiProvider, string> = {
+  auto: "자동",
+  gemini: "Gemini",
+  openai: "OpenAI",
+  local: "로컬",
+};
+
+function providerHint(status: PptStatus | null, provider: PptAiProvider): string {
+  if (!status) return "";
+  if (provider === "gemini") {
+    if (status.ai.gemini.apiEnabled) return status.ai.gemini.model;
+    if (status.ai.gemini.cliAvailable) return `CLI ${status.ai.gemini.cliVersion ?? ""}`.trim();
+    return "API 키 또는 CLI 필요";
+  }
+  if (provider === "openai") {
+    return status.ai.openai.enabled ? status.ai.openai.model : "API 키 필요";
+  }
+  if (provider === "local") return "마크다운 플래너";
+  if (status.ai.gemini.apiEnabled || status.ai.gemini.cliAvailable) return "Gemini 우선";
+  if (status.ai.openai.enabled) return status.ai.openai.model;
+  return "로컬 플래너";
+}
+
 export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: AiCommandBarProps) {
   const [prompt, setPrompt] = useState("");
   const [format, setFormat] = useState<PptCanvasFormat>("ppt169");
   const [maxSlides, setMaxSlides] = useState(10);
+  const [provider, setProvider] = useState<PptAiProvider>("auto");
+  const [themeId, setThemeId] = useState("lobook");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<PptStatus | null>(null);
   const [lastFile, setLastFile] = useState<string | null>(null);
@@ -45,11 +91,18 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
   const loadStatus = useCallback(async () => {
     try {
       const res = await fetch("/api/ppt/status");
-      setStatus((await res.json()) as PptStatus);
+      const data = (await res.json()) as PptStatus;
+      setStatus(data);
+      setThemeId((prev) => {
+        if (data.themes?.length && !data.themes.some((t) => t.id === prev)) {
+          return data.themes[0].id;
+        }
+        return prev;
+      });
       const latest = await fetch(`/api/books/${bookId}/ppt/latest`);
       if (latest.ok) {
-        const data = await latest.json();
-        setLastFile(data.fileName);
+        const latestData = await latest.json();
+        setLastFile(latestData.fileName);
       }
     } catch {
       setStatus(null);
@@ -70,7 +123,7 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
       const res = await fetch(`/api/books/${bookId}/ppt/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, format, maxSlides }),
+        body: JSON.stringify({ prompt, format, maxSlides, provider, theme: themeId }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "PPT 생성 실패");
@@ -90,7 +143,8 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
   };
 
   const engineOk = status?.engine.available;
-  const aiOn = status?.ai.enabled;
+  const geminiReady = status?.ai.gemini.apiEnabled || status?.ai.gemini.cliAvailable;
+  const figmaReady = status?.figma.cliAvailable || status?.figma.apiEnabled;
 
   return (
     <div className="hancom-ai-bar shrink-0 px-4 py-3 shadow-sm">
@@ -105,12 +159,11 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
                 AI 프레젠테이션 스튜디오
               </p>
               <p className="text-[11px] text-slate-500">
-                PPT Master · {bookTitle || "제목 없음"}
-                {aiOn ? ` · ${status?.ai.model}` : " · 로컬 플래너"}
+                PPT Master · {bookTitle || "제목 없음"} · {providerHint(status, provider)}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-[11px]">
+          <div className="flex flex-wrap items-center gap-2 text-[11px]">
             {engineOk ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-800">
                 <CheckCircle2 className="size-3" /> PPT 엔진 준비
@@ -118,6 +171,26 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
             ) : (
               <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-amber-900">
                 <AlertCircle className="size-3" /> setup:ppt-master 필요
+              </span>
+            )}
+            {geminiReady ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-violet-800">
+                <Cpu className="size-3" /> Gemini
+                {status?.ai.gemini.cliVersion ? ` ${status.ai.gemini.cliVersion}` : ""}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-slate-600">
+                <Cpu className="size-3" /> Gemini 미연결
+              </span>
+            )}
+            {figmaReady ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-pink-100 px-2 py-0.5 text-pink-800">
+                <Palette className="size-3" /> Figma
+                {status?.figma.cliVersion ? ` ${status.figma.cliVersion}` : ""}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-slate-600">
+                <Palette className="size-3" /> Figma 기본 테마
               </span>
             )}
             {lastFile && (
@@ -154,6 +227,32 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={provider}
+              onChange={(e) => setProvider(e.target.value as PptAiProvider)}
+              title="AI 엔진"
+              className="h-9 rounded-lg border border-[var(--hnc-control-border-color)] bg-white px-2 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-[var(--hnc-control-border-color-hover)]/30"
+            >
+              {(Object.keys(PROVIDER_LABELS) as PptAiProvider[]).map((p) => (
+                <option key={p} value={p}>
+                  {PROVIDER_LABELS[p]}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={themeId}
+              onChange={(e) => setThemeId(e.target.value)}
+              title="Figma 테마"
+              className="h-9 max-w-[140px] rounded-lg border border-[var(--hnc-control-border-color)] bg-white px-2 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-[var(--hnc-control-border-color-hover)]/30"
+            >
+              {(status?.themes ?? [{ id: "lobook", label: "LoBooK Classic" }]).map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
+
             <div className="flex overflow-hidden rounded-lg border border-[var(--hnc-control-border-color)] bg-white">
               {(["ppt169", "ppt43"] as PptCanvasFormat[]).map((f) => (
                 <button

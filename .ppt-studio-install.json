@@ -1,0 +1,10 @@
+{
+  "installedAt": "2026-06-18T02:11:51.226Z",
+  "geminiCli": true,
+  "figmaCli": true,
+  "envHints": {
+    "GEMINI_API_KEY": "Gemini API (슬라이드 AI 플래닝)",
+    "FIGMA_ACCESS_TOKEN": "Figma REST API (라이브 변수 테마)",
+    "FIGMA_FILE_KEY": "Figma 파일 키 (기본: Book Studio Design System)"
+  }
+}

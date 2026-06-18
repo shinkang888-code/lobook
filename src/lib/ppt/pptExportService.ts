@@ -11,6 +11,7 @@ import {
   resolvePptWorkspaceDir,
 } from "./pptMasterPaths";
 import { buildSlideSvg, type PptGenerationPlan } from "./slideSvgBuilder";
+import { resolvePptTheme } from "./pptFigmaTheme";
 
 export type PptEngineStatus = {
   available: boolean;
@@ -76,7 +77,8 @@ async function initProject(
   const scripts = resolvePptMasterScriptsDir();
   const workspace = resolvePptWorkspaceDir(bookId);
   await fs.mkdir(workspace, { recursive: true });
-  const projectName = `book_${bookId.slice(0, 8)}`;
+  const stamp = new Date().toISOString().replace(/[-:T.Z]/g, "").slice(0, 14);
+  const projectName = `book_${bookId.slice(0, 8)}_${stamp}`;
   const manager = path.join(scripts, "project_manager.py");
   await runPython([manager, "init", projectName, "--format", format, "--dir", workspace]);
   const entries = await fs.readdir(workspace, { withFileTypes: true });
@@ -89,6 +91,7 @@ export async function generatePptxFromPlan(
   bookId: string,
   plan: PptGenerationPlan,
   format: PptCanvasFormat = "ppt169",
+  themeId?: string,
 ): Promise<PptGenerateResult> {
   const status = await getPptEngineStatus();
   if (!status.available) throw new Error(status.error ?? "PPT 엔진을 사용할 수 없습니다.");
@@ -99,12 +102,13 @@ export async function generatePptxFromPlan(
   await fs.mkdir(svgDir, { recursive: true });
 
   const canvas = PPT_CANVAS[format];
+  const theme = await resolvePptTheme(themeId ?? plan.theme);
   const slides = plan.slides;
   let idx = 0;
   for (const slide of slides) {
     idx += 1;
     const fileName = `${String(idx).padStart(2, "0")}_${slide.id.replace(/^\d+_/, "")}.svg`;
-    const svg = buildSlideSvg(slide, idx - 1, slides.length, canvas.viewBox);
+    const svg = buildSlideSvg(slide, idx - 1, slides.length, canvas.viewBox, theme);
     await fs.writeFile(path.join(svgDir, fileName), svg, "utf-8");
   }
 

@@ -1,5 +1,8 @@
 import type { PptAiRequest, PptGenerationPlan } from "./slideSvgBuilder";
 import { planFromMarkdown } from "./slideSvgBuilder";
+import { buildPptPlanWithGemini, getPptGeminiStatus, hasGeminiApiKey } from "./pptGeminiService";
+
+export type PptAiProvider = "auto" | "openai" | "gemini" | "local";
 
 type AiSlideJson = {
   deckTitle?: string;
@@ -11,7 +14,7 @@ type AiSlideJson = {
   }>;
 };
 
-function hasAiKey(): boolean {
+function hasOpenAiKey(): boolean {
   return Boolean(process.env.OPENAI_API_KEY || process.env.PPT_AI_API_KEY);
 }
 
@@ -31,7 +34,7 @@ function aiApiKey(): string {
   return process.env.PPT_AI_API_KEY || process.env.OPENAI_API_KEY || "";
 }
 
-export async function buildPptPlan(request: PptAiRequest): Promise<PptGenerationPlan> {
+async function buildPptPlanWithOpenAi(request: PptAiRequest): Promise<PptGenerationPlan> {
   const maxSlides = request.maxSlides ?? 12;
   const fallback = planFromMarkdown(
     request.bookTitle,
@@ -41,7 +44,7 @@ export async function buildPptPlan(request: PptAiRequest): Promise<PptGeneration
     maxSlides,
   );
 
-  if (!hasAiKey()) return fallback;
+  if (!hasOpenAiKey()) return fallback;
 
   const system = `You are a presentation strategist for LoBooK. Return ONLY valid JSON:
 {"deckTitle":"string","slides":[{"title":"string","subtitle":"string","bullets":["string"],"layout":"cover|content|closing"}]}
@@ -96,7 +99,7 @@ ${request.sourceMarkdown.slice(0, 12000)}`;
 
     return {
       deckTitle: parsed.deckTitle || request.bookTitle,
-      theme: "ai",
+      theme: "openai",
       slides,
     };
   } catch {
@@ -104,6 +107,53 @@ ${request.sourceMarkdown.slice(0, 12000)}`;
   }
 }
 
-export function getPptAiStatus(): { enabled: boolean; model: string } {
-  return { enabled: hasAiKey(), model: aiModel() };
+export type BuildPptPlanOptions = PptAiRequest & {
+  provider?: PptAiProvider;
+};
+
+export async function buildPptPlan(options: BuildPptPlanOptions): Promise<PptGenerationPlan> {
+  const provider = options.provider ?? "auto";
+  const maxSlides = options.maxSlides ?? 12;
+  const localFallback = planFromMarkdown(
+    options.bookTitle,
+    options.author,
+    options.sourceMarkdown,
+    options.prompt,
+    maxSlides,
+  );
+
+  if (provider === "local") return localFallback;
+  if (provider === "gemini") return buildPptPlanWithGemini(options);
+  if (provider === "openai") return buildPptPlanWithOpenAi(options);
+
+  if (hasGeminiApiKey()) {
+    const geminiPlan = await buildPptPlanWithGemini(options);
+    if (geminiPlan.theme === "gemini") return geminiPlan;
+  }
+  if (hasOpenAiKey()) {
+    const openAiPlan = await buildPptPlanWithOpenAi(options);
+    if (openAiPlan.theme === "openai") return openAiPlan;
+  }
+
+  return localFallback;
+}
+
+export async function getPptAiStatus() {
+  const gemini = await getPptGeminiStatus();
+  const openaiEnabled = hasOpenAiKey();
+  const activeProvider: PptAiProvider = gemini.apiEnabled
+    ? "gemini"
+    : openaiEnabled
+      ? "openai"
+      : gemini.cliAvailable
+        ? "gemini"
+        : "local";
+
+  return {
+    enabled: gemini.apiEnabled || openaiEnabled || gemini.cliAvailable,
+    model: gemini.apiEnabled || gemini.cliAvailable ? gemini.model : aiModel(),
+    provider: activeProvider,
+    openai: { enabled: openaiEnabled, model: aiModel() },
+    gemini,
+  };
 }

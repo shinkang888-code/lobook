@@ -1,6 +1,53 @@
-export type EditorMode = "markdown" | "html" | "word" | "hwp" | "pdf" | "cowork" | "architecture" | "office" | "preview";
+export type EditorMode =
+  | "libreoffice"
+  | "writer"
+  | "studio"
+  | "preview"
+  /** @deprecated use writer */
+  | "markdown"
+  /** @deprecated use libreoffice */
+  | "html"
+  | "word"
+  | "hwp"
+  | "pdf"
+  | "cowork"
+  | "architecture"
+  | "office";
 
-export const CORE_EDITOR_MODES: EditorMode[] = ["markdown", "html", "word", "hwp", "pdf", "office", "cowork", "architecture"];
+/** LibreOffice 중심 3탭 구조 */
+export const CORE_EDITOR_MODES: EditorMode[] = ["libreoffice", "writer", "studio"];
+
+export type PrimaryEditorMode = "libreoffice" | "writer" | "studio" | "preview";
+
+export function normalizeEditorMode(mode: EditorMode): PrimaryEditorMode {
+  switch (mode) {
+    case "markdown":
+    case "writer":
+      return "writer";
+    case "html":
+    case "word":
+    case "hwp":
+    case "pdf":
+    case "office":
+    case "libreoffice":
+      return "libreoffice";
+    case "cowork":
+    case "architecture":
+    case "studio":
+      return "studio";
+    case "preview":
+      return "preview";
+    default:
+      return "libreoffice";
+  }
+}
+
+export const EDITOR_MODE_LABELS: Record<PrimaryEditorMode, string> = {
+  libreoffice: "LibreOffice",
+  writer: "Writer (원고)",
+  studio: "LoBooK Studio",
+  preview: "미리보기",
+};
 
 export type PagePresetId =
   | "a4"

@@ -5,9 +5,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PageCanvas, ZoomControls } from "@/components/editor/canvas/PageCanvas";
 import { PageSpecPanel } from "@/components/editor/canvas/PageSpecPanel";
-import { HwpEditorPanel } from "@/components/editor/hwp/HwpEditorPanel";
-import { PdfEditorPanel } from "@/components/editor/pdf/PdfEditorPanel";
-import { HtmlEditorPanel, type HtmlEditorPanelHandle } from "@/components/editor/html/HtmlEditorPanel";
 import {
   MarkdownEditorPanel,
   type MarkdownEditorPanelHandle,
@@ -15,23 +12,25 @@ import {
 import { ChapterList } from "@/components/editor/navigation/ChapterList";
 import { PageThumbnailStrip } from "@/components/editor/navigation/PageThumbnailStrip";
 import { TocNavigator } from "@/components/editor/navigation/TocNavigator";
-import { AionCoworkHub } from "@/components/editor/cowork/AionCoworkHub";
 import { AiCommandBar } from "@/components/editor/shell/AiCommandBar";
 import { ConvertToMarkdownDialog } from "@/components/editor/modals/ConvertToMarkdownDialog";
 import { ImportDialog, type ImportKind } from "@/components/editor/modals/ImportDialog";
 import { EditorTabBar } from "@/components/editor/shell/EditorTabBar";
 import { EditorToolbarProvider, useEditorToolbar } from "@/components/editor/shell/EditorToolbarContext";
-import { PolarisRibbon } from "@/components/editor/shell/PolarisRibbon";
+import { LibreOfficeRibbon } from "@/components/editor/libreoffice/LibreOfficeRibbon";
+import { LibreOfficeHub, type LibreOfficePanelId } from "@/components/editor/libreoffice/LibreOfficeHub";
+import { LibreOfficeSidebar } from "@/components/editor/libreoffice/LibreOfficeSidebar";
+import { StudioHub } from "@/components/editor/studio/StudioHub";
 import { StatusBar } from "@/components/editor/shell/StatusBar";
-import { WordEditorPanel, type WordEditorPanelHandle } from "@/components/editor/word/WordEditorPanel";
-import { ArchitectureHub } from "@/components/editor/architecture/ArchitectureHub";
-import { LoOfficeHub } from "@/components/editor/looffice/LoOfficeHub";
+import type { WordEditorPanelHandle } from "@/components/editor/word/WordEditorPanel";
+import type { HtmlEditorPanelHandle } from "@/components/editor/html/HtmlEditorPanel";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAddChapter, useBookStructure, useSaveBookStructure } from "@/hooks/useBookStructure";
 import { useQueryClient } from "@tanstack/react-query";
 import { loadPageSpec, savePageSpec } from "@/lib/editor/pageSpec";
 import { buildTocFromMarkdown, splitMarkdownToPages } from "@/lib/editor/tocBuilder";
 import type { EditorMode, PageSpec } from "@/lib/editor/types";
+import { normalizeEditorMode } from "@/lib/editor/types";
 import type { Book, BookStatus, SaveStructureInput } from "@/lib/types";
 
 type BookEditorShellProps = {
@@ -53,7 +52,8 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
   const [author, setAuthor] = useState(book.author);
   const [status] = useState<BookStatus>(book.status);
   const [dirty, setDirty] = useState(false);
-  const [activeMode, setActiveMode] = useState<EditorMode>("markdown");
+  const [activeMode, setActiveMode] = useState<EditorMode>("libreoffice");
+  const [loPanel, setLoPanel] = useState<LibreOfficePanelId>("writer");
   const [pageSpec, setPageSpec] = useState<PageSpec>(() => loadPageSpec(book.id));
   const [zoom, setZoom] = useState(1);
   const [activePage, setActivePage] = useState(1);
@@ -103,7 +103,12 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
   const pages = useMemo(() => splitMarkdownToPages(currentMd), [currentMd]);
   const toc = useMemo(() => buildTocFromMarkdown(currentMd), [currentMd]);
   const pageTotal =
-    activeMode === "hwp" && hwpPageCount > 0 ? hwpPageCount : Math.max(1, pages.length);
+    normalizeEditorMode(activeMode) === "libreoffice" && hwpPageCount > 0
+      ? hwpPageCount
+      : Math.max(1, pages.length);
+
+  const primaryMode = normalizeEditorMode(activeMode);
+  const isFullWidth = primaryMode === "libreoffice" || primaryMode === "studio";
 
   useEffect(() => {
     savePageSpec(book.id, pageSpec);
@@ -142,13 +147,16 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
       let content_html = draft?.html ?? ch.content_html;
 
       if (ch.id === activeChapter?.id) {
-        if (activeMode === "markdown" && mdRef.current) {
+        const mode = normalizeEditorMode(activeMode);
+        if (mode === "writer" && mdRef.current) {
           content_md = mdRef.current.getMarkdown();
           content_html = mdRef.current.getHTML();
-        } else if (activeMode === "html" && htmlRef.current) {
-          content_html = htmlRef.current.getHtml();
-        } else if (activeMode === "word" && wordRef.current) {
-          content_html = wordRef.current.getHtml();
+        } else if (mode === "libreoffice") {
+          if (htmlRef.current) {
+            content_html = htmlRef.current.getHtml();
+          } else if (wordRef.current) {
+            content_html = wordRef.current.getHtml();
+          }
         }
       }
 
@@ -244,17 +252,26 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
     }
   };
 
+  const importModeToPanel = (mode: "word" | "hwp" | "pdf"): LibreOfficePanelId => {
+    if (mode === "hwp") return "hwp";
+    if (mode === "pdf") return "pdf";
+    return "writer";
+  };
+
   const handleImportSuccess = (opts?: { switchMode?: "word" | "hwp" | "pdf" }) => {
     setChapterDrafts({});
     setDirty(false);
-    if (opts?.switchMode) setActiveMode(opts.switchMode);
+    if (opts?.switchMode) {
+      setActiveMode("libreoffice");
+      setLoPanel(importModeToPanel(opts.switchMode));
+    }
     void queryClient.invalidateQueries({ queryKey: ["books", book.id, "structure"] });
   };
 
   const handleConvertMarkdownSuccess = () => {
     setChapterDrafts({});
     setDirty(false);
-    setActiveMode("markdown");
+    setActiveMode("writer");
     void queryClient.invalidateQueries({ queryKey: ["books", book.id, "structure"] });
   };
 
@@ -277,8 +294,8 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
       );
     }
 
-    switch (activeMode) {
-      case "markdown":
+    switch (primaryMode) {
+      case "writer":
         return (
           <MarkdownEditorPanel
             key={activeChapter.id}
@@ -293,49 +310,29 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
             onUploadError={(msg) => toast.error(msg)}
           />
         );
-      case "html":
+      case "libreoffice":
         return (
-          <HtmlEditorPanel
-            key={`html-${activeChapter.id}`}
-            ref={htmlRef}
+          <LibreOfficeHub
+            bookId={book.id}
+            bookTitle={title}
+            chapterTitle={activeChapter.title}
             initialHtml={currentHtml}
             pageSpec={pageSpec}
             zoom={zoom}
-            onChange={() => updateDraft("html", htmlRef.current?.getHtml() ?? "")}
-          />
-        );
-      case "word":
-        return (
-          <WordEditorPanel
-            key={`word-${activeChapter.id}`}
-            ref={wordRef}
-            bookId={book.id}
-            initialHtml={currentHtml}
-            pageSpec={pageSpec}
-            chapterTitle={activeChapter.title}
-            onChange={() => updateDraft("html", wordRef.current?.getHtml() ?? "")}
-          />
-        );
-      case "pdf":
-        return (
-          <PdfEditorPanel
-            bookId={book.id}
-            pageSpec={pageSpec}
             activePage={activePage}
+            wordRef={wordRef}
+            htmlRef={htmlRef}
+            initialPanel={loPanel}
+            onWordChange={() => updateDraft("html", wordRef.current?.getHtml() ?? "")}
+            onHtmlChange={() => updateDraft("html", htmlRef.current?.getHtml() ?? "")}
             onPageCountChange={setHwpPageCount}
-          />
-        );
-      case "cowork":
-        return <AionCoworkHub bookId={book.id} bookTitle={title} />;
-      case "architecture":
-        return <ArchitectureHub bookId={book.id} bookTitle={title} />;
-      case "office":
-        return (
-          <LoOfficeHub
-            bookId={book.id}
-            bookTitle={title}
+            onConvertedToWord={() => {
+              setChapterDrafts({});
+              setDirty(false);
+              setLoPanel("writer");
+              void queryClient.invalidateQueries({ queryKey: ["books", book.id, "structure"] });
+            }}
             onApplyOcrText={(text) => {
-              if (!activeChapter) return;
               const html = text
                 .split(/\n\n+/)
                 .map((p) => `<p>${p.replace(/\n/g, "<br/>")}</p>`)
@@ -347,35 +344,22 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
             }}
           />
         );
-      case "hwp":
-        return (
-          <HwpEditorPanel
-            bookId={book.id}
-            pageSpec={pageSpec}
-            zoom={zoom}
-            activePage={activePage}
-            onPageCountChange={setHwpPageCount}
-            onConvertedToWord={() => {
-              setChapterDrafts({});
-              setDirty(false);
-              setActiveMode("word");
-              void queryClient.invalidateQueries({ queryKey: ["books", book.id, "structure"] });
-            }}
-          />
-        );
+      case "studio":
+        return <StudioHub bookId={book.id} bookTitle={title} />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="hancom-editor-shell fixed inset-0 z-50 flex flex-col hancom-workspace-bg">
+    <div className="hancom-editor-shell lo-shell fixed inset-0 z-50 flex flex-col hancom-workspace-bg">
       <AiCommandBar
         bookId={book.id}
         bookTitle={title}
-        onOpenCowork={() => setActiveMode("cowork")}
+        onOpenCowork={() => setActiveMode("studio")}
       />
-      <PolarisRibbon
+      <LibreOfficeRibbon
+        editorMode={activeMode}
         bookTitle={title}
         saving={saveStructure.isPending}
         dirty={dirty}
@@ -449,7 +433,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
         </aside>
 
         <main className="flex min-w-0 flex-1 flex-col">
-          {activeMode === "word" || activeMode === "architecture" || activeMode === "office" ? (
+          {isFullWidth ? (
             <div className="min-h-0 flex-1">{renderEditor()}</div>
           ) : (
             <>
@@ -469,23 +453,45 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
         </main>
 
         <aside
-          className={`hidden shrink-0 border-l border-gray-300 lg:block ${activeMode === "word" || activeMode === "architecture" || activeMode === "office" ? "lg:hidden" : ""}`}
-          style={{ width: "var(--editor-right-width, 300px)" }}
+          className={`hidden shrink-0 lg:block ${isFullWidth ? "" : ""}`}
+          style={{ width: "var(--editor-right-width, 280px)" }}
         >
-          <PageSpecPanel
-            pageSpec={pageSpec}
-            onChange={(spec) => {
-              setPageSpec(spec);
-              setDirty(true);
-            }}
-            bookTitle={title}
-            author={author}
-            onMetaChange={(field, value) => {
-              if (field === "title") setTitle(value);
-              else setAuthor(value);
-              setDirty(true);
-            }}
-          />
+          {primaryMode === "libreoffice" ? (
+            <LibreOfficeSidebar
+              pageSpec={pageSpec}
+              docKind={loPanel === "tools" ? "writer" : loPanel}
+              moduleLabel={
+                loPanel === "writer"
+                  ? "LibreOffice Writer"
+                  : loPanel === "hwp"
+                    ? "HWP Filter"
+                    : loPanel === "pdf"
+                      ? "PDF Filter"
+                      : loPanel === "html"
+                        ? "HTML Source"
+                        : "LoOffice Tools"
+              }
+              onPageSpecChange={(spec) => {
+                setPageSpec(spec);
+                setDirty(true);
+              }}
+            />
+          ) : (
+            <PageSpecPanel
+              pageSpec={pageSpec}
+              onChange={(spec) => {
+                setPageSpec(spec);
+                setDirty(true);
+              }}
+              bookTitle={title}
+              author={author}
+              onMetaChange={(field, value) => {
+                if (field === "title") setTitle(value);
+                else setAuthor(value);
+                setDirty(true);
+              }}
+            />
+          )}
         </aside>
       </div>
 

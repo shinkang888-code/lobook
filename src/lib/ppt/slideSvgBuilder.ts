@@ -1,3 +1,5 @@
+import type { PptThemeTokens } from "./pptFigmaTheme";
+
 export type PptSlidePlan = {
   id: string;
   title: string;
@@ -50,27 +52,34 @@ export function buildSlideSvg(
   index: number,
   total: number,
   viewBox = "0 0 1280 720",
+  theme?: PptThemeTokens,
 ): string {
   const [w, h] = viewBox.replace("0 0 ", "").split(" ").map(Number);
-  const accent = "#2b579a";
-  const bg = "#f8fafc";
-  const text = "#0f172a";
-  const muted = "#64748b";
+  const accent = theme?.accent ?? "#2b579a";
+  const bg = theme?.bg ?? "#f8fafc";
+  const text = theme?.text ?? "#0f172a";
+  const muted = theme?.muted ?? "#64748b";
+  const gradientStart = theme?.gradientStart ?? "#1e3f6f";
+  const gradientEnd = theme?.gradientEnd ?? accent;
+  const coverSubtitle = theme?.coverSubtitle ?? "#dbeafe";
+  const coverFooter = theme?.coverFooter ?? "#bfdbfe";
+  const fontFamily = theme?.fontFamily ?? "Malgun Gothic, Apple SD Gothic Neo, sans-serif";
+  const brandLabel = theme?.id === "lobook" || !theme ? "PPT Master · LoBooK" : `PPT Master · ${theme.label}`;
 
   if (slide.layout === "cover") {
     return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1e3f6f"/>
-      <stop offset="100%" stop-color="#2b579a"/>
+      <stop offset="0%" stop-color="${gradientStart}"/>
+      <stop offset="100%" stop-color="${gradientEnd}"/>
     </linearGradient>
   </defs>
   <rect width="${w}" height="${h}" fill="url(#g)"/>
   <rect x="0" y="${h - 12}" width="${w}" height="12" fill="#ffffff" opacity="0.12"/>
-  <text x="80" y="280" font-family="Malgun Gothic, Apple SD Gothic Neo, sans-serif" font-size="56" font-weight="700" fill="#ffffff">${escapeXml(slide.title)}</text>
-  <text x="80" y="360" font-family="Malgun Gothic, Apple SD Gothic Neo, sans-serif" font-size="28" fill="#dbeafe">${escapeXml(slide.subtitle ?? "LoBooK AI Presentation")}</text>
-  <text x="80" y="${h - 56}" font-family="Malgun Gothic, sans-serif" font-size="18" fill="#bfdbfe">PPT Master · LoBooK</text>
+  <text x="80" y="280" font-family="${fontFamily}" font-size="56" font-weight="700" fill="#ffffff">${escapeXml(slide.title)}</text>
+  <text x="80" y="360" font-family="${fontFamily}" font-size="28" fill="${coverSubtitle}">${escapeXml(slide.subtitle ?? "LoBooK AI Presentation")}</text>
+  <text x="80" y="${h - 56}" font-family="${fontFamily}" font-size="18" fill="${coverFooter}">${escapeXml(brandLabel)}</text>
 </svg>`;
   }
 
@@ -79,8 +88,8 @@ export function buildSlideSvg(
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">
   <rect width="${w}" height="${h}" fill="${bg}"/>
   <rect width="${w}" height="8" fill="${accent}"/>
-  <text x="80" y="300" font-family="Malgun Gothic, sans-serif" font-size="48" font-weight="700" fill="${text}">${escapeXml(slide.title)}</text>
-  <text x="80" y="380" font-family="Malgun Gothic, sans-serif" font-size="24" fill="${muted}">${escapeXml(slide.subtitle ?? "감사합니다")}</text>
+  <text x="80" y="300" font-family="${fontFamily}" font-size="48" font-weight="700" fill="${text}">${escapeXml(slide.title)}</text>
+  <text x="80" y="380" font-family="${fontFamily}" font-size="24" fill="${muted}">${escapeXml(slide.subtitle ?? "감사합니다")}</text>
 </svg>`;
   }
 
@@ -89,7 +98,7 @@ export function buildSlideSvg(
   const bulletSvg = bulletLines
     .map((line, i) => {
       const y = bulletY + i * 52;
-      return `<circle cx="92" cy="${y - 10}" r="6" fill="${accent}"/><text x="120" y="${y}" font-family="Malgun Gothic, sans-serif" font-size="26" fill="${text}">${escapeXml(line)}</text>`;
+      return `<circle cx="92" cy="${y - 10}" r="6" fill="${accent}"/><text x="120" y="${y}" font-family="${fontFamily}" font-size="26" fill="${text}">${escapeXml(line)}</text>`;
     })
     .join("\n");
 
@@ -97,10 +106,10 @@ export function buildSlideSvg(
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">
   <rect width="${w}" height="${h}" fill="${bg}"/>
   <rect width="${w}" height="8" fill="${accent}"/>
-  <text x="80" y="96" font-family="Malgun Gothic, sans-serif" font-size="40" font-weight="700" fill="${text}">${escapeXml(slide.title)}</text>
+  <text x="80" y="96" font-family="${fontFamily}" font-size="40" font-weight="700" fill="${text}">${escapeXml(slide.title)}</text>
   <line x1="80" y1="120" x2="360" y2="120" stroke="${accent}" stroke-width="4"/>
   ${bulletSvg}
-  <text x="${w - 80}" y="${h - 40}" text-anchor="end" font-family="Malgun Gothic, sans-serif" font-size="16" fill="${muted}">${index + 1} / ${total}</text>
+  <text x="${w - 80}" y="${h - 40}" text-anchor="end" font-family="${fontFamily}" font-size="16" fill="${muted}">${index + 1} / ${total}</text>
 </svg>`;
 }
 

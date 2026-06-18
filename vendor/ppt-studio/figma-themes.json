@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "extractedAt": "2026-06-18T02:11:43.524Z",
+  "figmaFileKey": "3FVgUkf0MGa6QVQoRxnUE3",
+  "figmaFileUrl": "https://www.figma.com/design/3FVgUkf0MGa6QVQoRxnUE3/Book-Studio-Design-System",
+  "themes": [
+    {
+      "id": "lobook",
+      "label": "LoBooK Classic",
+      "accent": "#335095",
+      "bg": "#f8fafc",
+      "text": "#0f172a",
+      "muted": "#64748b",
+      "gradientStart": "#1e3f6f",
+      "gradientEnd": "#335095",
+      "coverSubtitle": "#dbeafe",
+      "coverFooter": "#bfdbfe",
+      "fontFamily": "Malgun Gothic, Apple SD Gothic Neo, sans-serif",
+      "source": "figma"
+    },
+    {
+      "id": "figma-light",
+      "label": "Figma Design System",
+      "accent": "#6182d6",
+      "bg": "#ffffff",
+      "text": "#1a1a1a",
+      "muted": "#6b7280",
+      "gradientStart": "#335095",
+      "gradientEnd": "#6182d6",
+      "coverSubtitle": "#e8eef8",
+      "coverFooter": "#c5d4f0",
+      "fontFamily": "Inter, Malgun Gothic, sans-serif",
+      "source": "figma"
+    }
+  ]
+}

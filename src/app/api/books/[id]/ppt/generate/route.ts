@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getBookStructure } from "@/lib/chapterService";
-import { buildPptPlan } from "@/lib/ppt/pptAiService";
+import { buildPptPlan, type PptAiProvider } from "@/lib/ppt/pptAiService";
 import { generatePptxFromPlan, getPptEngineStatus } from "@/lib/ppt/pptExportService";
 import type { PptCanvasFormat } from "@/lib/ppt/pptMasterPaths";
 
@@ -21,6 +21,8 @@ export async function POST(request: Request, { params }: Params) {
       prompt?: string;
       format?: PptCanvasFormat;
       maxSlides?: number;
+      provider?: PptAiProvider;
+      theme?: string;
     };
 
     const structure = await getBookStructure(id);
@@ -38,15 +40,18 @@ export async function POST(request: Request, { params }: Params) {
       author: structure.book.author,
       sourceMarkdown,
       maxSlides: body.maxSlides ?? 12,
+      provider: body.provider ?? "auto",
     });
 
-    const result = await generatePptxFromPlan(id, plan, body.format ?? "ppt169");
+    const result = await generatePptxFromPlan(id, plan, body.format ?? "ppt169", body.theme);
 
     return NextResponse.json({
       fileName: result.fileName,
       slideCount: result.slideCount,
       storagePath: result.storagePath,
       deckTitle: plan.deckTitle,
+      provider: body.provider ?? "auto",
+      theme: body.theme ?? plan.theme,
       downloadUrl: `/api/books/${id}/ppt/file`,
     });
   } catch (error) {

@@ -16,6 +16,8 @@
     "verify:markitdown": "tsx scripts/verify-markitdown.ts",
     "setup:markitdown": "pip install -r requirements-markitdown.txt",
     "setup:ppt-master": "node scripts/setup-ppt-master.js && pip install -r requirements-ppt-master.txt",
+    "setup:libreoffice": "node scripts/setup-libreoffice.js",
+    "verify:libreoffice": "tsx scripts/verify-libreoffice.ts",
     "verify:ppt": "tsx scripts/verify-ppt.ts",
     "setup:aionui": "node scripts/setup-aionui.js",
     "start:aionui": "node scripts/start-aionui.js",

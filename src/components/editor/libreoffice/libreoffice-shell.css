@@ -1,0 +1,256 @@
+/* LibreOffice-inspired shell — framework/cui/vcl NotebookBar aesthetic */
+
+.lo-shell {
+  --lo-accent: #18a303;
+  --lo-accent-dark: #0d6b02;
+  --lo-toolbar-bg: #f0f0f0;
+  --lo-toolbar-border: #c8c8c8;
+  --lo-tab-active: #ffffff;
+  --lo-tab-hover: #e8e8e8;
+  --lo-sidebar-bg: #fafafa;
+  --lo-status-bg: #e6e6e6;
+  font-family: "Segoe UI", "Malgun Gothic", sans-serif;
+}
+
+.lo-ribbon {
+  background: var(--lo-toolbar-bg);
+  border-bottom: 1px solid var(--lo-toolbar-border);
+}
+
+.lo-ribbon-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  padding: 0 8px;
+  background: linear-gradient(180deg, #f8f8f8 0%, #ececec 100%);
+  border-bottom: 1px solid var(--lo-toolbar-border);
+}
+
+.lo-ribbon-tab {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.lo-ribbon-tab:hover {
+  background: var(--lo-tab-hover);
+}
+
+.lo-ribbon-tab--active {
+  background: var(--lo-tab-active);
+  border-color: var(--lo-toolbar-border);
+  color: var(--lo-accent-dark);
+  font-weight: 600;
+}
+
+.lo-ribbon-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px 8px;
+  min-height: 72px;
+}
+
+.lo-ribbon-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px 8px;
+  border-right: 1px solid #d8d8d8;
+  gap: 2px;
+}
+
+.lo-ribbon-group:last-child {
+  border-right: none;
+}
+
+.lo-ribbon-group-label {
+  font-size: 9px;
+  color: #666;
+  text-align: center;
+  margin-top: 2px;
+}
+
+.lo-ribbon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: #222;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.lo-ribbon-btn:hover {
+  background: #fff;
+  border-color: #bbb;
+}
+
+.lo-ribbon-btn--primary {
+  background: var(--lo-accent);
+  color: #fff;
+  border-color: var(--lo-accent-dark);
+}
+
+.lo-ribbon-btn--primary:hover {
+  background: var(--lo-accent-dark);
+}
+
+.lo-ribbon-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.lo-hub {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #e8e8e8;
+}
+
+.lo-hub-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: #fff;
+  border-bottom: 1px solid var(--lo-toolbar-border);
+  flex-shrink: 0;
+}
+
+.lo-hub-tab {
+  padding: 4px 12px;
+  font-size: 11px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #444;
+  cursor: pointer;
+}
+
+.lo-hub-tab:hover {
+  background: #f0f0f0;
+}
+
+.lo-hub-tab--active {
+  background: #e8f5e6;
+  border-color: var(--lo-accent);
+  color: var(--lo-accent-dark);
+  font-weight: 600;
+}
+
+.lo-hub-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.lo-sidebar {
+  background: var(--lo-sidebar-bg);
+  border-left: 1px solid var(--lo-toolbar-border);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.lo-sidebar-header {
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f4f4f4;
+}
+
+.lo-sidebar-section {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.lo-sidebar-label {
+  font-size: 10px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.lo-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 2px 12px;
+  height: 24px;
+  font-size: 11px;
+  color: #444;
+  background: var(--lo-status-bg);
+  border-top: 1px solid var(--lo-toolbar-border);
+}
+
+.lo-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  border-radius: 3px;
+  background: #fff;
+  border: 1px solid #ccc;
+  font-size: 10px;
+}
+
+.lo-status-pill--ok {
+  border-color: #86efac;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.lo-editor-tabs {
+  display: flex;
+  align-items: stretch;
+  background: linear-gradient(180deg, #2d5016 0%, #1a3009 100%);
+  border-bottom: 2px solid var(--lo-accent);
+}
+
+.lo-editor-tab {
+  padding: 0 20px;
+  height: 36px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  background: transparent;
+  border: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lo-editor-tab:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.lo-editor-tab--active {
+  background: #fff;
+  color: var(--lo-accent-dark);
+  font-weight: 700;
+}
+
+.lo-editor-tab-icon {
+  width: 14px;
+  height: 14px;
+  opacity: 0.85;
+}

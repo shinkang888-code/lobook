@@ -1,6 +1,7 @@
 "use client";
 
 import type { EditorMode, PageSpec } from "@/lib/editor/types";
+import { EDITOR_MODE_LABELS, normalizeEditorMode } from "@/lib/editor/types";
 import { PAGE_PRESETS } from "@/lib/editor/pageSpec";
 
 type StatusBarProps = {
@@ -12,7 +13,7 @@ type StatusBarProps = {
   bookTitle: string;
 };
 
-const MODE_LABELS: Record<EditorMode, string> = {
+const LEGACY_MODE_LABELS: Partial<Record<EditorMode, string>> = {
   markdown: "Markdown",
   html: "HTML",
   word: "Word",
@@ -37,6 +38,11 @@ export function StatusBar({
       ? "사용자 정의"
       : PAGE_PRESETS[pageSpec.preset_id as keyof typeof PAGE_PRESETS]?.label ?? pageSpec.preset_id;
 
+  const modeLabel =
+    EDITOR_MODE_LABELS[normalizeEditorMode(editorMode)] ??
+    LEGACY_MODE_LABELS[editorMode] ??
+    editorMode;
+
   return (
     <footer className="hancom-statusbar shrink-0">
       <div className="flex items-center gap-3">
@@ -46,7 +52,7 @@ export function StatusBar({
         <span>
           {presetLabel} ({pageSpec.width_mm}×{pageSpec.height_mm}mm)
         </span>
-        <span>{MODE_LABELS[editorMode]}</span>
+        <span>{modeLabel}</span>
       </div>
       <div className="flex items-center gap-3">
         <span>{Math.round(zoom * 100)}%</span>

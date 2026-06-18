@@ -1,42 +1,50 @@
 "use client";
 
-import type { EditorMode } from "@/lib/editor/types";
-import { CORE_EDITOR_MODES } from "@/lib/editor/types";
-
-const MODE_LABELS: Record<EditorMode, string> = {
-  markdown: "Markdown",
-  html: "HTML",
-  word: "Word",
-  hwp: "HWP",
-  pdf: "PDF",
-  cowork: "AI Cowork",
-  architecture: "아키텍처",
-  office: "LoOffice",
-  preview: "미리보기",
-};
+import { FileText, Layers, Sparkles } from "lucide-react";
+import {
+  CORE_EDITOR_MODES,
+  EDITOR_MODE_LABELS,
+  normalizeEditorMode,
+  type EditorMode,
+  type PrimaryEditorMode,
+} from "@/lib/editor/types";
+import "../libreoffice/libreoffice-shell.css";
 
 type EditorTabBarProps = {
   activeMode: EditorMode;
   onModeChange: (mode: EditorMode) => void;
 };
 
+const TAB_ICONS: Record<PrimaryEditorMode, typeof FileText> = {
+  libreoffice: FileText,
+  writer: FileText,
+  studio: Sparkles,
+  preview: Layers,
+};
+
 export function EditorTabBar({ activeMode, onModeChange }: EditorTabBarProps) {
+  const normalized = normalizeEditorMode(activeMode);
+
   return (
-    <div className="hancom-editor-tabs shrink-0">
-      <div className="hancom-editor-tabs-inner h-10 items-stretch">
-        {CORE_EDITOR_MODES.map((mode) => (
+    <div className="lo-editor-tabs shrink-0">
+      {CORE_EDITOR_MODES.map((mode) => {
+        const primary = normalizeEditorMode(mode);
+        const Icon = TAB_ICONS[primary];
+        const isActive = normalized === primary;
+        return (
           <button
             key={mode}
             type="button"
             onClick={() => onModeChange(mode)}
-            className={`hancom-editor-tab-btn ${activeMode === mode ? "hancom-editor-tab-btn--active" : ""}`}
+            className={`lo-editor-tab ${isActive ? "lo-editor-tab--active" : ""}`}
           >
-            {MODE_LABELS[mode]}
+            <Icon className="lo-editor-tab-icon" />
+            {EDITOR_MODE_LABELS[primary]}
           </button>
-        ))}
-        <div className="ml-auto flex items-center pr-2 text-[10px] text-[var(--hnc-control-text-color-disabled)]">
-          편집기 모드
-        </div>
+        );
+      })}
+      <div className="ml-auto flex items-center pr-3 text-[10px] text-white/60">
+        LibreOffice 중심 편집기
       </div>
     </div>
   );
