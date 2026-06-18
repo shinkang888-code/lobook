@@ -30,7 +30,11 @@ export function geminiApiKey(): string {
 }
 
 export function geminiModel(): string {
-  return process.env.PPT_GEMINI_MODEL || process.env.GEMINI_MODEL || "gemini-2.0-flash";
+  return (
+    process.env.PPT_GEMINI_MODEL ||
+    process.env.GEMINI_MODEL ||
+    "gemini-2.0-flash-lite"
+  );
 }
 
 export function hasGeminiApiKey(): boolean {

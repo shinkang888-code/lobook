@@ -67,8 +67,14 @@ export function CoworkChatPanel({ bookId, enabled }: CoworkChatPanelProps) {
           });
         }
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "채팅 실패");
-        setMessages((m) => m.filter((_, i) => i !== m.length - 1 || m[m.length - 1].role !== "assistant"));
+        const msg = error instanceof Error ? error.message : "채팅 실패";
+        toast.error(msg);
+        setMessages((m) => {
+          const copy = [...m];
+          const last = copy[copy.length - 1];
+          if (last?.role === "assistant" && !last.content) copy.pop();
+          return copy;
+        });
       } finally {
         setLoading(false);
       }

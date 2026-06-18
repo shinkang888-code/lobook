@@ -42,5 +42,5 @@ export function formatContextForPrompt(ctx: BookCoworkContext, userPrompt: strin
 ${userPrompt}
 
 【원고 (마크다운)】
-${ctx.markdown.slice(0, 24000)}`;
+${ctx.markdown.slice(0, 10000)}`;
 }

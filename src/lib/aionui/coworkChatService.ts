@@ -1,5 +1,6 @@
 import { buildBookCoworkContext, formatContextForPrompt } from "./bookContext";
 import { geminiApiKey, geminiModel, hasGeminiApiKey } from "@/lib/ppt/pptGeminiService";
+import { geminiModelCandidates, parseGeminiApiError } from "@/lib/ai/geminiErrors";
 
 type CoworkProvider = "openai" | "gemini";
 
@@ -54,48 +55,8 @@ function extractGeminiText(payload: unknown): string {
   return obj.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
 }
 
-async function streamCoworkReplyGemini(
-  bookId: string,
-  userMessage: string,
-  history: Array<{ role: "user" | "assistant"; content: string }>,
-): Promise<ReadableStream<Uint8Array>> {
-  const key = geminiApiKey();
-  if (!key) {
-    throw new Error("AI API 키가 없습니다. GEMINI_API_KEY를 설정하세요.");
-  }
-
-  const ctx = await buildBookCoworkContext(bookId);
-  const model = coworkGeminiModel();
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${encodeURIComponent(key)}`;
-
-  const contents = [
-    ...history.slice(-8).map((m) => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content }],
-    })),
-    {
-      role: "user",
-      parts: [{ text: formatContextForPrompt(ctx, userMessage) }],
-    },
-  ];
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: COWORK_SYSTEM }] },
-      contents,
-      generationConfig: { temperature: 0.5 },
-    }),
-  });
-
-  if (!res.ok || !res.body) {
-    const err = await res.text();
-    throw new Error(err || `Gemini API 오류 (${res.status})`);
-  }
-
+function buildGeminiStream(reader: ReadableStreamDefaultReader<Uint8Array>): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
-  const reader = res.body.getReader();
   const decoder = new TextDecoder();
 
   return new ReadableStream({
@@ -130,6 +91,70 @@ async function streamCoworkReplyGemini(
   });
 }
 
+async function requestGeminiStream(
+  key: string,
+  model: string,
+  contents: Array<{ role: string; parts: Array<{ text: string }> }>,
+): Promise<Response> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${encodeURIComponent(key)}`;
+
+  return fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: COWORK_SYSTEM }] },
+      contents,
+      generationConfig: { temperature: 0.5 },
+    }),
+  });
+}
+
+async function streamCoworkReplyGemini(
+  bookId: string,
+  userMessage: string,
+  history: Array<{ role: "user" | "assistant"; content: string }>,
+): Promise<ReadableStream<Uint8Array>> {
+  const key = geminiApiKey();
+  if (!key) {
+    throw new Error("AI API 키가 없습니다. GEMINI_API_KEY를 설정하세요.");
+  }
+
+  const ctx = await buildBookCoworkContext(bookId);
+  const contents = [
+    ...history.slice(-6).map((m) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content.slice(0, 4000) }],
+    })),
+    {
+      role: "user",
+      parts: [{ text: formatContextForPrompt(ctx, userMessage) }],
+    },
+  ];
+
+  const models = geminiModelCandidates(coworkGeminiModel());
+  let lastError = "";
+  let lastStatus = 429;
+
+  for (const model of models) {
+    const res = await requestGeminiStream(key, model, contents);
+
+    if (res.status === 429) {
+      lastError = await res.text();
+      lastStatus = 429;
+      continue;
+    }
+
+    if (!res.ok || !res.body) {
+      const errText = await res.text();
+      throw new Error(parseGeminiApiError(errText, res.status));
+    }
+
+    return buildGeminiStream(res.body.getReader());
+  }
+
+  throw new Error(parseGeminiApiError(lastError, lastStatus));
+}
+
 async function streamCoworkReplyOpenAi(
   bookId: string,
   userMessage: string,
@@ -143,7 +168,7 @@ async function streamCoworkReplyOpenAi(
   const ctx = await buildBookCoworkContext(bookId);
   const messages = [
     { role: "system" as const, content: COWORK_SYSTEM },
-    ...history.slice(-8),
+    ...history.slice(-6),
     {
       role: "user" as const,
       content: formatContextForPrompt(ctx, userMessage),
@@ -166,7 +191,7 @@ async function streamCoworkReplyOpenAi(
 
   if (!res.ok || !res.body) {
     const err = await res.text();
-    throw new Error(err || `AI API 오류 (${res.status})`);
+    throw new Error(err.length > 200 ? `AI API 오류 (${res.status})` : err || `AI API 오류 (${res.status})`);
   }
 
   const encoder = new TextEncoder();
