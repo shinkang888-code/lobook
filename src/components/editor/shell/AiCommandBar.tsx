@@ -5,7 +5,6 @@ import {
   Download,
   Loader2,
   Presentation,
-  Sparkles,
   Wand2,
   CheckCircle2,
   AlertCircle,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { LofficeHomeLink } from "@/components/brand/LofficeLogo";
 import type { PptCanvasFormat } from "@/lib/ppt/pptMasterPaths";
 import type { PptAiProvider } from "@/lib/ppt/pptAiService";
 
@@ -149,47 +149,49 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
   return (
     <div className="hancom-ai-bar shrink-0 px-4 py-3 shadow-sm">
       <div className="mx-auto flex max-w-[1600px] flex-col gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-[var(--hnc-control-background-color-hover)]">
-              <Sparkles className="size-4 text-[var(--hnc-control-text-color-accent1)]" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold tracking-tight text-[var(--hnc-control-text-color-accent3)]">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-3">
+            <LofficeHomeLink variant="logo" className="shrink-0" />
+
+            <div className="min-w-0 flex-1 text-center">
+              <p className="truncate text-sm font-semibold tracking-tight text-[var(--hnc-control-text-color-accent3)]">
                 AI 프레젠테이션 스튜디오
               </p>
-              <p className="text-[11px] text-slate-500">
+              <p className="truncate text-[11px] text-slate-500">
                 PPT Master · {bookTitle || "제목 없음"} · {providerHint(status, provider)}
               </p>
             </div>
+
+            <LofficeHomeLink variant="button" className="shrink-0" />
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-[11px]">
+
+          <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] sm:justify-end">
             {engineOk ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-800">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-800">
                 <CheckCircle2 className="size-3" /> PPT 엔진 준비
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-amber-900">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-amber-900">
                 <AlertCircle className="size-3" /> setup:ppt-master 필요
               </span>
             )}
             {geminiReady ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-violet-800">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-violet-800">
                 <Cpu className="size-3" /> Gemini
                 {status?.ai.gemini.cliVersion ? ` ${status.ai.gemini.cliVersion}` : ""}
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-slate-600">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-slate-600">
                 <Cpu className="size-3" /> Gemini 미연결
               </span>
             )}
             {figmaReady ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-pink-100 px-2 py-0.5 text-pink-800">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-pink-100 px-2 py-0.5 text-pink-800">
                 <Palette className="size-3" /> Figma
-                {status?.figma.cliVersion ? ` ${status.figma.cliVersion}` : ""}
+                {status?.figma.cliVersion ? ` ${status?.figma.cliVersion}` : ""}
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-slate-600">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-slate-600">
                 <Palette className="size-3" /> Figma 기본 테마
               </span>
             )}
@@ -198,11 +200,11 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
                 type="button"
                 size="sm"
                 variant="secondary"
-                className="h-7 gap-1"
+                className="h-7 max-w-[200px] shrink-0 gap-1"
                 onClick={handleDownload}
               >
-                <Download className="size-3.5" />
-                {lastFile}
+                <Download className="size-3.5 shrink-0" />
+                <span className="truncate">{lastFile}</span>
               </Button>
             )}
           </div>

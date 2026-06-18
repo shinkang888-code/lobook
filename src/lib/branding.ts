@@ -9,3 +9,8 @@ export const APP_REPO_SLUG = "shinkang888-code/lobook";
 
 export const APP_ICON_PATH = "/lobook-icon.png";
 export const APP_LOGO_PATH = "/lobook-logo.png";
+
+/** Loffice 원오피스 홈 (lawbox-one) */
+export const LOOFFICE_NAME = "Loffice";
+export const LOOFFICE_HOME_URL = "https://lawbox-one.vercel.app/";
+export const LOOFFICE_ICON_PATH = "/looffice-icon.svg";
