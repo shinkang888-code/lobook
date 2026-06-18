@@ -18,10 +18,10 @@ export function Header() {
             href={LOOFFICE_HOME_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center rounded-lg px-1 py-0.5 transition hover:bg-[#e8f5e6]/80"
+            className="inline-flex items-center rounded-lg px-1 py-0.5 transition hover:opacity-85"
             title="Loffice 메인 포털 열기"
           >
-            <LofficeBookLogo size={36} showName nameClassName="text-lg" />
+            <LofficeBookLogo height={36} />
           </a>
           <Button size="sm" onClick={() => setDashboardOpen(true)}>
             <Plus className="size-4" />

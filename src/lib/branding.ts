@@ -11,7 +11,8 @@ export const APP_ICON_PATH = "/lobook-icon.png";
 export const APP_LOGO_PATH = "/lobook-logo.png";
 
 /** Loffice 원오피스 홈 (lawbox-one) */
-export const LOOFFICE_NAME = "Loffice";
-export const LOOFFICE_BOOK_NAME = "Loffice book";
+export const LOOFFICE_NAME = "LOFFICE";
+export const LOOFFICE_BOOK_NAME = "LOFFICE";
 export const LOOFFICE_HOME_URL = "https://lawbox-one.vercel.app/";
-export const LOOFFICE_ICON_PATH = "/looffice-icon.svg";
+export const LOOFFICE_LOGO_PATH = "/looffice-logo.png";
+export const LOOFFICE_ICON_PATH = LOOFFICE_LOGO_PATH;

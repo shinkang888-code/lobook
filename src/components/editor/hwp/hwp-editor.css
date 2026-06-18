@@ -1,0 +1,55 @@
+/* HWP 편집기 — 상단 툴바 + 하단까지 채우는 본문 */
+
+.hwp-editor-toolbar {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+  padding: 6px 10px;
+}
+
+.hwp-editor-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #475569;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.hwp-editor-tab:hover {
+  background: #fff;
+}
+
+.hwp-editor-tab--active {
+  background: #2b579a;
+  color: #fff;
+}
+
+.hwp-editor-empty {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 24px;
+  text-align: center;
+}
+
+.hwp-editor-footer {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(43, 87, 154, 0.15);
+  background: rgba(43, 87, 154, 0.05);
+  padding: 4px 10px;
+  font-size: 10px;
+  color: #2b579a;
+}

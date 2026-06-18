@@ -202,10 +202,36 @@
 
 .lo-hub-body {
   flex: 1 1 auto;
-  min-height: 480px;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.lo-hub-body > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+}
+
+/* Loffice 패널 공통 — 하단까지 채우는 본문 */
+.lo-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.lo-panel-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+  background: #fff;
 }
 
 .lo-sidebar {

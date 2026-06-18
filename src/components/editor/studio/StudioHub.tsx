@@ -18,7 +18,7 @@ export function StudioHub({ bookId, bookTitle, initialTab = "cowork" }: StudioHu
   const [tab, setTab] = useState<StudioTab>(initialTab);
 
   return (
-    <div className="lo-hub h-full">
+    <div className="lo-hub flex h-full min-h-0 flex-col">
       <div className="lo-hub-toolbar">
         <button
           type="button"

@@ -36,20 +36,39 @@ html.editor-scroll-mode body {
   display: flex;
   flex-direction: column;
   width: max(100%, var(--editor-min-width));
-  min-height: max(100dvh, var(--editor-min-height));
+  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
   background: var(--polaris-workspace, #e8eaef);
 }
 
 .editor-browser-shell .editor-workspace {
-  flex: 1 1 auto;
-  min-height: var(--editor-min-height);
+  flex: 1 1 0;
+  min-height: 0;
   min-width: 0;
   width: 100%;
 }
 
+.editor-browser-shell .editor-workspace-center {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
 .editor-browser-shell .editor-workspace-canvas {
-  overflow: auto;
-  min-height: var(--editor-min-height);
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-browser-shell .editor-workspace-canvas > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .editor-browser-shell .editor-fill-canvas {
@@ -60,8 +79,8 @@ html.editor-scroll-mode body {
 .editor-browser-shell .lo-hub,
 .editor-browser-shell .word-m365-workspace {
   flex: 1 1 auto;
-  min-height: var(--editor-min-height);
-  height: auto;
+  min-height: 0;
+  height: 100%;
 }
 
 @media (max-width: 1023px) {

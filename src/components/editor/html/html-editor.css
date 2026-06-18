@@ -1,0 +1,117 @@
+/* HTML 편집기 — 하단까지 채우는 분할 레이아웃 */
+
+.html-editor {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #fff;
+}
+
+.html-editor-toolbar {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+  padding: 6px 10px;
+}
+
+.html-editor-snippet {
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  padding: 2px 8px;
+  font-size: 10px;
+  color: #475569;
+  cursor: pointer;
+}
+
+.html-editor-snippet:hover {
+  background: #f1f5f9;
+}
+
+.html-editor-refresh {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+}
+
+.html-editor-refresh:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.html-editor-split {
+  display: grid;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.html-editor-code {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  border-right: 1px solid #e2e8f0;
+  background: #282c34;
+}
+
+.html-editor-code > div {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+.html-editor-code .cm-editor {
+  height: 100% !important;
+}
+
+.html-editor-code .cm-scroller {
+  overflow: auto !important;
+}
+
+.html-editor-preview-wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #fff;
+}
+
+.html-editor-preview-label {
+  flex-shrink: 0;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.html-editor-preview {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}

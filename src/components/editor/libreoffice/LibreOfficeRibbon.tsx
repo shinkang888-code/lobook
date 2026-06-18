@@ -44,7 +44,7 @@ export function LibreOfficeRibbon({
           >
             <ChevronLeft className="size-4" />
           </button>
-          <LofficeLogo size={24} showName nameClassName="text-sm font-bold text-[#0d6b02]" />
+          <LofficeLogo height={24} />
         </div>
 
         <h1 className="lo-titlebar-center truncate px-2 text-center text-sm font-semibold text-[#333]">

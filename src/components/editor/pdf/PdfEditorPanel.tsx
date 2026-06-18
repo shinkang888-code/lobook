@@ -87,15 +87,17 @@ export function PdfEditorPanel({
 
   if (loading && !printHtml) {
     return (
-      <div className="flex h-full items-center justify-center gap-2 text-sm text-gray-500">
-        <Loader2 className="size-5 animate-spin" />
-        PDF 미리보기 준비 중…
+      <div className="lo-panel">
+        <div className="flex flex-1 items-center justify-center gap-2 text-sm text-gray-500">
+          <Loader2 className="size-5 animate-spin" />
+          PDF 미리보기 준비 중…
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="lo-panel">
       <div className="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-gray-50 px-2 py-1">
         <button
           type="button"
@@ -133,20 +135,20 @@ export function PdfEditorPanel({
 
       {error && <p className="shrink-0 px-2 py-1 text-[10px] text-red-600">{error}</p>}
 
-      <div className="min-h-0 flex-1">
+      <div className="lo-panel-body flex flex-col">
         {viewTab === "print" && printHtml && (
           <iframe
             title="인쇄 미리보기"
             srcDoc={printHtml}
-            className="h-full w-full border-0 bg-white"
+            className="min-h-0 flex-1 w-full border-0 bg-white"
             sandbox="allow-same-origin"
           />
         )}
         {viewTab === "file" && pdfBuffer && pdfFileName && (
-          <PdfPreviewPanel buffer={pdfBuffer} fileName={pdfFileName} className="h-full w-full" />
+          <PdfPreviewPanel buffer={pdfBuffer} fileName={pdfFileName} className="min-h-0 flex-1 w-full" />
         )}
         {viewTab === "file" && !pdfBuffer && (
-          <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
+          <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
             <Upload className="size-10 text-gray-400" />
             <p className="text-xs text-gray-500">Ribbon → PDF 가져오기 또는 업로드 버튼으로 PDF를 열 수 있습니다.</p>
           </div>

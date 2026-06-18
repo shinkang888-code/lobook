@@ -493,7 +493,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
         }
       >
         {isFullWidth ? (
-          <div className="min-h-0 flex-1">{renderEditor()}</div>
+          <div className="editor-hub-host min-h-0 flex-1">{renderEditor()}</div>
         ) : (
           <PageCanvas pageSpec={pageSpec} zoom={zoom} fill>
             {renderEditor()}
