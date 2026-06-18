@@ -44,7 +44,7 @@ export function EditorTabBar({ activeMode, onModeChange }: EditorTabBarProps) {
         );
       })}
       <div className="ml-auto flex items-center pr-3 text-[10px] text-white/60">
-        Lofice 중심 편집기
+        Loffice 중심 편집기
       </div>
     </div>
   );

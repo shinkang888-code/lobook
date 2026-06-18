@@ -1,4 +1,4 @@
-/** lofice + lawygo documentOcr types — LoBooK 클라이언트 OCR */
+/** Loffice + lawygo documentOcr types — LoBooK 클라이언트 OCR */
 
 export type OcrMethod = "pdf-text" | "tesseract" | "ddddocr" | "pasted";
 

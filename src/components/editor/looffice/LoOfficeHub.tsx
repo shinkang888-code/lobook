@@ -18,7 +18,7 @@ import { APP_NAME } from "@/lib/branding";
 import { DOCUMENT_OCR_ACCEPT } from "@/lib/documentOcr/types";
 import { splitPdfIntoUploadChunks } from "@/lib/lawygo/clientPdfChunks";
 import { LAWYGO_FEATURES } from "@/lib/lawygo/lawygoFeatures";
-import { LOFICE_ENGINES, LOFICE_FORMAT_GROUPS } from "@/lib/lofice/loficeCatalog";
+import { LOOFFICE_ENGINES, LOOFFICE_FORMAT_GROUPS } from "@/lib/looffice/loofficeCatalog";
 import { extractDocumentTextClient } from "@/lib/documentOcr/extractDocumentTextClient";
 import "./looffice-hub.css";
 
@@ -89,7 +89,7 @@ export function LoOfficeHub({ bookId, bookTitle, onApplyOcrText }: LoOfficeHubPr
           <div>
             <h2 className="text-lg font-bold">LoOffice — {bookTitle}</h2>
             <p className="text-xs text-emerald-100">
-              lofice 통합 엔진 · lawygo OCR · {APP_NAME} 편집기
+              Loffice 통합 엔진 · lawygo OCR · {APP_NAME} 편집기
             </p>
           </div>
         </div>
@@ -122,14 +122,14 @@ export function LoOfficeHub({ bookId, bookTitle, onApplyOcrText }: LoOfficeHubPr
         {tab === "overview" && (
           <div className="mx-auto max-w-2xl space-y-4">
             <div className="looffice-card">
-              <h3 className="mb-2 text-sm font-bold text-slate-800">lofice × LoBooK</h3>
+              <h3 className="mb-2 text-sm font-bold text-slate-800">Loffice × LoBooK</h3>
               <p className="text-[11px] leading-relaxed text-slate-600">
                 shinkang888-code/lofice는 Word·HTML·PDF·HWP·Excel·PPT 등 60+ 형식을 통합한 핵심 오피스 허브입니다.
-                LoBooK는 lofice에서 검증된 OCR·뷰어·편집 엔진을 전자책 워크플로에 연동합니다.
+                LoBooK는 Loffice에서 검증된 OCR·뷰어·편집 엔진을 전자책 워크플로에 연동합니다.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {LOFICE_FORMAT_GROUPS.map((g) => (
+              {LOOFFICE_FORMAT_GROUPS.map((g) => (
                 <div key={g.app} className="looffice-card py-2">
                   <p className="text-xs font-semibold text-[#1a5f4a]">{g.label}</p>
                   <p className="text-[9px] text-slate-500">{g.exts.join(", ")}</p>
@@ -141,7 +141,7 @@ export function LoOfficeHub({ bookId, bookTitle, onApplyOcrText }: LoOfficeHubPr
 
         {tab === "engines" && (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {LOFICE_ENGINES.map((e) => (
+            {LOOFFICE_ENGINES.map((e) => (
               <div key={e.id} className={`looffice-card looffice-engine--${e.status}`}>
                 <div className="flex items-start justify-between gap-2">
                   <p className="text-xs font-bold text-slate-800">{e.label}</p>

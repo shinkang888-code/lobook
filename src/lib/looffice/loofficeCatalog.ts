@@ -1,9 +1,9 @@
 /**
- * lofice 통합 오피스 엔진 카탈로그
+ * Loffice 통합 오피스 엔진 카탈로그
  * @see https://github.com/shinkang888-code/lofice
  */
 
-export type LoficeEngineId =
+export type LofficeEngineId =
   | "udoc-viewer"
   | "rhwp"
   | "eigenpal-docx"
@@ -16,8 +16,8 @@ export type LoficeEngineId =
   | "spreadsheet"
   | "stirling-pdf";
 
-export type LoficeEngine = {
-  id: LoficeEngineId;
+export type LofficeEngine = {
+  id: LofficeEngineId;
   label: string;
   formats: string[];
   description: string;
@@ -25,7 +25,7 @@ export type LoficeEngine = {
   status: "integrated" | "partial" | "planned";
 };
 
-export const LOFICE_ENGINES: LoficeEngine[] = [
+export const LOOFFICE_ENGINES: LofficeEngine[] = [
   {
     id: "rhwp",
     label: "RHWP WASM",
@@ -111,7 +111,7 @@ export const LOFICE_ENGINES: LoficeEngine[] = [
   },
 ];
 
-export const LOFICE_FORMAT_GROUPS = [
+export const LOOFFICE_FORMAT_GROUPS = [
   { app: "word", label: "Word", exts: ["docx", "doc", "rtf", "odt", "html", "md"] },
   { app: "excel", label: "Excel", exts: ["xlsx", "xls", "csv", "ods"] },
   { app: "powerpoint", label: "PowerPoint", exts: ["pptx", "ppt", "odp"] },

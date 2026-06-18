@@ -23,7 +23,7 @@ LoBooK 편집기는 Markdown·TipTap·eigenpal·RHWP·microscope·Hancom 스킨 
 
 1. **LibreOffice를 메인** — UI/모듈 구조는 LO `framework`/`cui`/`vcl` NotebookBar 패턴
 2. **LoBooK는 확장만** — 전자책(챕터·EPUB·AI Studio) 등 LO에 없는 기능만 추가
-3. **런타임 현실성** — LO C++ 코어는 웹에 직접 빌드하지 않고, **LibreOfficeKit + 기존 lofice 엔진**으로 브리지
+3. **런타임 현실성** — LO C++ 코어는 웹에 직접 빌드하지 않고, **LibreOfficeKit + 기존 Loffice 엔진**으로 브리지
 4. **점진적 통합** — P1 UI/라우터, P2 LO Online WOPI, P3 WASM
 
 ---
@@ -73,7 +73,7 @@ BookEditorShell
 
 | 경로 | 역할 |
 |------|------|
-| `src/lib/libreoffice/libreOfficeCatalog.ts` | LO 모듈 ↔ lofice 엔진 바인딩 |
+| `src/lib/libreoffice/libreOfficeCatalog.ts` | LO 모듈 ↔ Loffice 엔진 바인딩 |
 | `src/lib/libreoffice/libreOfficeStatus.ts` | 런타임 상태 |
 | `src/components/editor/libreoffice/LibreOfficeHub.tsx` | 통합 문서 편집 허브 |
 | `src/components/editor/libreoffice/LibreOfficeRibbon.tsx` | LO 스타일 리본 |

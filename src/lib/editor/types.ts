@@ -43,7 +43,7 @@ export function normalizeEditorMode(mode: EditorMode): PrimaryEditorMode {
 }
 
 export const EDITOR_MODE_LABELS: Record<PrimaryEditorMode, string> = {
-  libreoffice: "Lofice",
+  libreoffice: "Loffice",
   writer: "Writer (원고)",
   studio: "LoBooK Studio",
   preview: "미리보기",

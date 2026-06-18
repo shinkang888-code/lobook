@@ -32,7 +32,7 @@
     "verify:m365-word": "tsx scripts/verify-m365-word.ts",
     "setup:architecture-center": "node scripts/setup-architecture-center.js",
     "verify:architecture": "tsx scripts/verify-architecture.ts",
-    "setup:lofice": "node scripts/setup-lofice.js",
+    "setup:looffice": "node scripts/setup-looffice.js",
     "setup:lawygo": "node scripts/setup-lawygo.js",
     "verify:looffice": "tsx scripts/verify-looffice.ts"
   },

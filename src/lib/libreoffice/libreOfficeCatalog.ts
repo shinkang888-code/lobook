@@ -21,7 +21,7 @@ export type LibreOfficeEngineBinding = {
   label: string;
   docKind: LibreOfficeDocKind;
   formats: string[];
-  /** LoBooK 기존 엔진 ID (lofice catalog) */
+  /** LoBooK 기존 엔진 ID (looffice catalog) */
   lobookEngine: string;
   lobookPanel: "word" | "hwp" | "pdf" | "html" | "office";
   status: "integrated" | "partial" | "planned";
@@ -32,7 +32,7 @@ export type LibreOfficeEngineBinding = {
 export const LIBREOFFICE_ENGINE_BINDINGS: LibreOfficeEngineBinding[] = [
   {
     moduleId: "sw",
-    label: "Lofice Writer",
+    label: "Loffice Writer",
     docKind: "writer",
     formats: ["odt", "docx", "doc", "rtf", "txt"],
     lobookEngine: "eigenpal-docx",
@@ -42,7 +42,7 @@ export const LIBREOFFICE_ENGINE_BINDINGS: LibreOfficeEngineBinding[] = [
   },
   {
     moduleId: "hwpfilter",
-    label: "Lofice HWP Filter",
+    label: "Loffice HWP Filter",
     docKind: "hwp",
     formats: ["hwp", "hwpx"],
     lobookEngine: "rhwp",
@@ -52,7 +52,7 @@ export const LIBREOFFICE_ENGINE_BINDINGS: LibreOfficeEngineBinding[] = [
   },
   {
     moduleId: "filter",
-    label: "Lofice PDF Filter",
+    label: "Loffice PDF Filter",
     docKind: "pdf",
     formats: ["pdf"],
     lobookEngine: "pdfjs",
@@ -72,17 +72,17 @@ export const LIBREOFFICE_ENGINE_BINDINGS: LibreOfficeEngineBinding[] = [
   },
   {
     moduleId: "sc",
-    label: "Lofice Calc",
+    label: "Loffice Calc",
     docKind: "calc",
     formats: ["ods", "xlsx", "csv"],
     lobookEngine: "spreadsheet",
     lobookPanel: "office",
     status: "planned",
-    description: "sc/ — 스프레드시트 (lofice planned)",
+    description: "sc/ — 스프레드시트 (looffice planned)",
   },
   {
     moduleId: "sd",
-    label: "Lofice Impress",
+    label: "Loffice Impress",
     docKind: "impress",
     formats: ["odp", "pptx"],
     lobookEngine: "ppt-master",
@@ -92,7 +92,7 @@ export const LIBREOFFICE_ENGINE_BINDINGS: LibreOfficeEngineBinding[] = [
   },
   {
     moduleId: "libreofficekit",
-    label: "LoficeKit",
+    label: "LofficeKit",
     docKind: "writer",
     formats: ["*"],
     lobookEngine: "libreofficekit",

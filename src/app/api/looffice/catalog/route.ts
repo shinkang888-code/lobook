@@ -1,11 +1,11 @@
 import fs from "fs";
 import path from "path";
 import { NextResponse } from "next/server";
-import { LOFICE_ENGINES } from "@/lib/lofice/loficeCatalog";
+import { LOOFFICE_ENGINES } from "@/lib/looffice/loofficeCatalog";
 import { isDdddOcrServerAvailable } from "@/lib/documentOcr/ddddocr-config";
 
 export async function GET() {
-  const manifestPath = path.join(process.cwd(), "vendor", "lofice", "engine-manifest.json");
+  const manifestPath = path.join(process.cwd(), "vendor", "looffice", "engine-manifest.json");
   let manifest: Record<string, unknown> = {};
   if (fs.existsSync(manifestPath)) {
     try {
@@ -16,7 +16,7 @@ export async function GET() {
   }
 
   return NextResponse.json({
-    engines: LOFICE_ENGINES,
+    engines: LOOFFICE_ENGINES,
     manifest,
     ocr: {
       tesseract: true,

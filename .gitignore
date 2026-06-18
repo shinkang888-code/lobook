@@ -1,4 +1,4 @@
-﻿# dependencies
+# dependencies
 /node_modules
 
 # next.js
@@ -32,8 +32,8 @@ vendor/hnc-office-addin-ctrl/
 vendor/microsoft-365-docs/
 .architecture-center-install.json
 vendor/architecture-center/
-.lofice-install.json
+.looffice-install.json
 .lawygo-install.json
-vendor/lofice/
+vendor/looffice/
 vendor/lawygo/
 .data/ppt-workspace/

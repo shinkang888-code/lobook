@@ -108,9 +108,9 @@ HWP Upload (Panel)  ──► WASM SVG ──✗──► chapters / save
 | **근본 원인 2** | SVG를 `max-w-lg flex-col gap-6`으로 렌더 — PageCanvas content area 무시 |
 | **근본 원인 3** | `@rhwp/core` `getPageInfo()` → HWP **원본 용지 mm** 사용, Book Studio spec과 독립 |
 | **근본 원인 4** | `activePage`가 HWP page index와 sync 안 됨 — 다페이지 전체 스크roll |
-| **수정 방향** | content area 크기 계산 → SVG/canvas scale fit (lofice `RhwpCanvasViewer` 패턴 포팅) |
+| **수정 방향** | content area 크기 계산 → SVG/canvas scale fit (Loffice `RhwpCanvasViewer` 패턴 포팅) |
 
-**참고 코드 (lofice):**
+**참고 코드 (Loffice):**
 ```typescript
 function fitScale(pageWidth: number, containerWidth: number): number {
   const pad = 32;
@@ -138,7 +138,7 @@ function fitScale(pageWidth: number, containerWidth: number): number {
 |------|------|------|
 | **B-1** | "편집 가능" 체감 | Import 시 `renderPageHtml()` → `content_html` + Word/HTML 탭에서 편집 |
 | **B-2** | HWP 탭 split view | 좌 HWP SVG 참조 + 우 HTML/TipTap 동기 편집 |
-| **B-3** | 네이티브 HWP 편집 | `@rhwp/core` canvas hit-test + `insertText` (lofice `RhwpPageCanvas` 수준, 4~8주) |
+| **B-3** | 네이티브 HWP 편집 | `@rhwp/core` canvas hit-test + `insertText` (Loffice `RhwpPageCanvas` 수준, 4~8주) |
 
 > **의사결정:** HWPX 완전 WYSIWYG 편집은 비현실적. **변환 후 HTML/Word 편집**을 1차 목표로 명시 (`EDITOR_UPGRADE_DEV_SPEC` §8.4.4).
 
@@ -282,7 +282,7 @@ setActions((prev) => ({ ...prev, ...next }));
 | B-3 | Import 통합: Ribbon = Panel 단일 진입 | ImportDialog success → HWP 탭 + fetch |
 | B-4 | `importHwpToBook()`: renderPageHtml → chapters | `primary_source: "hwp"`, html 저장 |
 | B-5 | HWP 탭 split UI | 좌 SVG 참조 / 우 WordEditor |
-| B-6 | lofice `RhwpCanvasViewer` / `RhwpPageCanvas` 포팅 | canvas 렌더 + zoom |
+| B-6 | Loffice `RhwpCanvasViewer` / `RhwpPageCanvas` 포팅 | canvas 렌더 + zoom |
 
 **Phase B 수용 기준:**
 - [ ] Ribbon HWP import 후 HWP 탭에 문서 표시 (새로고침 후에도)
@@ -295,7 +295,7 @@ setActions((prev) => ({ ...prev, ...next }));
 
 | ID | 작업 | 설명 |
 |----|------|------|
-| C-1 | `@rhwp/core` canvas 편집 UI | lofice hwp-editor 패턴 |
+| C-1 | `@rhwp/core` canvas 편집 UI | Loffice hwp-editor 패턴 |
 | C-2 | activePage editor slice | md/html/word 페이지 단위 |
 | C-3 | PageSpecPanel 고급 (font, orientation, facing) | 명세 §8.3 |
 | C-4 | HTML emmet + EPUB lint | CodeMirror extensions |
@@ -428,14 +428,14 @@ npm run verify:phase3  # hwp html import 테스트 (신규)
 | renderPageHtml 품질 | 표·각주 깨짐 | Word 탭에서 수동 보정 + SVG 참조 병행 |
 | CodeMirror Ribbon 한계 | HTML WYSIWYG 기대 | preview pane을 "준-WYSIWYG"로 강화 |
 | pageSpec vs HWP 원본 불일치 | 레이아웃 차이 | UI에 "HWP 원본 규격 / Book 규격" 토글 표시 |
-| `@rhwp/core` WASM 로드 실패 | HWP 탭 blank | lofice 동일 fallback 메시지 |
+| `@rhwp/core` WASM 로드 실패 | HWP 탭 blank | Loffice 동일 fallback 메시지 |
 
 ### 8.1 확정 의사결정
 
 1. **HWP 1차 편집 = HTML/Word 변환 편집** (네이티브 편집은 Phase C)
 2. **pageSpec authoritative source = Supabase `books.page_spec`**
 3. **Ribbon Insert는 WordEditor 우선 wiring**, HTML은 snippet bar 병행
-4. **lofice `RhwpCanvasViewer` 코드 재사용** (MIT/동일 계정 리포)
+4. **Loffice `RhwpCanvasViewer` 코드 재사용** (MIT/동일 계정 리포)
 
 ---
 
@@ -468,8 +468,8 @@ npm run verify:phase3  # hwp html import 테스트 (신규)
 
 | 리소스 | 경로 | 활용 |
 |--------|------|------|
-| lofice RhwpCanvasViewer | `c:\cursor\lofice\src\components\hwp\` | HWP scale/zoom/canvas |
-| lofice HwpEditor | `c:\cursor\lofice\src\app\hwp-editor\` | 편집 API 참고 |
+| Loffice RhwpCanvasViewer | `c:\cursor\lofice\src\components\hwp\` | HWP scale/zoom/canvas |
+| Loffice HwpEditor | `c:\cursor\lofice\src\app\hwp-editor\` | 편집 API 참고 |
 | @rhwp/core API | `node_modules/@rhwp/core/rhwp.d.ts` | renderPageHtml, insertText |
 | 기존 명세 | `docs/EDITOR_UPGRADE_DEV_SPEC_v1.md` §8.4 | 편집기 상세 TO-BE |
 

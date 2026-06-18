@@ -23,7 +23,7 @@ Book Studio는 현재 **Toast UI Editor 1종(Markdown/WYSIWYG)** 과 **EPUB3 단
 | 저장 | `content_md` + `content_html` | CDM + **Page[]** + 포맷별 원본 |
 | 내보내기 | EPUB3 (단일 챕터) | EPUB3/PDF (페이지 규격 반영) |
 
-**권장 접근:** 웹앱(`book`)을 **허브**로 두고, 이미 보유한 GitHub 리포(`naverb`, `ebook`/`Sigil`, `hwpreader`, `hwpx-skill`, `lofice`, `microscope-js`, `voice`)를 **편집 엔진·변환·뷰어**로 단계 통합한다.
+**권장 접근:** 웹앱(`book`)을 **허브**로 두고, 이미 보유한 GitHub 리포(`naverb`, `ebook`/`Sigil`, `hwpreader`, `hwpx-skill`, `Loffice`, `microscope-js`, `voice`)를 **편집 엔진·변환·뷰어**로 단계 통합한다.
 
 ---
 
@@ -319,7 +319,7 @@ src/lib/editor/adapters/
 | **2a Import** | `.docx` 업로드 → MD/HTML 변환 → 챕터 생성 | `mammoth`, Supabase Storage |
 | **2b Preview** | DOCX 브라우저 렌더 | `microscope-js` 또는 `@js-preview/docx` |
 | **3a Edit** | 브라우저 내 리치 편집 (DOCX 재저장) | TipTap + `docx` npm export |
-| **3b Pro** | OnlyOffice/Collabora 임베드 (고 fidelity) | `lofice` 아키텍처 참고 |
+| **3b Pro** | OnlyOffice/Collabora 임베드 (고 fidelity) | `Loffice` 아키텍처 참고 |
 
 **제약:** 완전한 Word 호환은 OnlyOffice급 엔진 없이는 불가 → **「import 후 EPUB용 HTML 정리」** 를 1차 가치로 명시.
 
@@ -728,10 +728,10 @@ flowchart TD
 | **ebook** / **Sigil** | EPUB 구조·검증 참고 | P2 | OPF/NCX UI, EPUBCheck |
 | **hwpreader** | HWP WASM 뷰어/파서 | **P1** | npm/wasm 패키지 또는 iframe |
 | **hwpx-skill** | HWPX 생성 | P3 | API sidecar |
-| **lofice** | Office 뷰어/오피스 | P3 | Electron 브릿지 또는 OnlyOffice 패턴 |
+| **Loffice** | Office 뷰어/오피스 | P3 | Electron 브릿지 또는 OnlyOffice 패턴 |
 | **microscope-js** | DOCX/PDF 클라이언트 뷰 | **P1** | Word import preview |
 | **voice** | 오디오북 트랙 | P4 | TTS·오디오 챕터 |
-| **lofice** / **ppt-master** | 슬라이드→챕터 | P4 | import 확장 |
+| **Loffice** / **ppt-master** | 슬라이드→챕터 | P4 | import 확장 |
 
 ---
 
@@ -883,7 +883,7 @@ create table book_versions (
 
 | ID | 작업 | 산출물 |
 |----|------|--------|
-| P4-1 | OnlyOffice/lofice 임베드 | 고급 Word 편집 |
+| P4-1 | OnlyOffice/Loffice 임베드 | 고급 Word 편집 |
 | P4-2 | Sigil/Magic 데스크톱 브릿지 | `.epub` 로컬 연동 |
 | P4-3 | voice 오디오북 | TTS·오디오 챕터 |
 | P4-4 | 협업·댓글 | Realtime (Supabase) |

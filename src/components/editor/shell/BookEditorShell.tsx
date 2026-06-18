@@ -462,7 +462,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
               docKind={loPanel === "tools" ? "writer" : loPanel}
               moduleLabel={
                 loPanel === "writer"
-                  ? "Lofice Writer"
+                  ? "Loffice Writer"
                   : loPanel === "hwp"
                     ? "HWP Filter"
                     : loPanel === "pdf"

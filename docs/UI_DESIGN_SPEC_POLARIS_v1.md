@@ -82,17 +82,17 @@ Book Studio는 현재 **단일 Markdown 에디터 + 카드 레이아웃** MVP이
 | **book** | ✅ `c:\cursor\book` | 허브 Next.js 앱 | 본 프로젝트 |
 | **naverb** | ✅ `c:\cursor\naverb` | Toast UI Editor 소스 | Markdown 탭 (npm `@toast-ui/react-editor` 사용 중) |
 | **ebook** | ✅ `c:\cursor\ebook` | Magic/Sigil EPUB C++ | OPF/Nav/Headings 알고리즘 TS 포팅 |
-| **lofice** | ✅ `c:\cursor\lofice` | **Polaris UI 레퍼런스** | `LoficeLayout`, `DocxEditor`, `RhwpCanvasViewer` 패턴 복제 |
+| **Loffice** | ✅ `c:\cursor\lofice` | **Polaris UI 레퍼런스** | `LofficeLayout`, `DocxEditor`, `RhwpCanvasViewer` 패턴 복제 |
 | **hwpreader** | ⚠️ LFS 일부 실패 | `@rhwp/core` WASM | npm 설치 + `public/rhwp_bg.wasm` |
 | **hwpx-skill** | ✅ | Python HWPX 변환 | Phase 2 API sidecar |
 | **microscope-js** | ✅ | DOCX/PDF 뷰어 | Word import preview |
 | **voice** | ❌ 빈 리포 | TTS/오디오북 | Phase 4 |
 
-### 2.2 lofice — Polaris UI 청사진 (1차 복제 대상)
+### 2.2 Loffice — Polaris UI 청사진 (1차 복제 대상)
 
-| lofice 파일 | Book Studio 대응 | 비고 |
+| Loffice 파일 | Book Studio 대응 | 비고 |
 |------------|-----------------|------|
-| `src/components/office/LoficeLayout.tsx` | `PolarisRibbon.tsx` | 타이틀바 `#2b579a`, 리본 76px, 상태줄 |
+| `src/components/office/LofficeLayout.tsx` | `PolarisRibbon.tsx` | 타이틀바 `#2b579a`, 리본 76px, 상태줄 |
 | `src/components/office/EditorToolbarContext.tsx` | `EditorToolbarContext.tsx` | 리본 ↔ 에디터 액션 브릿지 |
 | `src/components/editor/DocxEditor.tsx` | `WordEditorPanel.tsx` | TipTap + ribbonMode |
 | `src/components/editor/HtmlEditor.tsx` | `HtmlEditorPanel.tsx` | HTML 소스 편집 |
@@ -133,7 +133,7 @@ Book Studio는 현재 **단일 Markdown 에디터 + 카드 레이아웃** MVP이
 HwpDocument.load(bytes) → pageCount() → renderPageSvg(i)
 ```
 
-**lofice 패턴:** `registerRhwpTextMeasure()` 필수 → Canvas `measureTextWidth`.
+**Loffice 패턴:** `registerRhwpTextMeasure()` 필수 → Canvas `measureTextWidth`.
 
 ### 2.6 microscope-js — Word Preview
 
@@ -254,7 +254,7 @@ import { docxRenderer } from '@microscope-js/renderer-docx';
 - 리본: Format, Well-formed check
 
 #### Word
-- TipTap WYSIWYG (lofice `DocxEditor` ribbonMode)
+- TipTap WYSIWYG (Loffice `DocxEditor` ribbonMode)
 - DOCX import: microscope preview → mammoth → TipTap
 - `.polaris-doc-body` 스타일
 
@@ -271,7 +271,7 @@ import { docxRenderer } from '@microscope-js/renderer-docx';
 src/components/editor/
 ├── shell/
 │   ├── BookEditorShell.tsx      # 3-Zone + full viewport
-│   ├── PolarisRibbon.tsx        # lofice LoficeLayout 패턴
+│   ├── PolarisRibbon.tsx        # Loffice LofficeLayout 패턴
 │   ├── EditorTabBar.tsx         # MD|HTML|Word|HWP
 │   ├── FormatToolbar.tsx        # 글꼴·B/I/U bar
 │   ├── StatusBar.tsx
@@ -296,7 +296,7 @@ src/lib/editor/
 └── adapters/ (Phase 2)
 
 src/lib/export/epub/          # ebook 포팅
-src/lib/rhwp/                 # lofice 포팅
+src/lib/rhwp/                 # Loffice 포팅
 src/lib/parsers/              # docx, hancom
 ```
 
@@ -328,7 +328,7 @@ src/lib/parsers/              # docx, hancom
 
 ### Sprint 2 — HTML + Word
 - [ ] CodeMirror 6 HTML panel
-- [ ] TipTap Word panel (lofice 복제)
+- [ ] TipTap Word panel (Loffice 복제)
 - [ ] mammoth DOCX import
 - [ ] `@microscope-js/renderer-docx` preview
 
@@ -388,7 +388,7 @@ npm install @rhwp/core @rhwp/editor
 ## 10. 참고 링크
 
 - [Polaris Office Web HWP](https://hwp.polarisoffice.com/)
-- lofice `LoficeLayout.tsx` — 이미 Polaris 벤치마킹 구현
+- Loffice `LofficeLayout.tsx` — 이미 Polaris 벤치마킹 구현
 - `EDITOR_UPGRADE_DEV_SPEC_v1.md` v1.1
 - Figma: Book Studio Design System
 

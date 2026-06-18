@@ -41,7 +41,7 @@ export function LibreOfficeSidebar({
 
   return (
     <div className="lo-sidebar h-full">
-      <div className="lo-sidebar-header">속성 · Lofice</div>
+      <div className="lo-sidebar-header">속성 · Loffice</div>
 
       <div className="lo-sidebar-section">
         <div className="lo-sidebar-label">문서 종류</div>
@@ -86,7 +86,7 @@ export function LibreOfficeSidebar({
               {runtime.integratedCount}개 엔진 연동
             </span>
             {runtime.collaboraEnabled ? (
-              <span className="lo-status-pill lo-status-pill--ok">Lofice Online</span>
+              <span className="lo-status-pill lo-status-pill--ok">Loffice Online</span>
             ) : (
               <span className="lo-status-pill text-[10px]">로컬 엔진 모드</span>
             )}
