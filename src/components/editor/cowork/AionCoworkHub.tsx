@@ -15,11 +15,16 @@ type HubTab = "aion" | "studio";
 export function AionCoworkHub({ bookId, bookTitle }: AionCoworkHubProps) {
   const [tab, setTab] = useState<HubTab>("studio");
   const [studioEnabled, setStudioEnabled] = useState(false);
+  const [studioProvider, setStudioProvider] = useState("gemini");
 
   const loadStatus = useCallback(async () => {
     const res = await fetch("/api/aionui/status");
-    const data = (await res.json()) as { studioChat: { enabled: boolean }; aion: { running: boolean } };
+    const data = (await res.json()) as {
+      studioChat: { enabled: boolean; provider?: string };
+      aion: { running: boolean };
+    };
     setStudioEnabled(data.studioChat.enabled);
+    setStudioProvider(data.studioChat.provider ?? "gemini");
     if (data.aion.running) setTab("aion");
   }, []);
 
@@ -60,7 +65,7 @@ export function AionCoworkHub({ bookId, bookTitle }: AionCoworkHubProps) {
 
       <div className="min-h-0 flex-1">
         {tab === "studio" ? (
-          <CoworkChatPanel bookId={bookId} enabled={studioEnabled} />
+          <CoworkChatPanel bookId={bookId} enabled={studioEnabled} provider={studioProvider} />
         ) : (
           <AionUiEmbed bookId={bookId} />
         )}

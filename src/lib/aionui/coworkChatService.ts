@@ -1,6 +1,7 @@
 import { buildBookCoworkContext, formatContextForPrompt } from "./bookContext";
 import { geminiApiKey, geminiModel, hasGeminiApiKey } from "@/lib/ppt/pptGeminiService";
 import { geminiModelCandidates, parseGeminiApiError } from "@/lib/ai/geminiErrors";
+import { extractGeminiTextDelta, parseGeminiSseChunk } from "@/lib/ai/geminiStream";
 
 type CoworkProvider = "openai" | "gemini";
 
@@ -47,14 +48,6 @@ export function getCoworkAiProvider(): CoworkProvider {
   return coworkProvider();
 }
 
-function extractGeminiText(payload: unknown): string {
-  if (!payload || typeof payload !== "object") return "";
-  const obj = payload as {
-    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-  };
-  return obj.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? "";
-}
-
 function buildGeminiStream(reader: ReadableStreamDefaultReader<Uint8Array>): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
@@ -67,21 +60,13 @@ function buildGeminiStream(reader: ReadableStreamDefaultReader<Uint8Array>): Rea
           const { done, value } = await reader.read();
           if (done) break;
           buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() ?? "";
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed.startsWith("data:")) continue;
-            const data = trimmed.slice(5).trim();
-            if (!data || data === "[DONE]") continue;
-            try {
-              const json = JSON.parse(data) as unknown;
-              const chunk = extractGeminiText(json);
-              if (chunk) controller.enqueue(encoder.encode(chunk));
-            } catch {
-              /* skip malformed SSE */
-            }
-          }
+          const parsed = parseGeminiSseChunk(buffer);
+          buffer = parsed.rest;
+          if (parsed.text) controller.enqueue(encoder.encode(parsed.text));
+        }
+        if (buffer.trim()) {
+          const tail = parseGeminiSseChunk(`${buffer}\n`);
+          if (tail.text) controller.enqueue(encoder.encode(tail.text));
         }
         controller.close();
       } catch (e) {
@@ -89,6 +74,30 @@ function buildGeminiStream(reader: ReadableStreamDefaultReader<Uint8Array>): Rea
       }
     },
   });
+}
+
+async function generateGeminiReplyOnce(
+  key: string,
+  model: string,
+  contents: Array<{ role: string; parts: Array<{ text: string }> }>,
+): Promise<string> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: COWORK_SYSTEM }] },
+      contents,
+      generationConfig: { temperature: 0.5 },
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(parseGeminiApiError(await res.text(), res.status));
+  }
+  const data = (await res.json()) as unknown;
+  const text = extractGeminiTextDelta(data);
+  if (!text) throw new Error("Gemini 응답이 비어 있습니다.");
+  return text;
 }
 
 async function requestGeminiStream(
@@ -149,7 +158,29 @@ async function streamCoworkReplyGemini(
       throw new Error(parseGeminiApiError(errText, res.status));
     }
 
-    return buildGeminiStream(res.body.getReader());
+    const stream = buildGeminiStream(res.body.getReader());
+    return new ReadableStream({
+      async start(controller) {
+        const reader = stream.getReader();
+        let total = "";
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = new TextDecoder().decode(value);
+            total += chunk;
+            controller.enqueue(value);
+          }
+          if (!total.trim()) {
+            const fallback = await generateGeminiReplyOnce(key, model, contents);
+            controller.enqueue(new TextEncoder().encode(fallback));
+          }
+          controller.close();
+        } catch (e) {
+          controller.error(e);
+        }
+      },
+    });
   }
 
   throw new Error(parseGeminiApiError(lastError, lastStatus));
