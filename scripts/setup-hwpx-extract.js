@@ -32,7 +32,7 @@ function main() {
   const manifest = {
     root,
     installedAt: new Date().toISOString(),
-    note: "Book Studio는 TypeScript 포팅 추출기를 사용합니다. Java/Python은 선택 사항입니다.",
+    note: "LoBooK는 TypeScript 포팅 추출기를 사용합니다. Java/Python은 선택 사항입니다.",
   };
   fs.writeFileSync(path.join(bookRoot, ".hwpx-extract-install.json"), JSON.stringify(manifest, null, 2));
 

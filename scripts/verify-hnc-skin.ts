@@ -35,7 +35,7 @@ function main() {
 
   const bridge = fs.readFileSync(path.join(SKIN_DIR, "book-studio-hancom.css"), "utf-8");
   if (!bridge.includes("hancom-ribbon-panel")) errors.push("bridge css");
-  else ok("Book Studio bridge CSS");
+  else ok("LoBooK bridge CSS");
 
   const icons = path.join(SKIN_DIR, "icons");
   if (!fs.existsSync(icons)) errors.push("icons dir");

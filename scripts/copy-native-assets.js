@@ -20,3 +20,9 @@ copyIfExists(
   path.join(root, "public/rhwp_bg.wasm"),
   "rhwp_bg.wasm",
 );
+
+copyIfExists(
+  path.join(root, "node_modules/pdfjs-dist/build/pdf.worker.min.mjs"),
+  path.join(root, "public/pdf.worker.min.mjs"),
+  "pdf.worker.min.mjs",
+);

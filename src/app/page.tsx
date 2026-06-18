@@ -1,4 +1,5 @@
 import { BookList } from "@/components/books/BookList";
+import { APP_NAME } from "@/lib/branding";
 
 export default function HomePage() {
   return (
@@ -6,7 +7,7 @@ export default function HomePage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">내 전자책</h1>
         <p className="mt-2 text-muted-foreground">
-          naverb(Toast UI Editor) 기반 에디터로 작성하고 EPUB3 파일로 내보낼 수 있습니다.
+          {APP_NAME} 멀티 편집기로 작성하고 EPUB·DOCX 파일로보낼 수 있습니다.
         </p>
       </div>
       <BookList />

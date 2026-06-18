@@ -1,0 +1,11 @@
+/** LoBooK 앱 브랜딩 상수 */
+export const APP_NAME = "LoBooK";
+export const APP_TAGLINE = "전자책 제작 스튜디오";
+export const APP_DESCRIPTION =
+  "Markdown·Word·HWP 멀티 편집기로 전자책을 작성하고 EPUB·DOCX로보내는 웹 스튜디오";
+
+export const APP_REPO = "https://github.com/shinkang888-code/lobook";
+export const APP_REPO_SLUG = "shinkang888-code/lobook";
+
+export const APP_ICON_PATH = "/lobook-icon.png";
+export const APP_LOGO_PATH = "/lobook-logo.png";

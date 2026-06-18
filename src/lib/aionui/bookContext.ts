@@ -33,7 +33,7 @@ export async function buildBookCoworkContext(bookId: string): Promise<BookCowork
 }
 
 export function formatContextForPrompt(ctx: BookCoworkContext, userPrompt: string): string {
-  return `【Book Studio 컨텍스트】
+  return `【LoBooK 컨텍스트】
 제목: ${ctx.title}
 저자: ${ctx.author}
 챕터: ${ctx.chapterCount}개

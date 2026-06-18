@@ -11,6 +11,7 @@ const MODE_LABELS: Record<EditorMode, string> = {
   pdf: "PDF",
   cowork: "AI Cowork",
   architecture: "아키텍처",
+  office: "LoOffice",
   preview: "미리보기",
 };
 

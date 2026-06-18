@@ -87,7 +87,7 @@ function PackageCard({ pkg }: { pkg: HancomPackage }) {
         </a>
       ) : (
         <span className="inline-flex h-7 items-center justify-center rounded-md bg-slate-100 px-2 text-[10px] text-slate-500">
-          Book Studio 내장
+          LoBooK 내장
         </span>
       )}
     </div>

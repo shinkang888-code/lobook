@@ -72,7 +72,7 @@ export function AionUiEmbed({ bookId }: AionUiEmbedProps) {
     try {
       const res = await fetch(`/api/books/${bookId}/cowork/context`);
       const data = await res.json();
-      const text = `【Book Studio】 ${data.title}\n저자: ${data.author}\n\n${data.markdown?.slice(0, 20000) ?? ""}`;
+      const text = `【LoBooK】 ${data.title}\n저자: ${data.author}\n\n${data.markdown?.slice(0, 20000) ?? ""}`;
       await navigator.clipboard.writeText(text);
       toast.success("책 컨텍스트가 클립보드에 복사되었습니다. AionUi 채팅에 붙여넣으세요.");
     } catch {

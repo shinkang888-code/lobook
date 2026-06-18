@@ -1,5 +1,6 @@
 "use client";
 
+import { LoBookLogo } from "@/components/brand/LoBookLogo";
 import {
   AlignCenter,
   AlignLeft,
@@ -92,7 +93,7 @@ export function PolarisRibbon({
   return (
     <div className="hancom-editor-shell shrink-0 select-none">
       <div className="hancom-titlebar">
-        <span className="hancom-titlebar-brand">한글 Book Studio</span>
+        <LoBookLogo size={22} showName nameClassName="hancom-titlebar-brand !text-inherit !font-semibold" />
         <span className="mx-1 opacity-40">|</span>
         <span className="hancom-titlebar-doc">{bookTitle || "제목 없음"}</span>
         <div className="hancom-titlebar-status">

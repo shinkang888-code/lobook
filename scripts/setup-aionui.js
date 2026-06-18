@@ -1,5 +1,5 @@
 /**
- * AionUi vendor setup for Book Studio Cowork integration.
+ * AionUi vendor setup for LoBooK Cowork integration.
  * Usage: node scripts/setup-aionui.js
  */
 const fs = require("fs");
@@ -140,7 +140,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log("\nInstalling Book Studio bun runtime (dev)...");
+  console.log("\nInstalling LoBooK bun runtime (dev)...");
   runSafe("npm install bun --save-dev", bookRoot);
 
   const bunCmd = installAionUi(root, bookRoot);

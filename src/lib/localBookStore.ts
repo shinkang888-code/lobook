@@ -15,7 +15,7 @@ async function ensureStore(): Promise<Book[]> {
       {
         id: crypto.randomUUID(),
         title: "시작 가이드",
-        author: "Book Studio",
+        author: "LoBooK",
         content_md: "# 전자책에 오신 것을 환영합니다\n\n왼쪽에서 **마크다운** 또는 **WYSIWYG**로 글을 쓰고, EPUB으로 내보낼 수 있습니다.",
         content_html:
           "<h1>전자책에 오신 것을 환영합니다</h1><p>왼쪽에서 <strong>마크다운</strong> 또는 <strong>WYSIWYG</strong>로 글을 쓰고, EPUB으로 내보낼 수 있습니다.</p>",

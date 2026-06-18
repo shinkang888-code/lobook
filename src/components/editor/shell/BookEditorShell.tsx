@@ -25,6 +25,7 @@ import { PolarisRibbon } from "@/components/editor/shell/PolarisRibbon";
 import { StatusBar } from "@/components/editor/shell/StatusBar";
 import { WordEditorPanel, type WordEditorPanelHandle } from "@/components/editor/word/WordEditorPanel";
 import { ArchitectureHub } from "@/components/editor/architecture/ArchitectureHub";
+import { LoOfficeHub } from "@/components/editor/looffice/LoOfficeHub";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAddChapter, useBookStructure, useSaveBookStructure } from "@/hooks/useBookStructure";
 import { useQueryClient } from "@tanstack/react-query";
@@ -328,6 +329,24 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
         return <AionCoworkHub bookId={book.id} bookTitle={title} />;
       case "architecture":
         return <ArchitectureHub bookId={book.id} bookTitle={title} />;
+      case "office":
+        return (
+          <LoOfficeHub
+            bookId={book.id}
+            bookTitle={title}
+            onApplyOcrText={(text) => {
+              if (!activeChapter) return;
+              const html = text
+                .split(/\n\n+/)
+                .map((p) => `<p>${p.replace(/\n/g, "<br/>")}</p>`)
+                .join("");
+              updateDraft("md", text);
+              updateDraft("html", html);
+              setDirty(true);
+              toast.success("OCR 텍스트가 현재 챕터에 적용되었습니다.");
+            }}
+          />
+        );
       case "hwp":
         return (
           <HwpEditorPanel
@@ -430,7 +449,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
         </aside>
 
         <main className="flex min-w-0 flex-1 flex-col">
-          {activeMode === "word" || activeMode === "architecture" ? (
+          {activeMode === "word" || activeMode === "architecture" || activeMode === "office" ? (
             <div className="min-h-0 flex-1">{renderEditor()}</div>
           ) : (
             <>
@@ -450,7 +469,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
         </main>
 
         <aside
-          className={`hidden shrink-0 border-l border-gray-300 lg:block ${activeMode === "word" || activeMode === "architecture" ? "lg:hidden" : ""}`}
+          className={`hidden shrink-0 border-l border-gray-300 lg:block ${activeMode === "word" || activeMode === "architecture" || activeMode === "office" ? "lg:hidden" : ""}`}
           style={{ width: "var(--editor-right-width, 300px)" }}
         >
           <PageSpecPanel

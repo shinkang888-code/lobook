@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { Header } from "@/components/layout/Header";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { APP_DESCRIPTION, APP_ICON_PATH, APP_NAME, APP_TAGLINE } from "@/lib/branding";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,8 +17,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Book Studio — 전자책 제작",
-  description: "Markdown/WYSIWYG 에디터로 전자책을 작성하고 EPUB으로 내보내는 웹 스튜디오",
+  title: `${APP_NAME} — ${APP_TAGLINE}`,
+  description: APP_DESCRIPTION,
+  icons: {
+    icon: APP_ICON_PATH,
+    apple: APP_ICON_PATH,
+    shortcut: APP_ICON_PATH,
+  },
+  applicationName: APP_NAME,
 };
 
 export default function RootLayout({

@@ -43,7 +43,7 @@ export async function buildPptPlan(request: PptAiRequest): Promise<PptGeneration
 
   if (!hasAiKey()) return fallback;
 
-  const system = `You are a presentation strategist for Book Studio. Return ONLY valid JSON:
+  const system = `You are a presentation strategist for LoBooK. Return ONLY valid JSON:
 {"deckTitle":"string","slides":[{"title":"string","subtitle":"string","bullets":["string"],"layout":"cover|content|closing"}]}
 Rules: Korean preferred, ${maxSlides} slides max, first slide cover, last closing, middle content slides with 3-5 bullets each.`;
 

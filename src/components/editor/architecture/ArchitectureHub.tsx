@@ -101,7 +101,7 @@ export function ArchitectureHub({ bookId, bookTitle }: ArchitectureHubProps) {
               Architecture Hub — {bookTitle}
             </h2>
             <p className="mt-1 text-xs text-blue-100">
-              Azure Architecture Center 패턴을 Book Studio에 매핑 ·{" "}
+              Azure Architecture Center 패턴을 LoBooK에 매핑 ·{" "}
               <a
                 href="https://learn.microsoft.com/azure/architecture"
                 target="_blank"
@@ -147,7 +147,7 @@ export function ArchitectureHub({ bookId, bookTitle }: ArchitectureHubProps) {
         {tab === "overview" && (
           <div className="mx-auto max-w-3xl space-y-4">
             <div className="arch-card">
-              <h3 className="mb-3 text-sm font-bold text-slate-800">Book Studio 스택</h3>
+              <h3 className="mb-3 text-sm font-bold text-slate-800">LoBooK 스택</h3>
               <dl className="grid gap-2 text-[11px]">
                 <div className="flex gap-2">
                   <dt className="w-24 shrink-0 font-medium text-slate-500">Frontend</dt>
@@ -340,7 +340,7 @@ export function ArchitectureHub({ bookId, bookTitle }: ArchitectureHubProps) {
         {tab === "diagram" && (
           <div className="mx-auto max-w-3xl space-y-4">
             <div className="arch-card">
-              <h3 className="mb-2 text-sm font-bold text-slate-800">Book Studio 시스템 다이어그램</h3>
+              <h3 className="mb-2 text-sm font-bold text-slate-800">LoBooK 시스템 다이어그램</h3>
               <p className="mb-3 text-[10px] text-slate-500">
                 Azure Architecture Center 스타일 — 클라이언트·API·엔진·AI·저장소 계층
               </p>

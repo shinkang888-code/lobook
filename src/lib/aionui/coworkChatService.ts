@@ -32,7 +32,7 @@ export async function streamCoworkReply(
   }
 
   const ctx = await buildBookCoworkContext(bookId);
-  const system = `당신은 Book Studio의 AI Cowork 어시스턴트입니다. AionUi Cowork 워크플로와 유사하게, 사용자의 전자책 원고를 바탕으로 실용적이고 구체적인 작업 결과를 한국어로 제공합니다. PPT, Word, Excel, 편집 제안에 능숙합니다.`;
+  const system = `당신은 LoBooK의 AI Cowork 어시스턴트입니다. AionUi Cowork 워크플로와 유사하게, 사용자의 전자책 원고를 바탕으로 실용적이고 구체적인 작업 결과를 한국어로 제공합니다. PPT, Word, Excel, 편집 제안에 능숙합니다.`;
 
   const messages = [
     { role: "system" as const, content: system },

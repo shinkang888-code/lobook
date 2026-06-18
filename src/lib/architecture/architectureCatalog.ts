@@ -1,5 +1,5 @@
 /**
- * Azure Architecture Center 패턴 카탈로그 — Book Studio 모듈 매핑
+ * Azure Architecture Center 패턴 카탈로그 — LoBooK 모듈 매핑
  * @see https://github.com/shinkang888-code/architecture-center
  * @see https://learn.microsoft.com/azure/architecture
  */
@@ -126,7 +126,7 @@ export const ARCHITECTURE_PATTERNS: ArchitecturePattern[] = [
     id: "reliable-web-app",
     category: "web-app",
     label: "Reliable Web App 패턴",
-    description: "자가 치유·중복·운영 설계 — Book Studio 안정성 가이드",
+    description: "자가 치유·중복·운영 설계 — LoBooK 안정성 가이드",
     docPath: "docs/web-apps/guides/enterprise-app-patterns/reliable-web-app/dotnet/guidance.yml",
     learnUrl: "https://learn.microsoft.com/azure/architecture/web-apps/guides/enterprise-app-patterns/reliable-web-app/dotnet/guidance",
     bookStudioModules: ["vercel-hosting"],

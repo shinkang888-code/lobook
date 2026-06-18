@@ -34,13 +34,13 @@ async function main() {
   if (!paras.includes("한글 HWPX")) errors.push("paragraph extract");
   else ok("hp:p 문단 추출");
 
-  const buf = await createSampleHwpx("Book Studio HWPX 테스트");
+  const buf = await createSampleHwpx("LoBooK HWPX 테스트");
   const extracted = await extractHwpx(buf);
   if (extracted.sections.length < 1) errors.push("no sections");
   else ok(`섹션 ${extracted.sections.length}개 추출`);
 
   const chapters = hwpxToChapters(extracted);
-  if (!chapters[0]?.content_html.includes("Book Studio")) errors.push("chapter html");
+  if (!chapters[0]?.content_html.includes("LoBooK")) errors.push("chapter html");
   else ok("HTML 챕터 변환");
 
   const preview = await previewHwpx(buf);

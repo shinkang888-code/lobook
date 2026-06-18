@@ -69,8 +69,8 @@ export function buildSlideSvg(
   <rect width="${w}" height="${h}" fill="url(#g)"/>
   <rect x="0" y="${h - 12}" width="${w}" height="12" fill="#ffffff" opacity="0.12"/>
   <text x="80" y="280" font-family="Malgun Gothic, Apple SD Gothic Neo, sans-serif" font-size="56" font-weight="700" fill="#ffffff">${escapeXml(slide.title)}</text>
-  <text x="80" y="360" font-family="Malgun Gothic, Apple SD Gothic Neo, sans-serif" font-size="28" fill="#dbeafe">${escapeXml(slide.subtitle ?? "Book Studio AI Presentation")}</text>
-  <text x="80" y="${h - 56}" font-family="Malgun Gothic, sans-serif" font-size="18" fill="#bfdbfe">PPT Master · Book Studio</text>
+  <text x="80" y="360" font-family="Malgun Gothic, Apple SD Gothic Neo, sans-serif" font-size="28" fill="#dbeafe">${escapeXml(slide.subtitle ?? "LoBooK AI Presentation")}</text>
+  <text x="80" y="${h - 56}" font-family="Malgun Gothic, sans-serif" font-size="18" fill="#bfdbfe">PPT Master · LoBooK</text>
 </svg>`;
   }
 
@@ -146,7 +146,7 @@ export function planFromMarkdown(
     {
       id: "01_cover",
       title: bookTitle || "발표 자료",
-      subtitle: prompt.slice(0, 120) || author || "Book Studio",
+      subtitle: prompt.slice(0, 120) || author || "LoBooK",
       bullets: [],
       layout: "cover",
     },
@@ -165,5 +165,5 @@ export function planFromMarkdown(
     },
   ];
 
-  return { deckTitle: bookTitle, theme: "book-studio", slides };
+  return { deckTitle: bookTitle, theme: "lobook", slides };
 }

@@ -24,7 +24,7 @@ async function main() {
 
   const plan = planFromMarkdown(
     "검증 책",
-    "Book Studio",
+    "LoBooK",
     "# 1장\n\n- 첫 번째 포인트\n- 두 번째 포인트\n\n# 2장\n\n- 마무리 내용",
     "검증용 발표 자료",
     6,

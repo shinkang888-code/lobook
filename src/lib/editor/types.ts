@@ -1,6 +1,6 @@
-export type EditorMode = "markdown" | "html" | "word" | "hwp" | "pdf" | "cowork" | "architecture" | "preview";
+export type EditorMode = "markdown" | "html" | "word" | "hwp" | "pdf" | "cowork" | "architecture" | "office" | "preview";
 
-export const CORE_EDITOR_MODES: EditorMode[] = ["markdown", "html", "word", "hwp", "pdf", "cowork", "architecture"];
+export const CORE_EDITOR_MODES: EditorMode[] = ["markdown", "html", "word", "hwp", "pdf", "office", "cowork", "architecture"];
 
 export type PagePresetId =
   | "a4"

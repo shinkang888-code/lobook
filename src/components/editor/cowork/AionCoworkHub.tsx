@@ -33,7 +33,7 @@ export function AionCoworkHub({ bookId, bookTitle }: AionCoworkHubProps) {
         <div>
           <h2 className="text-lg font-semibold text-slate-900">AI Cowork — {bookTitle}</h2>
           <p className="text-xs text-slate-500">
-            AionUi 멀티에이전트 + Book Studio 전용 채팅 (확장형 통합)
+            AionUi 멀티에이전트 + LoBooK 전용 채팅 (확장형 통합)
           </p>
         </div>
         <div className="flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm">

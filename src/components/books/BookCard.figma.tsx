@@ -2,7 +2,7 @@ import figma from "@figma/code-connect/react";
 import { BookCard } from "./BookCard";
 
 /**
- * Book Studio — BookCard
+ * LoBooK — BookCard
  * Figma: https://www.figma.com/design/3FVgUkf0MGa6QVQoRxnUE3/Book-Studio-Design-System?node-id=1-2
  */
 figma.connect(BookCard, "https://www.figma.com/design/3FVgUkf0MGa6QVQoRxnUE3?node-id=1-2", {

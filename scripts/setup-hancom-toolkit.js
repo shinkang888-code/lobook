@@ -42,7 +42,7 @@ function main() {
   );
 
   console.log("\n✓ hancom-toolkit manifest → vendor/hancom-toolkit/");
-  console.log("  Book Studio: 한컴 툴킷 허브 + 문서 분석 (웹 포팅)");
+  console.log("  LoBooK: 한컴 툴킷 허브 + 문서 분석 (웹 포팅)");
 }
 
 function run(cmd, cwd) {

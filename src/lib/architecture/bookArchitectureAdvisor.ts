@@ -83,7 +83,7 @@ function buildReason(pattern: ArchitecturePattern, modules: BookStudioModule[], 
     return `${structure.chapters.length}개 챕터 → EPUB/DOCX/PPT보내기 파이프라인에 적용`;
   }
   if (pattern.id === "modern-web-app") {
-    return "Book Studio Next.js + Vercel 스택에 Modern Web App 패턴 정합";
+    return "LoBooK Next.js + Vercel 스택에 Modern Web App 패턴 정합";
   }
   return `${labels} 모듈과 연관된 ${pattern.label} 패턴`;
 }
@@ -128,7 +128,7 @@ export function adviseBookArchitecture(structure: BookStructure): BookArchitectu
 
 export const BOOK_STUDIO_ARCHITECTURE_MERMAID = `flowchart TB
   subgraph Client["클라이언트"]
-    UI[Book Studio UI]
+    UI[LoBooK UI]
     Tabs[편집기 탭 MD/HTML/Word/HWP/PDF]
     ArchHub[Architecture Hub]
   end

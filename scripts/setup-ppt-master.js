@@ -1,5 +1,5 @@
 /**
- * Vendor ppt-master Python scripts into vendor/ppt-master for Book Studio.
+ * Vendor ppt-master Python scripts into vendor/ppt-master for LoBooK.
  * Usage: node scripts/setup-ppt-master.js
  * Source: PPT_MASTER_ROOT env or ../ppt-master (sibling clone)
  */
@@ -53,7 +53,7 @@ function main() {
       );
     fs.writeFileSync(
       reqDest,
-      `# PPT Master export deps (Book Studio)\n# pip install -r requirements-ppt-master.txt\n${lines.join("\n")}\n`,
+      `# PPT Master export deps (LoBooK)\n# pip install -r requirements-ppt-master.txt\n${lines.join("\n")}\n`,
     );
   }
 

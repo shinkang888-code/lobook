@@ -17,7 +17,7 @@ export type HancomPackage = {
   openInNewTab?: boolean;
 };
 
-/** Book Studio + hancom-toolkit Linux 패키지 + 웹 워크플로 */
+/** LoBooK + hancom-toolkit Linux 패키지 + 웹 워크플로 */
 export const HANCOM_TOOLKIT_PACKAGES: HancomPackage[] = [
   {
     package: "hoffice-viewer",
@@ -58,13 +58,13 @@ export const HANCOM_TOOLKIT_PACKAGES: HancomPackage[] = [
     openInNewTab: true,
   },
   {
-    package: "book-studio-hwpx-extract",
+    package: "lobook-hwpx-extract",
     version: "1.0.0",
     category: "builtin",
     platform: ["web"],
     name: {
-      ko: "Book Studio HWPX 추출기",
-      en: "Book Studio HWPX Extractor",
+      ko: "LoBooK HWPX 추출기",
+      en: "LoBooK HWPX Extractor",
     },
     installMessage: {
       ko: "hwpx-contents-extract 알고리즘 TypeScript 포팅 — 서버리스 동작",
@@ -74,7 +74,7 @@ export const HANCOM_TOOLKIT_PACKAGES: HancomPackage[] = [
     openInNewTab: true,
   },
   {
-    package: "book-studio-hwp-pipeline",
+    package: "lobook-hwp-pipeline",
     version: "1.0.0",
     category: "pipeline",
     platform: ["web"],
