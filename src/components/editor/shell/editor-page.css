@@ -18,11 +18,7 @@ html.editor-scroll-mode body {
   min-height: 100%;
 }
 
-html.editor-scroll-mode body > div > header {
-  display: none;
-}
-
-html.editor-scroll-mode body > div > main {
+html.editor-scroll-mode body > main {
   max-width: none;
   width: 100%;
   min-width: 0;
@@ -30,6 +26,10 @@ html.editor-scroll-mode body > div > main {
   margin: 0;
   overflow-x: auto;
   overflow-y: visible;
+}
+
+html.editor-scroll-mode body {
+  background: var(--polaris-workspace, #e8eaef);
 }
 
 .editor-browser-shell {

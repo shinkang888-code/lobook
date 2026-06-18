@@ -14,9 +14,10 @@ import { cn } from "@/lib/utils";
 
 type BookCardProps = {
   book: Book;
+  onNavigate?: () => void;
 };
 
-export function BookCard({ book }: BookCardProps) {
+export function BookCard({ book, onNavigate }: BookCardProps) {
   const deleteBook = useDeleteBook();
 
   const handleDelete = async () => {
@@ -53,12 +54,14 @@ export function BookCard({ book }: BookCardProps) {
           <Link
             href={`/books/${book.id}/preview`}
             className={cn(buttonVariants({ size: "icon-sm", variant: "ghost" }))}
+            onClick={onNavigate}
           >
             <Eye className="size-4" />
           </Link>
           <Link
             href={`/books/${book.id}`}
             className={cn(buttonVariants({ size: "icon-sm", variant: "ghost" }))}
+            onClick={onNavigate}
           >
             <Pencil className="size-4" />
           </Link>

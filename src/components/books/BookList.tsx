@@ -3,11 +3,16 @@
 import Link from "next/link";
 import { BookPlus, Loader2 } from "lucide-react";
 import { BookCard } from "@/components/books/BookCard";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useBooks } from "@/hooks/useBooks";
 import { cn } from "@/lib/utils";
 
-export function BookList() {
+type BookListProps = {
+  onNewBook?: () => void;
+  onBookNavigate?: () => void;
+};
+
+export function BookList({ onNewBook, onBookNavigate }: BookListProps) {
   const { data: books, isLoading, error } = useBooks();
 
   if (isLoading) {
@@ -37,9 +42,13 @@ export function BookList() {
             Markdown/WYSIWYG 에디터로 작성하고 EPUB으로 내보낼 수 있습니다.
           </p>
         </div>
-        <Link href="/books/new" className={cn(buttonVariants())}>
-          새 전자책 만들기
-        </Link>
+        {onNewBook ? (
+          <Button onClick={onNewBook}>새 전자책 만들기</Button>
+        ) : (
+          <Link href="/books/new" className={cn(buttonVariants())}>
+            새 전자책 만들기
+          </Link>
+        )}
       </div>
     );
   }
@@ -47,7 +56,7 @@ export function BookList() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {books.map((book) => (
-        <BookCard key={book.id} book={book} />
+        <BookCard key={book.id} book={book} onNavigate={onBookNavigate} />
       ))}
     </div>
   );

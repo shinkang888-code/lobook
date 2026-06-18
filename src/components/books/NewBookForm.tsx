@@ -8,8 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCreateBook } from "@/hooks/useBooks";
+import { cn } from "@/lib/utils";
 
-export function NewBookForm() {
+type NewBookFormProps = {
+  embedded?: boolean;
+  onCreated?: (bookId: string) => void;
+  onCancel?: () => void;
+};
+
+export function NewBookForm({ embedded, onCreated, onCancel }: NewBookFormProps) {
   const router = useRouter();
   const createBook = useCreateBook();
   const [title, setTitle] = useState("");
@@ -23,14 +30,24 @@ export function NewBookForm() {
         author: author.trim() || "익명",
       });
       toast.success("새 전자책이 생성되었습니다.");
-      router.push(`/books/${book.id}`);
+      if (onCreated) {
+        onCreated(book.id);
+      } else {
+        router.push(`/books/${book.id}`);
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "생성 실패");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-lg space-y-6 rounded-2xl border bg-card p-6">
+    <form
+      onSubmit={handleSubmit}
+      className={cn(
+        "mx-auto max-w-lg space-y-6",
+        embedded ? "p-0" : "rounded-2xl border bg-card p-6",
+      )}
+    >
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">새 전자책</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -60,6 +77,11 @@ export function NewBookForm() {
         {createBook.isPending && <Loader2 className="animate-spin" />}
         만들기
       </Button>
+      {onCancel && (
+        <Button type="button" variant="outline" className="w-full" onClick={onCancel}>
+          목록으로
+        </Button>
+      )}
     </form>
   );
 }
