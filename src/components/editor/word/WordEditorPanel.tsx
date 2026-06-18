@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState, type CSSProperties } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -12,6 +12,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useEditorToolbarOptional } from "@/components/editor/shell/EditorToolbarContext";
 import type { PageSpec } from "@/lib/editor/types";
+import { mmToPx } from "@/lib/editor/pageSpec";
 import { buildTocHtml, extractHeadings } from "@/lib/word/wordDocumentUtils";
 import { EigenpalDocxEditor, type EigenpalDocxEditorHandle } from "./EigenpalDocxEditor";
 import { WordM365Ribbon } from "./WordM365Ribbon";
@@ -30,6 +31,8 @@ type Props = {
   pageSpec: PageSpec;
   chapterTitle?: string;
   onChange?: () => void;
+  /** BookEditorShell 내장 시 내부 사이드바 숨김 */
+  embedded?: boolean;
 };
 
 type WordSubMode = "html" | "docx";
@@ -49,7 +52,7 @@ const WORD_TOOLBAR_KEYS = [
 ] as const;
 
 export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function WordEditorPanel(
-  { bookId, initialHtml, pageSpec, chapterTitle, onChange },
+  { bookId, initialHtml, pageSpec, chapterTitle, onChange, embedded = false },
   ref,
 ) {
   const toolbar = useEditorToolbarOptional();
@@ -210,6 +213,15 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
 
   const htmlContent = editor?.getHTML() ?? "";
 
+  const pageWmm = pageSpec.orientation === "portrait" ? pageSpec.width_mm : pageSpec.height_mm;
+  const pageHmm = pageSpec.orientation === "portrait" ? pageSpec.height_mm : pageSpec.width_mm;
+  const paperStyle = embedded
+    ? ({
+        "--paper-width": `${mmToPx(pageWmm, 1)}px`,
+        "--paper-min-height": `${mmToPx(pageHmm, 1)}px`,
+      } as CSSProperties)
+    : undefined;
+
   return (
     <div className="word-m365-workspace h-full min-h-0">
       <WordM365Ribbon
@@ -241,11 +253,16 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
         {chapterTitle && <span className="ml-auto text-[10px] text-slate-500">{chapterTitle}</span>}
       </div>
 
-      <div className="word-m365-body">
+      <div className={`word-m365-body ${embedded ? "word-m365-body--embedded" : ""}`}>
         <div className="word-m365-canvas">
           {subMode === "html" && editor && (
-            <div className="word-m365-page">
-              <div className={`word-m365-paper ${reviewMode ? "word-m365-paper--review" : ""}`}>
+            <div
+              className={`word-m365-page ${embedded ? "word-m365-page--centered" : ""}`}
+              style={paperStyle}
+            >
+              <div
+                className={`word-m365-paper ${embedded ? "word-m365-paper--centered" : ""} ${reviewMode ? "word-m365-paper--review" : ""}`}
+              >
                 <EditorContent editor={editor} />
               </div>
             </div>
@@ -266,7 +283,7 @@ export const WordEditorPanel = forwardRef<WordEditorPanelHandle, Props>(function
           )}
         </div>
 
-        {subMode === "html" && (
+        {subMode === "html" && !embedded && (
           <WordM365SidePanel bookId={bookId} html={htmlContent} onInsertToc={insertToc} />
         )}
       </div>

@@ -1,0 +1,78 @@
+/* 편집기 — 브라우저 프레임(문서) 상·하·좌·우 스크롤 */
+
+:root {
+  --editor-min-width: 1320px;
+  --editor-min-height: 720px;
+}
+
+html.editor-scroll-mode {
+  overflow: auto;
+  overflow-x: auto;
+  height: auto;
+}
+
+html.editor-scroll-mode body {
+  overflow: auto;
+  overflow-x: auto;
+  height: auto;
+  min-height: 100%;
+}
+
+html.editor-scroll-mode body > div > header {
+  display: none;
+}
+
+html.editor-scroll-mode body > div > main {
+  max-width: none;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.editor-browser-shell {
+  display: flex;
+  flex-direction: column;
+  width: max(100%, var(--editor-min-width));
+  min-height: max(100dvh, var(--editor-min-height));
+  background: var(--polaris-workspace, #e8eaef);
+}
+
+.editor-browser-shell .editor-workspace {
+  flex: 1 1 auto;
+  min-height: var(--editor-min-height);
+  min-width: 0;
+  width: 100%;
+}
+
+.editor-browser-shell .editor-workspace-canvas {
+  overflow: auto;
+  min-height: var(--editor-min-height);
+}
+
+.editor-browser-shell .editor-fill-canvas {
+  overflow: auto;
+  min-height: 480px;
+}
+
+.editor-browser-shell .lo-hub,
+.editor-browser-shell .word-m365-workspace {
+  flex: 1 1 auto;
+  min-height: var(--editor-min-height);
+  height: auto;
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --editor-min-width: 960px;
+  }
+}
+
+@media (max-width: 639px) {
+  :root {
+    --editor-min-width: 720px;
+    --editor-min-height: 640px;
+  }
+}

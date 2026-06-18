@@ -7,7 +7,8 @@ export async function POST(request: Request, { params }: Params) {
     if (!isCoworkAiEnabled()) {
       return new Response(
         JSON.stringify({
-          error: "Studio Chat API 키가 없습니다. OPENAI_API_KEY 또는 COWORK_AI_API_KEY를 설정하세요.",
+          error:
+            "Studio Chat API 키가 없습니다. GEMINI_API_KEY 또는 OPENAI_API_KEY/COWORK_AI_API_KEY를 설정하세요.",
         }),
         { status: 503, headers: { "Content-Type": "application/json" } },
       );

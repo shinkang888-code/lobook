@@ -4,9 +4,10 @@
 .word-m365-workspace {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   height: 100%;
-  min-height: 0;
-  background: #e8eaef;
+  min-height: 480px;
+  background: var(--ew-bg, #d4d8e0);
 }
 
 .word-m365-ribbon {
@@ -55,8 +56,8 @@
 
 .word-m365-body {
   display: flex;
-  flex: 1;
-  min-height: 0;
+  flex: 1 1 auto;
+  min-height: 480px;
 }
 
 .word-m365-canvas {
@@ -72,6 +73,44 @@
   overflow: auto;
   padding: 24px 16px;
   background: #c8c8c8;
+}
+
+.word-m365-page--centered {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: auto;
+  min-width: 100%;
+  min-height: 100%;
+  padding: 12px;
+  background: var(--ew-bg, #d4d8e0);
+}
+
+.word-m365-paper--centered {
+  width: var(--paper-width, 816px);
+  min-height: var(--paper-min-height, 1056px);
+  max-width: calc(100% - 24px);
+  flex-shrink: 0;
+  margin: 0;
+  padding: clamp(16px, 3vw, 56px) clamp(12px, 4vw, 56px);
+  background: #fff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12);
+  border-radius: 2px;
+  font-family: "맑은 고딕", "Malgun Gothic", "Calibri", sans-serif;
+  font-size: 11pt;
+  line-height: 1.5;
+  color: #000;
+}
+
+.word-m365-body--embedded .word-m365-canvas {
+  flex: 1;
+  overflow: hidden;
+}
+
+.word-m365-paper--centered .ProseMirror {
+  min-height: calc(var(--paper-min-height, 1056px) - 112px);
+  outline: none;
 }
 
 .word-m365-paper {

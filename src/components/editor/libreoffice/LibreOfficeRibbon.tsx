@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { LoBookLogo } from "@/components/brand/LoBookLogo";
+import { LofficeLogo } from "@/components/brand/LofficeLogo";
 import type { EditorMode } from "@/lib/editor/types";
 import { useEditorToolbarOptional } from "../shell/EditorToolbarContext";
 import "./libreoffice-shell.css";
@@ -135,23 +135,31 @@ export function LibreOfficeRibbon({
 
   return (
     <div className="lo-shell lo-ribbon shrink-0">
-      <div className="flex items-center gap-2 border-b border-[#c8c8c8] bg-[#f4f4f4] px-3 py-1">
-        <button
-          type="button"
-          className="lo-ribbon-btn"
-          title="책 목록"
-          onClick={() => router.push("/")}
-        >
-          <ChevronLeft className="size-4" />
-        </button>
-        <LoBookLogo size={24} />
-        <span className="text-xs font-semibold text-[#333]">{bookTitle || "제목 없음"}</span>
-        <span className="rounded bg-[#e8f5e6] px-2 py-0.5 text-[10px] font-medium text-[#0d6b02]">
-          {modeLabel}
-        </span>
-        {dirty && (
-          <span className="text-[10px] text-amber-700">● 저장되지 않음</span>
-        )}
+      <div className="lo-titlebar border-b border-[#c8c8c8] bg-[#f4f4f4] px-3 py-1.5">
+        <div className="lo-titlebar-left flex min-w-0 items-center gap-1">
+          <button
+            type="button"
+            className="lo-ribbon-btn shrink-0"
+            title="책 목록"
+            onClick={() => router.push("/")}
+          >
+            <ChevronLeft className="size-4" />
+          </button>
+          <LofficeLogo size={24} showName nameClassName="text-sm font-bold text-[#0d6b02]" />
+        </div>
+
+        <h1 className="lo-titlebar-center truncate px-2 text-center text-sm font-semibold text-[#333]">
+          {bookTitle || "제목 없음"}
+        </h1>
+
+        <div className="lo-titlebar-right flex min-w-0 items-center justify-end gap-2">
+          <span className="shrink-0 rounded bg-[#e8f5e6] px-2 py-0.5 text-[10px] font-medium text-[#0d6b02]">
+            {modeLabel}
+          </span>
+          {dirty && (
+            <span className="shrink-0 text-[10px] text-amber-700">● 저장되지 않음</span>
+          )}
+        </div>
       </div>
 
       <div className="lo-ribbon-tabs">

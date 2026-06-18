@@ -1,6 +1,7 @@
 "use client";
 
 import { BookEditorShell } from "@/components/editor/shell/BookEditorShell";
+import { EditorScrollMode } from "@/components/editor/shell/EditorScrollMode";
 import type { Book } from "@/lib/types";
 
 type BookEditorProps = {
@@ -8,5 +9,10 @@ type BookEditorProps = {
 };
 
 export function BookEditor({ book }: BookEditorProps) {
-  return <BookEditorShell book={book} />;
+  return (
+    <>
+      <EditorScrollMode />
+      <BookEditorShell book={book} />
+    </>
+  );
 }

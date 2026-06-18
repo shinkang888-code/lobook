@@ -27,7 +27,7 @@ export function CoworkChatPanel({ bookId, enabled }: CoworkChatPanelProps) {
     async (text: string) => {
       if (!text.trim() || loading) return;
       if (!enabled) {
-        toast.error("AI API 키를 설정하세요.");
+        toast.error("AI API 키를 설정하세요. (GEMINI_API_KEY)");
         return;
       }
 

@@ -1,19 +1,47 @@
 "use client";
 
 import { Minus, Plus } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ReactNode, CSSProperties } from "react";
 import type { PageSpec } from "@/lib/editor/types";
-import { pageSpecToCss } from "@/lib/editor/pageSpec";
+import { mmToPx, pageSpecToCss } from "@/lib/editor/pageSpec";
 
 type PageCanvasProps = {
   pageSpec: PageSpec;
   zoom: number;
   showMarginGuides?: boolean;
+  /** true면 페이지가 캔버스 영역을 최대한 채움 */
+  fill?: boolean;
   children: ReactNode;
 };
 
-export function PageCanvas({ pageSpec, zoom, showMarginGuides = true, children }: PageCanvasProps) {
+export function PageCanvas({ pageSpec, zoom, showMarginGuides = true, fill = false, children }: PageCanvasProps) {
   const pageStyle = pageSpecToCss(pageSpec, zoom);
+
+  if (fill) {
+    const { margins } = pageSpec;
+    const w = pageSpec.orientation === "portrait" ? pageSpec.width_mm : pageSpec.height_mm;
+    const h = pageSpec.orientation === "portrait" ? pageSpec.height_mm : pageSpec.width_mm;
+    const fillStyle: CSSProperties = {
+      width: mmToPx(w, zoom),
+      minHeight: mmToPx(h, zoom),
+      maxWidth: "100%",
+      flexShrink: 0,
+      padding: `${mmToPx(margins.top, zoom)}px ${mmToPx(margins.right, zoom)}px ${mmToPx(margins.bottom, zoom)}px ${mmToPx(margins.left, zoom)}px`,
+      fontFamily: pageSpec.font_family,
+      fontSize: `${pageSpec.font_size_pt * zoom}pt`,
+      lineHeight: pageSpec.line_height,
+      backgroundColor: "#ffffff",
+      boxShadow: "0 1px 6px rgba(0,0,0,0.12)",
+    };
+
+    return (
+      <div className="editor-fill-canvas">
+        <div className="editor-fill-page polaris-page" style={fillStyle}>
+          {children}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="polaris-workspace flex flex-1 flex-col overflow-hidden">

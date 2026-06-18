@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { PageCanvas, ZoomControls } from "@/components/editor/canvas/PageCanvas";
+import { PageCanvas } from "@/components/editor/canvas/PageCanvas";
 import { PageSpecPanel } from "@/components/editor/canvas/PageSpecPanel";
 import {
   MarkdownEditorPanel,
@@ -15,6 +15,10 @@ import { TocNavigator } from "@/components/editor/navigation/TocNavigator";
 import { ConvertToMarkdownDialog } from "@/components/editor/modals/ConvertToMarkdownDialog";
 import { ImportDialog, type ImportKind } from "@/components/editor/modals/ImportDialog";
 import { EditorTabBar } from "@/components/editor/shell/EditorTabBar";
+import {
+  EditorWorkspaceLayout,
+} from "@/components/editor/shell/EditorWorkspaceLayout";
+import type { MobileDrawer } from "@/components/editor/shell/EditorMobileDock";
 import { EditorToolbarProvider, useEditorToolbar } from "@/components/editor/shell/EditorToolbarContext";
 import { LibreOfficeRibbon } from "@/components/editor/libreoffice/LibreOfficeRibbon";
 import { LibreOfficeHub, type LibreOfficePanelId } from "@/components/editor/libreoffice/LibreOfficeHub";
@@ -63,6 +67,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
   const [importKind, setImportKind] = useState<ImportKind | null>(null);
   const [convertMarkdownOpen, setConvertMarkdownOpen] = useState(false);
   const [hwpPageCount, setHwpPageCount] = useState(0);
+  const [mobileDrawer, setMobileDrawer] = useState<MobileDrawer>(null);
   const queryClient = useQueryClient();
 
   const chapters = structure?.chapters ?? [];
@@ -351,7 +356,7 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
   };
 
   return (
-    <div className="hancom-editor-shell lo-shell fixed inset-0 z-50 flex flex-col hancom-workspace-bg">
+    <div className="hancom-editor-shell lo-shell editor-browser-shell">
       <LibreOfficeRibbon
         editorMode={activeMode}
         bookTitle={title}
@@ -395,19 +400,57 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
 
       <EditorTabBar activeMode={activeMode} onModeChange={setActiveMode} />
 
-      <div className="flex min-h-0 flex-1">
-        <aside
-          className="hidden shrink-0 flex-col border-r border-gray-300 bg-white lg:flex"
-          style={{ width: "var(--editor-left-width, 260px)" }}
-        >
-          <ChapterList
-            chapters={chapters}
-            activeChapterId={activeChapter?.id ?? ""}
-            onSelect={setActiveChapterId}
-            onAdd={() => void handleAddChapter()}
-            adding={addChapter.isPending}
-          />
-          <Tabs value={leftTab} onValueChange={(v) => setLeftTab(v as "toc" | "thumb")} className="flex min-h-0 flex-1 flex-col">
+      <EditorWorkspaceLayout
+        zoom={zoom}
+        pageNumber={activePage}
+        pageTotal={pageTotal}
+        onZoomChange={setZoom}
+        onPrevPage={() => setActivePage((p) => Math.max(1, p - 1))}
+        onNextPage={() => setActivePage((p) => Math.min(pageTotal, p + 1))}
+        mobileDrawer={mobileDrawer}
+        onMobileDrawerChange={setMobileDrawer}
+        showMarginTools
+        leftPanel={
+          <>
+            <ChapterList
+              chapters={chapters}
+              activeChapterId={activeChapter?.id ?? ""}
+              onSelect={(id) => {
+                setActiveChapterId(id);
+                setMobileDrawer(null);
+              }}
+              onAdd={() => void handleAddChapter()}
+              adding={addChapter.isPending}
+            />
+            <Tabs
+              value={leftTab}
+              onValueChange={(v) => setLeftTab(v as "toc" | "thumb")}
+              className="flex min-h-0 flex-1 flex-col"
+            >
+              <TabsList className="mx-2 mt-2 grid w-auto grid-cols-2">
+                <TabsTrigger value="toc" className="text-xs">
+                  목차
+                </TabsTrigger>
+                <TabsTrigger value="thumb" className="text-xs">
+                  썸네일
+                </TabsTrigger>
+              </TabsList>
+              <div className="min-h-0 flex-1">
+                {leftTab === "toc" ? (
+                  <TocNavigator nodes={toc} activePage={activePage} onPageSelect={setActivePage} />
+                ) : (
+                  <PageThumbnailStrip pages={pages} activePage={activePage} onPageSelect={setActivePage} />
+                )}
+              </div>
+            </Tabs>
+          </>
+        }
+        navPanel={
+          <Tabs
+            value={leftTab}
+            onValueChange={(v) => setLeftTab(v as "toc" | "thumb")}
+            className="flex min-h-0 flex-1 flex-col"
+          >
             <TabsList className="mx-2 mt-2 grid w-auto grid-cols-2">
               <TabsTrigger value="toc" className="text-xs">
                 목차
@@ -424,33 +467,9 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
               )}
             </div>
           </Tabs>
-        </aside>
-
-        <main className="flex min-w-0 flex-1 flex-col">
-          {isFullWidth ? (
-            <div className="min-h-0 flex-1">{renderEditor()}</div>
-          ) : (
-            <>
-              <PageCanvas pageSpec={pageSpec} zoom={zoom}>
-                {renderEditor()}
-              </PageCanvas>
-              <ZoomControls
-                zoom={zoom}
-                onZoomChange={setZoom}
-                pageNumber={activePage}
-                pageTotal={pageTotal}
-                onPrevPage={() => setActivePage((p) => Math.max(1, p - 1))}
-                onNextPage={() => setActivePage((p) => Math.min(pageTotal, p + 1))}
-              />
-            </>
-          )}
-        </main>
-
-        <aside
-          className={`hidden shrink-0 lg:block ${isFullWidth ? "" : ""}`}
-          style={{ width: "var(--editor-right-width, 280px)" }}
-        >
-          {primaryMode === "libreoffice" ? (
+        }
+        rightPanel={
+          primaryMode === "libreoffice" ? (
             <LibreOfficeSidebar
               pageSpec={pageSpec}
               docKind={loPanel === "tools" ? "writer" : loPanel}
@@ -485,9 +504,17 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
                 setDirty(true);
               }}
             />
-          )}
-        </aside>
-      </div>
+          )
+        }
+      >
+        {isFullWidth ? (
+          <div className="min-h-0 flex-1">{renderEditor()}</div>
+        ) : (
+          <PageCanvas pageSpec={pageSpec} zoom={zoom} fill>
+            {renderEditor()}
+          </PageCanvas>
+        )}
+      </EditorWorkspaceLayout>
 
       <StatusBar
         pageNumber={activePage}

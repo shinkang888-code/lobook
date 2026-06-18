@@ -94,6 +94,7 @@ export function LibreOfficeHub({
             pageSpec={pageSpec}
             chapterTitle={chapterTitle}
             onChange={onWordChange}
+            embedded
           />
         );
       case "hwp":

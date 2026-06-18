@@ -28,8 +28,8 @@
   }
 
   :root {
-    --editor-left-width: 260px;
-    --editor-right-width: 300px;
+    --editor-left-width: 220px;
+    --editor-right-width: 240px;
     --polaris-navy: var(--hnc-control-text-color-accent3, #335095);
     --polaris-workspace: #e8eaef;
   }
