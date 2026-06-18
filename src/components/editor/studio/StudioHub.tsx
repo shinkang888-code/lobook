@@ -38,7 +38,7 @@ export function StudioHub({ bookId, bookTitle, initialTab = "cowork" }: StudioHu
         </button>
         <span className="ml-auto flex items-center gap-1 text-[10px] text-violet-700">
           <Sparkles className="size-3" />
-          LoBooK 확장 (LibreOffice 비중복)
+          LoBooK 확장 (Lofice 비중복)
         </span>
       </div>
       <div className="lo-hub-body">

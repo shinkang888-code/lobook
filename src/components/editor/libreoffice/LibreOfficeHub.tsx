@@ -180,7 +180,7 @@ export function LibreOfficeHub({
         })}
         {binding && (
           <span className="ml-auto text-[10px] text-gray-500">
-            LO/{binding.moduleId} → {binding.lobookEngine}
+            Lofice/{binding.moduleId} → {binding.lobookEngine}
           </span>
         )}
       </div>

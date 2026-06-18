@@ -128,7 +128,7 @@ export function LibreOfficeRibbon({
     editorMode === "writer" || editorMode === "markdown"
       ? "Writer (원고)"
       : editorMode === "libreoffice"
-        ? "LibreOffice 문서"
+        ? "Lofice 문서"
         : editorMode === "studio"
           ? "LoBooK Studio"
           : editorMode;

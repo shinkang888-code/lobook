@@ -32,7 +32,7 @@ export type LibreOfficeEngineBinding = {
 export const LIBREOFFICE_ENGINE_BINDINGS: LibreOfficeEngineBinding[] = [
   {
     moduleId: "sw",
-    label: "LibreOffice Writer",
+    label: "Lofice Writer",
     docKind: "writer",
     formats: ["odt", "docx", "doc", "rtf", "txt"],
     lobookEngine: "eigenpal-docx",
@@ -42,7 +42,7 @@ export const LIBREOFFICE_ENGINE_BINDINGS: LibreOfficeEngineBinding[] = [
   },
   {
     moduleId: "hwpfilter",
-    label: "LibreOffice HWP Filter",
+    label: "Lofice HWP Filter",
     docKind: "hwp",
     formats: ["hwp", "hwpx"],
     lobookEngine: "rhwp",
@@ -52,7 +52,7 @@ export const LIBREOFFICE_ENGINE_BINDINGS: LibreOfficeEngineBinding[] = [
   },
   {
     moduleId: "filter",
-    label: "LibreOffice PDF Filter",
+    label: "Lofice PDF Filter",
     docKind: "pdf",
     formats: ["pdf"],
     lobookEngine: "pdfjs",
@@ -72,7 +72,7 @@ export const LIBREOFFICE_ENGINE_BINDINGS: LibreOfficeEngineBinding[] = [
   },
   {
     moduleId: "sc",
-    label: "LibreOffice Calc",
+    label: "Lofice Calc",
     docKind: "calc",
     formats: ["ods", "xlsx", "csv"],
     lobookEngine: "spreadsheet",
@@ -82,7 +82,7 @@ export const LIBREOFFICE_ENGINE_BINDINGS: LibreOfficeEngineBinding[] = [
   },
   {
     moduleId: "sd",
-    label: "LibreOffice Impress",
+    label: "Lofice Impress",
     docKind: "impress",
     formats: ["odp", "pptx"],
     lobookEngine: "ppt-master",
@@ -92,7 +92,7 @@ export const LIBREOFFICE_ENGINE_BINDINGS: LibreOfficeEngineBinding[] = [
   },
   {
     moduleId: "libreofficekit",
-    label: "LibreOfficeKit",
+    label: "LoficeKit",
     docKind: "writer",
     formats: ["*"],
     lobookEngine: "libreofficekit",
