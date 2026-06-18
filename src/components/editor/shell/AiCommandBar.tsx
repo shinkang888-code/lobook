@@ -6,15 +6,10 @@ import {
   Loader2,
   Presentation,
   Wand2,
-  CheckCircle2,
-  AlertCircle,
   Bot,
-  Palette,
-  Cpu,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { LofficeHomeLink } from "@/components/brand/LofficeLogo";
 import type { PptCanvasFormat } from "@/lib/ppt/pptMasterPaths";
 import type { PptAiProvider } from "@/lib/ppt/pptAiService";
 
@@ -43,7 +38,6 @@ type PptStatus = {
 
 type AiCommandBarProps = {
   bookId: string;
-  bookTitle: string;
   onGenerated?: (fileName: string) => void;
   onOpenCowork?: () => void;
 };
@@ -62,23 +56,7 @@ const PROVIDER_LABELS: Record<PptAiProvider, string> = {
   local: "로컬",
 };
 
-function providerHint(status: PptStatus | null, provider: PptAiProvider): string {
-  if (!status) return "";
-  if (provider === "gemini") {
-    if (status.ai.gemini.apiEnabled) return status.ai.gemini.model;
-    if (status.ai.gemini.cliAvailable) return `CLI ${status.ai.gemini.cliVersion ?? ""}`.trim();
-    return "API 키 또는 CLI 필요";
-  }
-  if (provider === "openai") {
-    return status.ai.openai.enabled ? status.ai.openai.model : "API 키 필요";
-  }
-  if (provider === "local") return "마크다운 플래너";
-  if (status.ai.gemini.apiEnabled || status.ai.gemini.cliAvailable) return "Gemini 우선";
-  if (status.ai.openai.enabled) return status.ai.openai.model;
-  return "로컬 플래너";
-}
-
-export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: AiCommandBarProps) {
+export function AiCommandBar({ bookId, onGenerated, onOpenCowork }: AiCommandBarProps) {
   const [prompt, setPrompt] = useState("");
   const [format, setFormat] = useState<PptCanvasFormat>("ppt169");
   const [maxSlides, setMaxSlides] = useState(10);
@@ -143,73 +121,10 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
   };
 
   const engineOk = status?.engine.available;
-  const geminiReady = status?.ai.gemini.apiEnabled || status?.ai.gemini.cliAvailable;
-  const figmaReady = status?.figma.cliAvailable || status?.figma.apiEnabled;
 
   return (
     <div className="hancom-ai-bar shrink-0 px-4 py-3 shadow-sm">
       <div className="mx-auto flex max-w-[1600px] flex-col gap-3">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-3">
-            <LofficeHomeLink variant="logo" className="shrink-0" />
-
-            <div className="min-w-0 flex-1 text-center">
-              <p className="truncate text-sm font-semibold tracking-tight text-[var(--hnc-control-text-color-accent3)]">
-                AI 프레젠테이션 스튜디오
-              </p>
-              <p className="truncate text-[11px] text-slate-500">
-                PPT Master · {bookTitle || "제목 없음"} · {providerHint(status, provider)}
-              </p>
-            </div>
-
-            <LofficeHomeLink variant="button" className="shrink-0" />
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] sm:justify-end">
-            {engineOk ? (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-800">
-                <CheckCircle2 className="size-3" /> PPT 엔진 준비
-              </span>
-            ) : (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-amber-900">
-                <AlertCircle className="size-3" /> setup:ppt-master 필요
-              </span>
-            )}
-            {geminiReady ? (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-violet-800">
-                <Cpu className="size-3" /> Gemini
-                {status?.ai.gemini.cliVersion ? ` ${status.ai.gemini.cliVersion}` : ""}
-              </span>
-            ) : (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-slate-600">
-                <Cpu className="size-3" /> Gemini 미연결
-              </span>
-            )}
-            {figmaReady ? (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-pink-100 px-2 py-0.5 text-pink-800">
-                <Palette className="size-3" /> Figma
-                {status?.figma.cliVersion ? ` ${status?.figma.cliVersion}` : ""}
-              </span>
-            ) : (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-slate-600">
-                <Palette className="size-3" /> Figma 기본 테마
-              </span>
-            )}
-            {lastFile && (
-              <Button
-                type="button"
-                size="sm"
-                variant="secondary"
-                className="h-7 max-w-[200px] shrink-0 gap-1"
-                onClick={handleDownload}
-              >
-                <Download className="size-3.5 shrink-0" />
-                <span className="truncate">{lastFile}</span>
-              </Button>
-            )}
-          </div>
-        </div>
-
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end">
           <div className="relative flex-1">
             <Wand2 className="pointer-events-none absolute left-3 top-3 size-4 text-slate-400" />
@@ -283,6 +198,19 @@ export function AiCommandBar({ bookId, bookTitle, onGenerated, onOpenCowork }: A
                 </option>
               ))}
             </select>
+
+            {lastFile && (
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                className="h-9 max-w-[160px] gap-1"
+                onClick={handleDownload}
+              >
+                <Download className="size-3.5 shrink-0" />
+                <span className="truncate">{lastFile}</span>
+              </Button>
+            )}
 
             {onOpenCowork && (
               <Button type="button" variant="outline" className="h-9 gap-1.5" onClick={onOpenCowork}>

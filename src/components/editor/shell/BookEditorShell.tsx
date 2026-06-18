@@ -12,7 +12,6 @@ import {
 import { ChapterList } from "@/components/editor/navigation/ChapterList";
 import { PageThumbnailStrip } from "@/components/editor/navigation/PageThumbnailStrip";
 import { TocNavigator } from "@/components/editor/navigation/TocNavigator";
-import { AiCommandBar } from "@/components/editor/shell/AiCommandBar";
 import { ConvertToMarkdownDialog } from "@/components/editor/modals/ConvertToMarkdownDialog";
 import { ImportDialog, type ImportKind } from "@/components/editor/modals/ImportDialog";
 import { EditorTabBar } from "@/components/editor/shell/EditorTabBar";
@@ -353,11 +352,6 @@ function BookEditorShellInner({ book }: BookEditorShellProps) {
 
   return (
     <div className="hancom-editor-shell lo-shell fixed inset-0 z-50 flex flex-col hancom-workspace-bg">
-      <AiCommandBar
-        bookId={book.id}
-        bookTitle={title}
-        onOpenCowork={() => setActiveMode("studio")}
-      />
       <LibreOfficeRibbon
         editorMode={activeMode}
         bookTitle={title}
