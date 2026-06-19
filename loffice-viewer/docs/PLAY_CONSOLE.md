@@ -40,9 +40,9 @@ HWP·PDF·Word·PPT·Excel·TXT를 광고 없이 무료로 보는 Loffice 문서
 
 ## AAB 빌드
 
-1. `keystore.properties.example`을 복사해 `keystore.properties` 작성 (로컬 keystore 경로·비밀번호)
-2. `keystore/loffice-viewer-release.keystore` 백업 (Git 제외)
-3. Android Studio → **Build → Generate Signed Bundle / APK**
+1. `keystore.properties.example` → `keystore.properties` 복사 (로컬 keystore 경로·비밀번호)
+2. `local.properties.example` → `local.properties` (Android SDK 경로)
+3. `keystore/loffice-viewer-release.keystore` 백업 (Git 제외)
 
 ```powershell
 cd loffice-viewer
@@ -51,7 +51,7 @@ cd loffice-viewer
 
 출력: `app/build/outputs/bundle/release/app-release.aab`
 
-스토어 등록 문구 전체: [docs/STORE_LISTING.md](STORE_LISTING.md)
+스토어 등록 문구: [docs/STORE_LISTING.md](STORE_LISTING.md)
 
 ## 데이터 안전 양식
 

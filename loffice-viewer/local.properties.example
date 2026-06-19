@@ -1,0 +1,3 @@
+# Android SDK 로컬 경로 (Git 제외)
+# Android Studio가 자동 생성하거나 아래처럼 수동 설정
+sdk.dir=C\:\\Android\\Sdk
