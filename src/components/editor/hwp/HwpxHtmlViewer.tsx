@@ -58,7 +58,7 @@ export function HwpxHtmlViewer({
 
   if (loading) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 bg-[#e8e8e8]">
+      <div className="flex h-full flex-col items-center justify-center gap-2 bg-white">
         <Loader2 className="size-6 animate-spin text-[#2b579a]" />
         <p className="text-xs text-gray-600">HWPX 본문 추출 중…</p>
       </div>
@@ -67,7 +67,7 @@ export function HwpxHtmlViewer({
 
   if (error || !preview) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 px-4 text-center bg-[#e8e8e8]">
+      <div className="flex h-full flex-col items-center justify-center gap-2 px-4 text-center bg-white">
         <p className="text-sm font-medium text-red-600">HWPX 뷰어 오류</p>
         <p className="text-xs text-gray-500">{error ?? "내용 없음"}</p>
       </div>
@@ -96,7 +96,7 @@ export function HwpxHtmlViewer({
         </div>
       )}
 
-      <div className="min-h-0 flex-1 overflow-auto overscroll-contain bg-[#d8d8d8] px-4 py-6">
+      <div className="min-h-0 flex-1 overflow-auto overscroll-contain bg-white px-4 py-6">
         <div
           className="mx-auto rounded-sm bg-white shadow-lg prose prose-sm max-w-none px-8 py-10 text-slate-900"
           style={{

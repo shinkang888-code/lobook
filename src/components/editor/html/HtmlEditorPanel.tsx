@@ -51,8 +51,6 @@ export const HtmlEditorPanel = forwardRef<HtmlEditorPanelHandle, Props>(function
 ) {
   const [draft, setDraft] = useState(initialHtml);
   const [preview, setPreview] = useState(initialHtml);
-  const [splitHeight, setSplitHeight] = useState(480);
-  const splitRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const toolbar = useEditorToolbarOptional();
 
@@ -90,25 +88,6 @@ export const HtmlEditorPanel = forwardRef<HtmlEditorPanelHandle, Props>(function
 
     return () => toolbar.unregister([...HTML_TOOLBAR_KEYS]);
   }, [toolbar, draft]);
-
-  useEffect(() => {
-    const el = splitRef.current;
-    if (!el) return;
-
-    const syncHeight = () => {
-      const next = el.clientHeight;
-      if (next > 0) setSplitHeight(next);
-    };
-
-    syncHeight();
-    const observer = new ResizeObserver(syncHeight);
-    observer.observe(el);
-    window.addEventListener("resize", syncHeight);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", syncHeight);
-    };
-  }, []);
 
   const previewStyle = pageSpecToCss(pageSpec, zoom);
   const { width: _w, height: _h, padding, boxShadow, ...typography } = previewStyle;
@@ -148,11 +127,11 @@ export const HtmlEditorPanel = forwardRef<HtmlEditorPanelHandle, Props>(function
         </button>
       </div>
 
-      <div ref={splitRef} className="html-editor-split">
+      <div className="html-editor-split">
         <div className="html-editor-code">
           <CodeMirror
             value={draft}
-            height={`${splitHeight}px`}
+            height="100%"
             theme={oneDark}
             extensions={[
               html(),

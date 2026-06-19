@@ -110,7 +110,7 @@ export function RhwpCanvasViewer({
 
   if (loading) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 bg-[#e8e8e8]">
+      <div className="flex h-full flex-col items-center justify-center gap-2 bg-white">
         <Loader2 className="size-6 animate-spin text-[#2b579a]" />
         <p className="text-xs text-gray-600">HWP Canvas 렌더링 중…</p>
       </div>
@@ -119,7 +119,7 @@ export function RhwpCanvasViewer({
 
   if (error || !doc || pages.length === 0) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 px-4 text-center bg-[#e8e8e8]">
+      <div className="flex h-full flex-col items-center justify-center gap-2 px-4 text-center bg-white">
         <p className="text-sm font-medium text-red-600">HWP 뷰어 오류</p>
         <p className="text-xs text-gray-500">{error ?? "페이지 없음"}</p>
       </div>
@@ -132,7 +132,7 @@ export function RhwpCanvasViewer({
         {fileName} · {singlePage ? `${activePage}/${pageCount}` : `${pageCount}페이지`} ·{" "}
         {pageSpec.preset_id.toUpperCase()} · scale {Math.round(scale * 100)}%
       </p>
-      <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto overscroll-contain bg-[#c8c8c8] px-2 py-4">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-auto overscroll-contain bg-white px-2 py-4">
         <div className="mx-auto" style={{ width: "fit-content" }}>
           {pages.map((info, i) => (
             <RhwpPageCanvas

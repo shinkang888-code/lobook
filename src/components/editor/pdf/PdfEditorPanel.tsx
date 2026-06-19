@@ -140,7 +140,7 @@ export function PdfEditorPanel({
           <iframe
             title="인쇄 미리보기"
             srcDoc={printHtml}
-            className="min-h-0 flex-1 w-full border-0 bg-white"
+            className="min-h-0 flex-1 w-full grow border-0 bg-white"
             sandbox="allow-same-origin"
           />
         )}

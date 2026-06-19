@@ -23,7 +23,7 @@ export function PdfPreviewPanel({ buffer, fileName, className }: PdfPreviewPanel
     <Viewer
       source={source}
       registry={registry}
-      className={className ?? "h-full w-full overflow-auto bg-gray-100"}
+      className={className ?? "h-full w-full overflow-auto bg-white"}
       loadingFallback={
         <div className="flex h-full flex-col items-center justify-center gap-2">
           <Loader2 className="size-7 animate-spin text-[#2b579a]" />
