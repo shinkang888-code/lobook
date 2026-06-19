@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+  <title>HWP Viewer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #fff; font-family: "Malgun Gothic", sans-serif; }
+    #status { padding: 8px 12px; font-size: 11px; color: #64748b; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
+    #scroll { height: calc(100% - 34px); overflow: auto; padding: 16px 8px; background: #fff; }
+    .page { margin: 0 auto 16px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    canvas { display: block; width: 100%; height: auto; }
+    #error { color: #dc2626; padding: 24px; text-align: center; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div id="status">HWP Canvas · RHWP WASM</div>
+  <div id="scroll"><div id="pages"></div><div id="error" hidden></div></div>
+  <script type="module">
+    import init, { HwpDocument } from "./rhwp.js";
+
+    function measureTextWidth(font, text) {
+      const c = document.createElement("canvas").getContext("2d");
+      if (!c) return text.length * 8;
+      c.font = font;
+      return c.measureText(text).width;
+    }
+    globalThis.measureTextWidth = measureTextWidth;
+
+    function fitScale(pageWidth, containerWidth) {
+      if (pageWidth <= 0 || containerWidth <= 0) return 1;
+      return Math.min(2, Math.max(0.25, containerWidth / pageWidth));
+    }
+
+    function showError(msg) {
+      document.getElementById("error").hidden = false;
+      document.getElementById("error").textContent = msg;
+    }
+
+    window.renderHwpBase64 = async function (base64, fileName) {
+      const status = document.getElementById("status");
+      const pagesEl = document.getElementById("pages");
+      pagesEl.innerHTML = "";
+      document.getElementById("error").hidden = true;
+
+      try {
+        await init({ module_or_path: "./rhwp_bg.wasm" });
+        const binary = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+        const doc = new HwpDocument(binary);
+        const count = doc.pageCount();
+        const containerW = document.getElementById("scroll").clientWidth - 16;
+        let scale = 1;
+
+        for (let i = 0; i < count; i++) {
+          const info = JSON.parse(doc.getPageInfo(i));
+          if (i === 0) scale = fitScale(info.width, containerW);
+          const w = Math.max(1, Math.floor(info.width * scale));
+          const h = Math.max(1, Math.floor(info.height * scale));
+          const wrap = document.createElement("div");
+          wrap.className = "page";
+          wrap.dataset.page = String(i + 1);
+          wrap.style.width = w + "px";
+          wrap.style.minHeight = h + "px";
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          wrap.appendChild(canvas);
+          pagesEl.appendChild(wrap);
+          doc.renderPageToCanvas(i, canvas, scale);
+        }
+
+        status.textContent = `${fileName || "document.hwp"} · ${count}페이지 · scale ${Math.round(scale * 100)}%`;
+        doc.free();
+        if (window.AndroidBridge) window.AndroidBridge.onRenderComplete(count);
+      } catch (e) {
+        showError(e?.message || String(e));
+        if (window.AndroidBridge) window.AndroidBridge.onRenderError(String(e));
+      }
+    };
+  </script>
+</body>
+</html>

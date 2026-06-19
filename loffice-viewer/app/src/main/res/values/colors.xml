@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="loffice_teal">#0D7377</color>
+    <color name="loffice_teal_dark">#095456</color>
+    <color name="loffice_gold">#C9A227</color>
+    <color name="loffice_silver">#B8C0CC</color>
+    <color name="loffice_blue">#2B579A</color>
+    <color name="loffice_bg">#F4F6FA</color>
+    <color name="loffice_surface">#FFFFFF</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
+</resources>
