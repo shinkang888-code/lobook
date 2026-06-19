@@ -8,6 +8,8 @@
 .kotlin/
 hs_err_pid*.log
 replay_pid*.log
+/release-package/
+loffice-viewer-play-release-*.zip
 .externalNativeBuild
 .cxx
 *.apk
