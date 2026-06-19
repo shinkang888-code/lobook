@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader2, Monitor, Upload, Wrench } from "lucide-react";
+import { Loader2, Monitor, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import type { PageSpec } from "@/lib/editor/types";
+import { HwpBlankCanvas } from "./HwpBlankCanvas";
 import { RhwpCanvasViewer } from "./RhwpCanvasViewer";
 import { HwpxHtmlViewer } from "./HwpxHtmlViewer";
 import { HancomToolkitHub } from "./HancomToolkitHub";
@@ -48,10 +49,16 @@ function HwpToolbarActions({
   inputRef,
   onReload,
   reloading,
+  onConvert,
+  converting,
+  showConvert,
 }: {
   inputRef: React.RefObject<HTMLInputElement | null>;
   onReload: () => void;
   reloading?: boolean;
+  onConvert?: () => void;
+  converting?: boolean;
+  showConvert?: boolean;
 }) {
   return (
     <div className="ml-auto flex shrink-0 items-center gap-1">
@@ -75,6 +82,19 @@ function HwpToolbarActions({
         {reloading ? <Loader2 className="size-3 animate-spin" /> : null}
         서버에서 다시 불러오기
       </Button>
+      {showConvert && onConvert && (
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="h-7 text-[10px]"
+          disabled={converting}
+          onClick={onConvert}
+        >
+          {converting ? <Loader2 className="size-3 animate-spin" /> : null}
+          HTML 변환
+        </Button>
+      )}
     </div>
   );
 }
@@ -94,6 +114,9 @@ export function HwpEditorPanel({
   const [error, setError] = useState<string | null>(null);
   const [buffer, setBuffer] = useState<ArrayBuffer | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
+
+  const hasDocument = Boolean(buffer && fileName);
+  const displayName = fileName ?? "새 문서.hwp";
 
   const loadFromServer = useCallback(async () => {
     setLoadingMeta(true);
@@ -170,67 +193,44 @@ export function HwpEditorPanel({
     );
   }
 
-  if (buffer && fileName) {
-    return (
-      <div className="lo-panel">
-        <HwpFileInput inputRef={inputRef} onFile={handleFile} />
-        <div className="hwp-editor-toolbar">
-          <button
-            type="button"
-            onClick={() => setPanelTab("preview")}
-            className={`hwp-editor-tab ${panelTab === "preview" ? "hwp-editor-tab--active" : ""}`}
-          >
-            <Monitor className="size-3.5" /> 미리보기
-          </button>
-          <button
-            type="button"
-            onClick={() => setPanelTab("toolkit")}
-            className={`hwp-editor-tab ${panelTab === "toolkit" ? "hwp-editor-tab--active" : ""}`}
-          >
-            <Wrench className="size-3.5" /> 한컴 툴킷
-          </button>
-          <span className="truncate text-[10px] text-gray-500">{fileName}</span>
-          <div className="ml-auto flex shrink-0 items-center gap-1">
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              className="h-7 text-[10px]"
-              onClick={() => inputRef.current?.click()}
-            >
-              HWP/HWPX 선택
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              className="h-7 text-[10px]"
-              onClick={() => void loadFromServer()}
-            >
-              서버에서 다시 불러오기
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              className="h-7 text-[10px]"
-              disabled={converting}
-              onClick={() => void handleConvertHtml()}
-            >
-              {converting ? <Loader2 className="size-3 animate-spin" /> : null}
-              HTML 변환
-            </Button>
-          </div>
-        </div>
+  return (
+    <div className="lo-panel">
+      <HwpFileInput inputRef={inputRef} onFile={handleFile} />
+      <div className="hwp-editor-toolbar">
+        <button
+          type="button"
+          onClick={() => setPanelTab("preview")}
+          className={`hwp-editor-tab ${panelTab === "preview" ? "hwp-editor-tab--active" : ""}`}
+        >
+          <Monitor className="size-3.5" /> 미리보기
+        </button>
+        <button
+          type="button"
+          onClick={() => setPanelTab("toolkit")}
+          className={`hwp-editor-tab ${panelTab === "toolkit" ? "hwp-editor-tab--active" : ""}`}
+        >
+          <Wrench className="size-3.5" /> 한컴 툴킷
+        </button>
+        <span className="truncate text-[10px] text-gray-500">{displayName}</span>
+        <HwpToolbarActions
+          inputRef={inputRef}
+          onReload={() => void loadFromServer()}
+          reloading={loadingMeta}
+          onConvert={() => void handleConvertHtml()}
+          converting={converting}
+          showConvert={hasDocument}
+        />
+      </div>
 
-        <div className="lo-panel-body flex flex-col">
-          {panelTab === "toolkit" ? (
-            <HancomToolkitHub
-              bookId={bookId}
-              fileName={fileName}
-              onConvertHtml={() => void handleConvertHtml()}
-            />
-          ) : isHwpxFileName(fileName) ? (
+      <div className="lo-panel-body flex flex-col">
+        {panelTab === "toolkit" ? (
+          <HancomToolkitHub
+            bookId={bookId}
+            fileName={fileName}
+            onConvertHtml={hasDocument ? () => void handleConvertHtml() : undefined}
+          />
+        ) : hasDocument && buffer && fileName ? (
+          isHwpxFileName(fileName) ? (
             <HwpxHtmlViewer
               buffer={buffer}
               fileName={fileName}
@@ -250,46 +250,26 @@ export function HwpEditorPanel({
               onPageCountChange={onPageCountChange}
               onError={setError}
             />
-          )}
-        </div>
-
-        {error && panelTab === "preview" && (
-          <p className="shrink-0 px-2 py-1 text-[10px] text-red-600">{error}</p>
+          )
+        ) : (
+          <HwpBlankCanvas
+            pageSpec={pageSpec}
+            zoom={zoom}
+            activePage={activePage}
+            onPageCountChange={onPageCountChange}
+          />
         )}
-        <p className="hwp-editor-footer">
-          {isHwpxFileName(fileName)
-            ? "HWPX 추출 + 한컴 툴킷 · Ribbon 가져오기 또는 「HTML 변환」"
-            : "HWP Canvas + 한컴오피스 뷰어 연동 · 툴킷 탭에서 분석·다운로드"}
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="lo-panel">
-      <HwpFileInput inputRef={inputRef} onFile={handleFile} />
-      <div className="hwp-editor-toolbar">
-        <span className="text-[11px] font-medium text-slate-700">한컴 HWP 편집기</span>
-        <HwpToolbarActions
-          inputRef={inputRef}
-          onReload={() => void loadFromServer()}
-          reloading={loadingMeta}
-        />
       </div>
 
-      <div className="lo-panel-body hwp-editor-empty">
-        <Upload className="mb-4 size-12 text-gray-300" />
-        <h3 className="mb-2 text-sm font-semibold text-gray-700">HWP 문서를 열어 주세요</h3>
-        <p className="max-w-md text-center text-xs leading-relaxed text-gray-500">
-          HWP Canvas / HWPX HTML 미리보기 + 한컴 툴킷(문서 분석·뷰어·파이프라인).
-          <br />
-          ({pageSpec.preset_id.toUpperCase()} 규격)
-        </p>
-        {error && <p className="mt-4 text-xs text-red-500">{error}</p>}
-      </div>
-
+      {error && panelTab === "preview" && (
+        <p className="shrink-0 px-2 py-1 text-[10px] text-red-600">{error}</p>
+      )}
       <p className="hwp-editor-footer">
-        상단 「HWP/HWPX 선택」 또는 Ribbon → HWP 가져오기로 문서를 불러올 수 있습니다.
+        {hasDocument
+          ? isHwpxFileName(fileName!)
+            ? "HWPX 추출 + 한컴 툴킷 · Ribbon 가져오기 또는 「HTML 변환」"
+            : "HWP Canvas + 한컴오피스 뷰어 연동 · 툴킷 탭에서 분석·다운로드"
+          : "빈 HWP 캔버스 · 상단 「HWP/HWPX 선택」 또는 Ribbon → HWP 가져오기"}
       </p>
     </div>
   );
