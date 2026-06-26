@@ -1,6 +1,8 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabaseClient";
+import { getDataBackend } from "@/lib/dbMode";
+import { getPptExportColumnsNeon, updateBookColumnsNeon } from "@/lib/neonBookStore";
+import { getSupabaseAdmin } from "@/lib/supabaseClient";
 
 const META_DIR = path.join(process.cwd(), ".data", "book-ppt-meta");
 
@@ -22,7 +24,7 @@ export async function setLatestPptExport(
 ): Promise<void> {
   const record: PptExportMeta = { ...meta, updatedAt: new Date().toISOString() };
 
-  if (isSupabaseConfigured()) {
+  if (getDataBackend() === "supabase") {
     const admin = getSupabaseAdmin();
     if (admin) {
       const { error } = await admin
@@ -36,12 +38,19 @@ export async function setLatestPptExport(
     }
   }
 
+  if (getDataBackend() === "neon") {
+    await updateBookColumnsNeon(bookId, {
+      ppt_export_path: record.storagePath,
+      ppt_export_name: record.fileName,
+    });
+  }
+
   await fs.mkdir(META_DIR, { recursive: true });
   await fs.writeFile(metaPath(bookId), JSON.stringify(record, null, 2), "utf-8");
 }
 
 export async function getLatestPptExport(bookId: string): Promise<PptExportMeta | null> {
-  if (isSupabaseConfigured()) {
+  if (getDataBackend() === "supabase") {
     const admin = getSupabaseAdmin();
     if (admin) {
       const { data, error } = await admin
@@ -58,6 +67,18 @@ export async function getLatestPptExport(bookId: string): Promise<PptExportMeta 
           updatedAt: new Date().toISOString(),
         };
       }
+    }
+  }
+
+  if (getDataBackend() === "neon") {
+    const row = await getPptExportColumnsNeon(bookId);
+    if (row.path) {
+      return {
+        storagePath: row.path,
+        fileName: row.name ?? "presentation.pptx",
+        slideCount: 0,
+        updatedAt: new Date().toISOString(),
+      };
     }
   }
 

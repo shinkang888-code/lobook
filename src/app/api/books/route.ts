@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { createBook, listBooks } from "@/lib/bookService";
+import { getStorageLabel } from "@/lib/dbMode";
 
 export async function GET() {
   try {
     const books = await listBooks();
-    return NextResponse.json({ books, storage: process.env.NEXT_PUBLIC_SUPABASE_URL ? "supabase" : "local" });
+    return NextResponse.json({ books, storage: getStorageLabel() });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "목록 조회 실패" },

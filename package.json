@@ -45,6 +45,7 @@
     "@microscope-js/renderer-docx": "^0.1.5",
     "@microscope-js/renderer-image": "^0.1.5",
     "@microscope-js/renderer-pdf": "^0.1.5",
+    "@neondatabase/serverless": "^1.1.0",
     "@rhwp/core": "^0.7.15",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",

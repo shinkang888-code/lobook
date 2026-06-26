@@ -1,15 +1,24 @@
 import { NextResponse } from "next/server";
 import { getBookStructure } from "@/lib/chapterService";
-import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabaseClient";
+import { getDataBackend } from "@/lib/dbMode";
+import { createBookVersionNeon, listBookVersionsNeon } from "@/lib/neonBookStore";
+import { getSupabaseAdmin } from "@/lib/supabaseClient";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(_request: Request, { params }: Params) {
   try {
     const { id } = await params;
-    if (!isSupabaseConfigured()) {
+    const backend = getDataBackend();
+    if (backend === "local") {
       return NextResponse.json({ versions: [] });
     }
+
+    if (backend === "neon") {
+      const versions = await listBookVersionsNeon(id);
+      return NextResponse.json({ versions });
+    }
+
     const admin = getSupabaseAdmin();
     if (!admin) return NextResponse.json({ versions: [] });
 
@@ -39,8 +48,16 @@ export async function POST(request: Request, { params }: Params) {
       return NextResponse.json({ error: "책을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    if (!isSupabaseConfigured()) {
-      return NextResponse.json({ ok: true, local: true, message: "로컬 모드 — 버전은 Supabase에서만 저장됩니다." });
+    const backend = getDataBackend();
+    if (backend === "local") {
+      return NextResponse.json({ ok: true, local: true, message: "로컬 모드 — 버전은 원격 DB에서만 저장됩니다." });
+    }
+
+    const label = body.label?.trim() || `스냅샷 ${new Date().toLocaleString("ko-KR")}`;
+
+    if (backend === "neon") {
+      const version = await createBookVersionNeon(id, structure, label);
+      return NextResponse.json({ version });
     }
 
     const admin = getSupabaseAdmin();
@@ -51,7 +68,7 @@ export async function POST(request: Request, { params }: Params) {
       .insert({
         book_id: id,
         snapshot: structure,
-        label: body.label?.trim() || `스냅샷 ${new Date().toLocaleString("ko-KR")}`,
+        label,
       })
       .select("id, label, created_at")
       .single();

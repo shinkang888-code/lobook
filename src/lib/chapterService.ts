@@ -7,7 +7,9 @@ import {
   mergeBookWithSpec,
   saveLocalStructure,
 } from "./localStructureStore";
-import { getSupabaseAdmin, isSupabaseConfigured } from "./supabaseClient";
+import { getDataBackend } from "./dbMode";
+import { getBookStructureNeon, saveBookStructureNeon } from "./neonChapterStore";
+import { getSupabaseAdmin } from "./supabaseClient";
 import type { Book, BookStructure, Chapter, Page, SaveStructureInput } from "./types";
 
 function parsePageSpec(raw: unknown): PageSpec {
@@ -131,9 +133,18 @@ export async function getBookStructure(bookId: string): Promise<BookStructure | 
 
   const book = mergeBookWithSpec(rawBook);
 
-  if (!isSupabaseConfigured()) {
+  if (getDataBackend() === "local") {
     const { chapters, pages } = await getLocalStructure(book);
     return { book, chapters, pages };
+  }
+
+  if (getDataBackend() === "neon") {
+    try {
+      return await getBookStructureNeon(book);
+    } catch {
+      const { chapters, pages } = await getLocalStructure(book);
+      return { book, chapters, pages };
+    }
   }
 
   try {
@@ -163,9 +174,18 @@ export async function saveBookStructure(bookId: string, input: SaveStructureInpu
     page_spec: input.page_spec,
   });
 
-  if (!isSupabaseConfigured()) {
+  if (getDataBackend() === "local") {
     await saveLocalStructure(bookId, input);
     return getBookStructure(bookId);
+  }
+
+  if (getDataBackend() === "neon") {
+    try {
+      return await saveBookStructureNeon(bookId, input);
+    } catch {
+      await saveLocalStructure(bookId, input);
+      return getBookStructure(bookId);
+    }
   }
 
   try {

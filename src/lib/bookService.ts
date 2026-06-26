@@ -1,6 +1,14 @@
 import { DEFAULT_PAGE_SPEC } from "@/lib/editor/pageSpec";
 import type { PageSpec } from "@/lib/editor/types";
-import { getSupabaseAdmin, isSupabaseConfigured } from "./supabaseClient";
+import { getDataBackend } from "./dbMode";
+import {
+  createBookNeon,
+  deleteBookNeon,
+  getBookNeon,
+  listBooksNeon,
+  updateBookNeon,
+} from "./neonBookStore";
+import { getSupabaseAdmin } from "./supabaseClient";
 import {
   createLocalBook,
   deleteLocalBook,
@@ -32,7 +40,9 @@ function mapRow(row: Record<string, unknown>): Book {
 }
 
 export async function listBooks(): Promise<Book[]> {
-  if (!isSupabaseConfigured()) return listLocalBooks();
+  const backend = getDataBackend();
+  if (backend === "local") return listLocalBooks();
+  if (backend === "neon") return listBooksNeon();
 
   const admin = getSupabaseAdmin()!;
   const { data, error } = await admin
@@ -45,7 +55,9 @@ export async function listBooks(): Promise<Book[]> {
 }
 
 export async function getBook(id: string): Promise<Book | null> {
-  if (!isSupabaseConfigured()) return getLocalBook(id);
+  const backend = getDataBackend();
+  if (backend === "local") return getLocalBook(id);
+  if (backend === "neon") return getBookNeon(id);
 
   const admin = getSupabaseAdmin()!;
   const { data, error } = await admin.from("books").select("*").eq("id", id).maybeSingle();
@@ -54,7 +66,9 @@ export async function getBook(id: string): Promise<Book | null> {
 }
 
 export async function createBook(input: CreateBookInput): Promise<Book> {
-  if (!isSupabaseConfigured()) return createLocalBook(input);
+  const backend = getDataBackend();
+  if (backend === "local") return createLocalBook(input);
+  if (backend === "neon") return createBookNeon(input);
 
   const admin = getSupabaseAdmin()!;
   const payload = {
@@ -70,7 +84,9 @@ export async function createBook(input: CreateBookInput): Promise<Book> {
 }
 
 export async function updateBook(id: string, input: UpdateBookInput): Promise<Book | null> {
-  if (!isSupabaseConfigured()) return updateLocalBook(id, input);
+  const backend = getDataBackend();
+  if (backend === "local") return updateLocalBook(id, input);
+  if (backend === "neon") return updateBookNeon(id, input);
 
   const admin = getSupabaseAdmin()!;
   const { data, error } = await admin
@@ -85,7 +101,9 @@ export async function updateBook(id: string, input: UpdateBookInput): Promise<Bo
 }
 
 export async function deleteBook(id: string): Promise<boolean> {
-  if (!isSupabaseConfigured()) return deleteLocalBook(id);
+  const backend = getDataBackend();
+  if (backend === "local") return deleteLocalBook(id);
+  if (backend === "neon") return deleteBookNeon(id);
 
   const admin = getSupabaseAdmin()!;
   const { error } = await admin.from("books").delete().eq("id", id);

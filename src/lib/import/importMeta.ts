@@ -1,6 +1,11 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabaseClient";
+import { getDataBackend } from "@/lib/dbMode";
+import {
+  getBookImportColumnsNeon,
+  updateBookColumnsNeon,
+} from "@/lib/neonBookStore";
+import { getSupabaseAdmin } from "@/lib/supabaseClient";
 
 const META_DIR = path.join(process.cwd(), ".data", "book-import-meta");
 
@@ -38,11 +43,17 @@ async function updateBookColumns(
   bookId: string,
   columns: Record<string, string | null>,
 ): Promise<void> {
-  if (!isSupabaseConfigured()) return;
-  const admin = getSupabaseAdmin();
-  if (!admin) return;
-  const { error } = await admin.from("books").update(columns).eq("id", bookId);
-  if (error) throw new Error(error.message);
+  const backend = getDataBackend();
+  if (backend === "neon") {
+    await updateBookColumnsNeon(bookId, columns);
+    return;
+  }
+  if (backend === "supabase") {
+    const admin = getSupabaseAdmin();
+    if (!admin) return;
+    const { error } = await admin.from("books").update(columns).eq("id", bookId);
+    if (error) throw new Error(error.message);
+  }
 }
 
 export async function setLatestImport(
@@ -74,7 +85,7 @@ export async function getLatestImport(
   bookId: string,
   kind: "hwp" | "docx" | "pdf",
 ): Promise<ImportFileMeta | null> {
-  if (isSupabaseConfigured()) {
+  if (getDataBackend() === "supabase") {
     const admin = getSupabaseAdmin();
     if (admin) {
       const selectMap = {
@@ -107,6 +118,17 @@ export async function getLatestImport(
           updatedAt: new Date().toISOString(),
         };
       }
+    }
+  }
+
+  if (getDataBackend() === "neon") {
+    const row = await getBookImportColumnsNeon(bookId, kind);
+    if (row.path) {
+      return {
+        storagePath: row.path,
+        fileName: row.name ?? `document.${kind}`,
+        updatedAt: new Date().toISOString(),
+      };
     }
   }
 
