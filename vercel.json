@@ -1,0 +1,13 @@
+{
+  "experimentalServices": {
+    "frontend": {
+      "routePrefix": "/",
+      "framework": "nextjs"
+    },
+    "markitdown-api": {
+      "root": "services/markitdown-api",
+      "entrypoint": "main:app",
+      "routePrefix": "/_/markitdown-api"
+    }
+  }
+}
